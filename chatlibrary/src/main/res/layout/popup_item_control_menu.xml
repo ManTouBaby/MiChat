@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+
+    <ImageView
+        android:id="@+id/up_tag"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_centerHorizontal="true"
+        android:src="@mipmap/icon_strangle_up" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/show_item_control_menu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/up_tag"
+        android:layout_marginTop="-4dp"
+        android:background="@drawable/icon_corner_white_bg" />
+
+</RelativeLayout>

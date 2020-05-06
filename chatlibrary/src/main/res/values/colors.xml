@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="mi_chat_main_bg">#EDEDED</color><!--聊天界面总体背景-->
+    <color name="mi_chat_black_bg">#000000</color><!--聊天界面总体背景-->
+    <color name="mi_input_bg">#F5F5F5</color><!--输入控件背景-->
+    <color name="mi_white_bg">#FFFFFF</color>
+    <color name="mi_gray_bg">#F8F8F8</color><!--灰色背景-->
+    <color name="mi_deep_gray_bg">#EAEAEA</color><!--灰色背景-->
+    <color name="mi_text_black">#000000</color>
+    <color name="mi_text_white">#FFFFFF</color>
+    <color name="mi_text_title">#333333</color>
+    <color name="mi_text_gray">#888888</color>
+    <color name="mi_text_deep_gray">#6f6f6f</color>
+    <color name="divider_line">#E3E3E3</color>
+    <color name="common_greed">#75D3AB</color>
+    <color name="common_red">#F56F56</color>
+    <color name="common_purple">#9D71EE</color>
+
+</resources>

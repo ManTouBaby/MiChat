@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/chat_item_padding"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include layout="@layout/include_chat_item_time_tip" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mi_message_time"
+        android:gravity="end"
+        android:orientation="horizontal">
+
+        <include layout="@layout/include_chat_send_status" />
+
+        <RelativeLayout
+            android:id="@+id/mi_content_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/mi_item_pro"
+            android:layout_marginRight="8dp"
+            android:layout_toLeftOf="@+id/mi_item_pro">
+
+            <LinearLayout
+                android:id="@+id/mi_void_container"
+                android:layout_width="90dp"
+                android:layout_height="wrap_content"
+                android:background="@mipmap/icon_m_txt_bg"
+                android:gravity="center"
+                android:padding="0dp">
+
+                <TextView
+                    android:id="@+id/mi_voice_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="8dp"
+                    android:text="10``"
+                    android:textColor="@color/mi_text_black" />
+
+                <ImageView
+                    android:id="@+id/mi_voice_animate_holder"
+                    android:layout_width="24dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/icon_player_m_voice" />
+
+            </LinearLayout>
+        </RelativeLayout>
+
+        <include layout="@layout/include_chat_m_item_pro" />
+    </LinearLayout>
+
+</RelativeLayout>

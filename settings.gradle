@@ -1,0 +1,2 @@
+include ':app', ':chatlibrary'
+rootProject.name='MiChat'

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/chat_item_padding"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include layout="@layout/include_chat_item_time_tip" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/mi_message_time"
+        android:orientation="horizontal">
+
+        <include layout="@layout/include_chat_send_status" />
+
+        <RelativeLayout
+            android:id="@+id/mi_content_container"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="8dp"
+            android:layout_weight="1"
+            android:background="@mipmap/icon_m_white_bg"
+            android:padding="12dp">
+
+            <TextView
+                android:id="@+id/mi_file_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/mi_file_type_tag"
+                android:layout_toLeftOf="@+id/mi_file_type_tag"
+                android:ellipsize="end"
+                android:gravity="left"
+                android:lineSpacingExtra="6dp"
+                android:maxLines="2"
+                android:text="文件称文件名称文件名称件名称"
+                android:textColor="@color/mi_text_black" />
+
+            <TextView
+                android:id="@+id/mi_file_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/mi_file_name"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="4dp"
+                android:text="12.2k"
+                android:textSize="12sp" />
+
+
+            <ImageView
+                android:id="@+id/mi_file_type_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="8dp"
+                android:scaleType="centerInside"
+                android:src="@mipmap/icon_zip" />
+        </RelativeLayout>
+
+
+        <include layout="@layout/include_chat_m_item_pro" />
+    </LinearLayout>
+
+
+</RelativeLayout>

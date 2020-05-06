@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+
+
+    <ImageView
+        android:id="@+id/mi_item_video_bg"
+        android:layout_width="110dp"
+        android:layout_height="168dp"
+        android:src="@mipmap/bms"
+        android:scaleType="centerCrop" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:src="@mipmap/icon_video_player_tag" />
+
+    <TextView
+        android:id="@+id/mi_item_video_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/mi_item_video_bg"
+        android:layout_alignBottom="@+id/mi_item_video_bg"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="0:15"
+        android:textColor="@color/mi_text_white" />
+</RelativeLayout>

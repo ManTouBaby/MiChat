@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--聊天item布局中的内布局-->
+    <style name="chat_item_padding">
+        <item name="android:paddingRight">12dp</item>
+        <item name="android:paddingLeft">12dp</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">6dp</item>
+        <item name="android:background">@color/mi_gray_bg</item>
+    </style>
+    <!--聊天布局中item的头像大小-->
+    <style name="chat_pro_width_height">
+        <item name="android:layout_width">42dp</item>
+        <item name="android:layout_height">42dp</item>
+        <item name="android:layout_below">@+id/mi_message_time</item>
+    </style>
+    <!--聊天布局中item内容和头像的间距-->
+    <style name="chat_m_pro_content_space">
+        <item name="android:layout_marginRight">10dp</item>
+        <item name="android:layout_marginLeft">48dp</item>
+    </style>
+
+    <style name="chat_o_pro_content_space">
+        <item name="android:layout_marginRight">48dp</item>
+        <item name="android:layout_marginLeft">8dp</item>
+    </style>
+
+
+    <!-- 自定义圆角ImageView -->
+    <declare-styleable name="CornerImageView">
+        <attr name="circle" format="boolean" />
+        <attr name="radius" format="dimension" />
+    </declare-styleable>
+
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="36dp"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
+    android:visibility="visible">
+
+    <ProgressBar
+        android:id="@+id/mi_pull_down_load_more"
+        style="@android:style/Widget.ProgressBar.Small.Inverse"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</RelativeLayout>

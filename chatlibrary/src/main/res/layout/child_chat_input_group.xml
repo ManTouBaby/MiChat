@@ -1,0 +1,157 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mi_chat_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider_line" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/mi_input_bg"
+            android:gravity="bottom"
+            android:orientation="horizontal"
+            android:paddingLeft="8dp"
+            android:paddingTop="4dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="4dp">
+
+            <ImageView
+                android:id="@+id/emotion_voice"
+                android:layout_width="24dp"
+                android:layout_height="48dp"
+                android:layout_marginRight="8dp"
+                android:clickable="true"
+                android:src="@mipmap/icon_chat_voice" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <EditText
+                    android:id="@+id/edit_text"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginBottom="6dp"
+                    android:background="@drawable/icon_edit_text_bg"
+                    android:clickable="true"
+                    android:focusableInTouchMode="true"
+                    android:maxLines="3"
+                    android:paddingLeft="16dp"
+                    android:paddingRight="16dp"
+                    android:textSize="16sp" />
+
+                <RelativeLayout
+                    android:id="@+id/mi_quote_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="36dp"
+                    android:layout_marginBottom="6dp"
+                    android:visibility="gone">
+
+                    <TextView
+                        android:id="@+id/item_quote_tag"
+                        android:layout_width="match_parent"
+                        android:layout_height="26dp"
+                        android:layout_centerVertical="true"
+                        android:background="@drawable/icon_corner_deep_gray_bg"
+                        android:ellipsize="end"
+                        android:gravity="center_vertical"
+                        android:lines="1"
+                        android:paddingLeft="8dp"
+                        android:paddingRight="28dp"
+                        android:text="sdsd"
+                        android:textColor="@color/mi_text_deep_gray"
+                        android:textSize="12sp" />
+
+                    <ImageView
+                        android:id="@+id/mi_close_quote"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_alignParentRight="true"
+                        android:layout_centerVertical="true"
+                        android:padding="4dp"
+                        android:src="@mipmap/icon_white_delete" />
+                </RelativeLayout>
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/voice_text"
+                android:layout_width="0dp"
+                android:layout_height="36dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/icon_voice_long_click"
+                android:clickable="true"
+                android:gravity="center"
+                android:minHeight="36dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="按住说话"
+                android:visibility="gone" />
+
+            <ImageView
+                android:id="@+id/emotion_smile"
+                android:layout_width="24dp"
+                android:layout_height="48dp"
+                android:layout_marginRight="8dp"
+                android:clickable="true"
+                android:src="@mipmap/icon_chat_expression" />
+
+            <ImageView
+                android:id="@+id/emotion_add"
+                android:layout_width="24dp"
+                android:layout_height="48dp"
+                android:clickable="true"
+                android:src="@mipmap/icon_chat_add" />
+
+            <Button
+                android:id="@+id/emotion_send"
+                android:layout_width="0dp"
+                android:layout_height="28dp"
+                android:layout_marginBottom="5dp"
+                android:background="@drawable/icon_send_btn_bg"
+                android:text="发送"
+                android:textColor="@color/mi_text_white" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/divider_line" />
+
+        <RelativeLayout
+            android:id="@+id/emotion_layout"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@color/mi_input_bg"
+            android:orientation="vertical">
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/mi_other_send_content"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
