@@ -21,13 +21,14 @@ import java.util.List;
 @Entity(indices = {@Index("id"), @Index("createMillis")}, tableName = "instructModel")
 @TypeConverters(InstructAcceptorConverter.class)
 public class InstructBean implements Serializable {
-    private String title;//指令标题
-    private String content;//指令内容
-    private List<MessageHolder> accepters;//接收人员信息
-    private String netFilePath;//网络地址
-    private long duration;//视频时长
-    private float fileSize;//文件大小
-    private String fileName;//文件名称
+    private String              title;      //指令标题
+    private String              content;     //指令内容
+    private List<MessageHolder> accepters;  //接收人员信息
+    private String              netFilePath;//网络地址
+    private long                duration;   //视频时长
+    private float               fileSize;   //文件大小
+    private String              fileName;   //文件名称
+    private int                 replyStatus;//回复状态 0:未回复  1:已回复
 
     @NonNull
     @PrimaryKey
@@ -37,11 +38,19 @@ public class InstructBean implements Serializable {
     private String createStr;//消息生成时间
     @JSONField(serialize = false)
     private long createMillis;//消息生成时间戳
-//    @JSONField(serialize = false)
+    //    @JSONField(serialize = false)
     private String localFilePath;//本地地址
     @Ignore
     @JSONField(serialize = false)
     private boolean isOpenControl;//是否打开操作
+
+    public int getReplyStatus() {
+        return replyStatus;
+    }
+
+    public void setReplyStatus(int replyStatus) {
+        this.replyStatus = replyStatus;
+    }
 
     public boolean isOpenControl() {
         return isOpenControl;

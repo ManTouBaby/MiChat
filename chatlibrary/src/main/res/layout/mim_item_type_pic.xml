@@ -29,7 +29,7 @@
                 android:id="@+id/mi_item_pic"
                 android:layout_width="110dp"
                 android:layout_height="168dp"
-                android:scaleType="centerCrop" />
+                android:scaleType="fitXY" />
 
         </RelativeLayout>
 

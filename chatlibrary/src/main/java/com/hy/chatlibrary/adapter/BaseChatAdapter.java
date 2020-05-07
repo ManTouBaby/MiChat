@@ -26,8 +26,8 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
     private SparseIntArray itemTypes;
     List<ChatMessage> mChatMessages = new ArrayList<>();
     private OnSendFailTagClickListener mOnSendFailTagClickListener;
-    private OnChatItemChildClickListener mOnChatItemChildClickListener;
-    private OnChatItemChildLongClickListener mOnChatItemChildLongClickListener;
+    private OnItemChildClickListener mOnChatItemChildClickListener;
+    private OnItemChildLongClickListener mOnChatItemChildLongClickListener;
     private OnPullDownLoadMoreListener mOnPullDownLoadMoreListener;
     private boolean onPullDowning;//是否正在下拉加载
     private boolean onLoadMoreComplete;//是否下拉完成
@@ -211,7 +211,7 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
         this.mOnSendFailTagClickListener = mOnSendFailTagClickListener;
     }
 
-    public void setOnChatItemChildClickListener(OnChatItemChildClickListener mOnChatItemChildClickListener) {
+    public void setOnItemChildClickListener(OnItemChildClickListener mOnChatItemChildClickListener) {
         this.mOnChatItemChildClickListener = mOnChatItemChildClickListener;
     }
 
@@ -219,7 +219,7 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
         this.mOnPullDownLoadMoreListener = mOnPullDownLoadMoreListener;
     }
 
-    public void setOnChatItemChildLongClickListener(OnChatItemChildLongClickListener mOnChatItemChildLongClickListener) {
+    public void setOnItemChildLongClickListener(OnItemChildLongClickListener mOnChatItemChildLongClickListener) {
         this.mOnChatItemChildLongClickListener = mOnChatItemChildLongClickListener;
     }
 }

@@ -26,39 +26,36 @@ public class ChatMessageCreator {
     private String mChatGroupId;
     private String mChatGroupName;
     private int mChatGroupType;
-    private AMapLocation mAMapLocation;
     private OnLocalMessageControl localMessageControl;
 
-    public ChatMessageCreator(String mChatGroupId, String mChatGroupName, int mChatGroupType, MiChatHelper mMiChatHelper, MessageHolder mMessageHolder, AMapLocation mAMapLocation, Handler mHandler, OnLocalMessageControl localMessageControl) {
+    public ChatMessageCreator(String mChatGroupId, String mChatGroupName, MiChatHelper mMiChatHelper, MessageHolder mMessageHolder, Handler mHandler, OnLocalMessageControl localMessageControl) {
         this.mMiChatHelper = mMiChatHelper;
         this.mMessageHolder = mMessageHolder;
         this.mHandler = mHandler;
         this.mChatGroupId = mChatGroupId;
         this.mChatGroupName = mChatGroupName;
-        this.mChatGroupType = mChatGroupType;
-        this.mAMapLocation = mAMapLocation;
         this.localMessageControl = localMessageControl;
     }
 
     //发送指令
-    public void createChatMessage(InstructBean instructBean, OnChatMessageCreateListener onChatMessageCreateListener) {
-        createChatMessage(6, instructBean, "发送指令", 0, null, null, 0, 0, onChatMessageCreateListener);
+    public void createChatMessage(AMapLocation mAMapLocation, InstructBean instructBean, OnChatMessageCreateListener onChatMessageCreateListener) {
+        createChatMessage(6, mAMapLocation, instructBean, "发送指令", 0, null, null, 0, 0, onChatMessageCreateListener);
     }
 
     //位置发送
-    public void createChatMessage(int contentType, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
-        createChatMessage(contentType, null, "发送定位", 0, locationAddress, locationRoad, latitude, longitude, messageCreateListener);
+    public void createChatMessage(AMapLocation mAMapLocation, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
+        createChatMessage(4, mAMapLocation, null, "发送定位", 0, locationAddress, locationRoad, latitude, longitude, messageCreateListener);
     }
 
-    public void createChatMessage(int contentType, String content, long duration, OnChatMessageCreateListener messageCreateListener) {
-        createChatMessage(contentType, null, content, duration, null, null, 0, 0, messageCreateListener);
+    public void createChatMessage(int contentType, AMapLocation mAMapLocation, String content, long duration, OnChatMessageCreateListener messageCreateListener) {
+        createChatMessage(contentType, mAMapLocation, null, content, duration, null, null, 0, 0, messageCreateListener);
     }
 
-    public void createChatMessage(int contentType, String content, OnChatMessageCreateListener messageCreateListener) {
-        createChatMessage(contentType, null, content, 0, null, null, 0, 0, messageCreateListener);
+    public void createChatMessage(int contentType, AMapLocation mAMapLocation, String content, OnChatMessageCreateListener messageCreateListener) {
+        createChatMessage(contentType, mAMapLocation, null, content, 0, null, null, 0, 0, messageCreateListener);
     }
 
-    public void createChatMessage(int contentType, InstructBean instructBean, String content, long duration, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
+    public void createChatMessage(int contentType, AMapLocation mAMapLocation, InstructBean instructBean, String content, long duration, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
         DateUtil.getNetTimeMilliByURL(mMiChatHelper.getNetTimeUrl(), mHandler, netMilli -> {
             ChatMessage chatMessage = new ChatMessage();
             if (contentType == 4) {
@@ -101,9 +98,16 @@ public class ChatMessageCreator {
 
     public String getChatMessageJson(ChatMessage message) {
         String json = null;
-        SimplePropertyPreFilter filter = new SimplePropertyPreFilter();
-        filter.getExcludes().add("localFilePath");
-        json = JSONObject.toJSONString(message, filter, SerializerFeature.WriteMapNullValue);
+//        PropertyFilter profilter = (object, name, value) -> {
+//            if (name.equals("localFilePath")) {
+//                // false表示字段将被排除在外
+//                return false;
+//            }
+//            return true;
+//        };
+        SimplePropertyPreFilter profilter = new SimplePropertyPreFilter();
+        profilter.getExcludes().add("localFilePath");
+        json = JSONObject.toJSONString(message, profilter, SerializerFeature.WriteMapNullValue);
         return json;
     }
 

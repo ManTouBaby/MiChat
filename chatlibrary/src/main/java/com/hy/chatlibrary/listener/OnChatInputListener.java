@@ -17,4 +17,5 @@ public interface OnChatInputListener {
     //初始化列表
     void onInitChatList(ChatMessage chatMessage, OnNetMessageControl onNetMessageControl);
 
+    void onDestroy();
 }

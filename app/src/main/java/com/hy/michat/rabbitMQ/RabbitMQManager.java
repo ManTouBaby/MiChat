@@ -13,6 +13,7 @@ import com.hy.message.center.init.RabbitMQInit;
 import com.hy.message.center.listener.ConnSuccessListener;
 import com.hy.message.center.listener.ReConnErrorListener;
 import com.hy.message.center.listener.TaskListener;
+import com.hy.michat.LoginTag;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -95,14 +96,14 @@ public class RabbitMQManager implements TaskListener, ConnSuccessListener, ReCon
     public void ConnSuccess() {
         isLoginSuccess = true;
         System.out.println("登录成功");
-        EventBus.getDefault().post(isLoginSuccess);
+        EventBus.getDefault().post(new LoginTag(true));
     }
 
     @Override
     public void reConnError(String s) {
         isLoginSuccess = false;
         System.out.println("失败");
-        EventBus.getDefault().post(isLoginSuccess);
+        EventBus.getDefault().post(new LoginTag(false));
     }
 
     @StringDef({MSG_TO, GROUP_ID})

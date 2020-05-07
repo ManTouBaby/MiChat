@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/mi_gray_bg"
     android:orientation="vertical">
 
     <LinearLayout
@@ -25,4 +27,114 @@
             android:textColor="@color/mi_text_black" />
 
     </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/mi_white_bg"
+        android:orientation="horizontal"
+        android:padding="16dp">
+
+        <com.hy.chatlibrary.widget.CornerImageView
+            android:id="@+id/mi_member_por"
+            android:layout_width="68dp"
+            android:layout_height="68dp"
+            android:scaleType="fitXY"
+            android:src="@mipmap/b_o"
+            app:radius="4dp" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="16dp"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/mi_member_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="名称"
+                android:textColor="@color/mi_text_black"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="所属单位："
+                    android:textColor="@color/mi_text_gray" />
+
+                <TextView
+                    android:id="@+id/mi_member_depart"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="政治处"
+                    android:textColor="@color/mi_text_deep_gray" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="工作职务："
+                    android:textColor="@color/mi_text_gray" />
+
+                <TextView
+                    android:id="@+id/mi_member_duty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="政治处处长"
+                    android:textColor="@color/mi_text_deep_gray" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="联系方式："
+                    android:textColor="@color/mi_text_gray" />
+
+                <TextView
+                    android:id="@+id/mi_member_phone"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="13829795301"
+                    android:textColor="@color/mi_text_deep_gray" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:background="@color/mi_white_bg"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="12dp"
+            android:text="发送消息" />
+    </LinearLayout>
+
+
 </LinearLayout>

@@ -8,6 +8,7 @@ import java.io.Serializable;
  * @desc:
  */
 public class MessageHolder implements Serializable {
+
     //信息持有者
     private String id;//消息发送人的唯一Id
     private String name;//消息发送人名称
@@ -17,6 +18,8 @@ public class MessageHolder implements Serializable {
     private String portrait;//消息发送人头像
     private String mobile;//移动电话
     private int gender;//性别 男:0  女:1
+
+
 
     public String getId() {
         return id;

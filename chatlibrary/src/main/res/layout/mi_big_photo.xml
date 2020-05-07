@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.lcw.library.imagepicker.view.PinchImageView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.mt.filepicker.view.PinchImageView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/mi_big_pic"
     android:layout_width="match_parent"
     android:layout_height="match_parent"

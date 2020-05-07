@@ -21,7 +21,7 @@ import com.hy.chatlibrary.bean.MessageHolder;
 @TypeConverters({MessageHolderConverter.class, InstructConverter.class})
 public class ChatMessage extends BaseSmartBO {
 
-    //itemType :自己的类型 0:文字 1:语音 2:视屏 3:图片 4:地图 5:文件 6：指令
+    //itemType :自己的类型 0:文字 1:语音 2:视屏 3:图片 4:地图 5:文件 6：指令 7:引用 8:回复指令
 
     private String messageGroupId;//消息聊天组ID
     private String messageGroupName;//消息聊天组名称
@@ -51,7 +51,6 @@ public class ChatMessage extends BaseSmartBO {
     private MessageHolder messageHolder;
     private InstructBean instructBean;
 
-
     //地图位置
     private String locationAddress;//位置名称
     private String locationRoad;//位置所在路段
@@ -71,6 +70,10 @@ public class ChatMessage extends BaseSmartBO {
     private int messageOwner;//0:表示自己 1表示其他人
     @JSONField(serialize = false)
     private boolean isSynchronization;
+
+//    @JSONField(serialize = false)
+//    private String messageTo;//消息发送到
+//    private String messageFrom;//消息来自
 
 
     public InstructBean getInstructBean() {

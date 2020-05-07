@@ -73,7 +73,7 @@ public class PhotoVideoBigShowAdapter extends RecyclerView.Adapter<SmartVH> {
             jzvdStd.fullscreenButton.setVisibility(View.GONE);
             jzvdStd.setUp(filePath, "", Jzvd.SCREEN_NORMAL);
             jzvdStd.posterImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-            GlideHelper.loadIntoUseFitWidth(holder.itemView.getContext(), filePath, jzvdStd.posterImageView);
+            GlideHelper.loadIntoUseNoCorner(holder.itemView.getContext(), filePath, jzvdStd.posterImageView);
         }
 
         if (chatMessage.getItemType() == 3) {//图片0

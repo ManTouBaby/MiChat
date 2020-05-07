@@ -70,6 +70,8 @@ public class ChatAdapter extends BaseChatAdapter {
         final ChatMessage chatMessage = mChatMessages.get(position);
         TextView text = holder.getText(R.id.mi_message_time);
         View view = holder.getViewById(R.id.mi_content_container);   //item单击监听
+        addChildViewClick(holder.getImage(R.id.mi_item_pro), chatMessage);
+
         if (text != null) {
             text.setVisibility(TextUtils.isEmpty(chatMessage.getMessageST()) ? View.GONE : View.VISIBLE);
             text.setText(chatMessage.getMessageST());
@@ -80,7 +82,7 @@ public class ChatAdapter extends BaseChatAdapter {
         if (!file.exists()) {
             filePath = chatMessage.getMessageContent();
         }
-        addChildViewLongClick(view, chatMessage);
+        if (view != null) addChildViewLongClick(view, chatMessage);
         switch (chatMessage.getItemType()) {
             case 0:
                 String content = chatMessage.getMessageContent();
@@ -114,11 +116,11 @@ public class ChatAdapter extends BaseChatAdapter {
             case 2:
                 addChildViewClick(view, chatMessage);
                 holder.getText(R.id.mi_item_video_time).setText(DateUtil.long2String(chatMessage.getDuration()));
-                GlideHelper.loadIntoUseFitWidth(holder.itemView.getContext(), filePath, holder.getImage(R.id.mi_item_video_bg));
+                GlideHelper.loadIntoUseNoCorner(holder.itemView.getContext(), filePath, holder.getImage(R.id.mi_item_video_bg));
                 break;
             case 3:
                 addChildViewClick(view, chatMessage);
-                GlideHelper.loadIntoUseFitWidth(holder.itemView.getContext(), filePath, holder.getImage(R.id.mi_item_pic));
+                GlideHelper.loadIntoUseNoCorner(holder.itemView.getContext(), filePath, holder.getImage(R.id.mi_item_pic));
                 break;
             case 4://地图
                 addChildViewClick(view, chatMessage);
@@ -171,10 +173,10 @@ public class ChatAdapter extends BaseChatAdapter {
                     if (duration > 0) {//视屏文件
                         instructVideoContainer.setVisibility(View.VISIBLE);
                         instructVideoTime.setText(DateUtil.long2String(duration));
-                        GlideHelper.loadIntoUseFitWidth(holder.itemView.getContext(), localFilePath, instructVideoBG);
+                        GlideHelper.loadIntoUseNoCorner(holder.itemView.getContext(), localFilePath, instructVideoBG);
                     } else {//图片文件
                         instructPic.setVisibility(View.VISIBLE);
-                        GlideHelper.loadIntoUseFitWidth(holder.itemView.getContext(), localFilePath, instructPic);
+                        GlideHelper.loadIntoUseNoCorner(holder.itemView.getContext(), localFilePath, instructPic);
                     }
                 }
                 break;

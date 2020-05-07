@@ -20,6 +20,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -59,6 +60,7 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
     RelativeLayout mQuoteContainer;
     TextView mQuoteLabel;
     ImageView mCloseQuote;
+    LinearLayout mLabelMsgContainer;
 //    ProgressBar mPullDownLoadMore;
 
     BaseChatAdapter mBaseChatAdapter;
@@ -112,9 +114,10 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
         ivAdd = findViewById(R.id.emotion_add);
         btSend = findViewById(R.id.emotion_send);
         mQuoteContainer = findViewById(R.id.mi_quote_container);
+        mLabelMsgContainer = findViewById(R.id.mi_label_msg_container);
         mCloseQuote = findViewById(R.id.mi_close_quote);
         mQuoteLabel = findViewById(R.id.item_quote_tag);
-
+        setOnClickListener(v -> closeSoftInputGroup());
 
 //        mPullDownLoadMore = findViewById(R.id.mi_pull_down_load_more);
         ivSmile.setOnClickListener(this);
@@ -298,14 +301,14 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
             if (isShowTakeVoiceBtn) {
                 ivVoice.setImageResource(R.mipmap.icon_keyboad);
                 tvVoiceClick.setVisibility(VISIBLE);
-                editText.setVisibility(GONE);
+                mLabelMsgContainer.setVisibility(GONE);
                 closeSoftInput();
                 hideContent();
                 hideSendBtn();
             } else {
                 ivVoice.setImageResource(R.mipmap.icon_chat_voice);
                 tvVoiceClick.setVisibility(GONE);
-                editText.setVisibility(VISIBLE);
+                mLabelMsgContainer.setVisibility(VISIBLE);
                 openSoftInput();
                 if (editText.getText().length() > 0) {
                     showSendBtn();
@@ -388,7 +391,7 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
         if (!isOpenSoftKeyBoard) emotionContainer.requestLayout();
     }
 
-    private void openSoftInput() {
+    public void openSoftInput() {
         isOpenSoftKeyBoard = true;
         editText.requestFocus();
         inputMethodManager.showSoftInput(editText, 0);

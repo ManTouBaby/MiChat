@@ -7,6 +7,7 @@ import android.support.annotation.IntDef;
 
 import com.hy.chatlibrary.adapter.BaseChatAdapter;
 import com.hy.chatlibrary.adapter.ChatAdapter;
+import com.hy.chatlibrary.bean.ChatGroupDetail;
 import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.listener.OnChatInputListener;
 import com.hy.chatlibrary.page.ChatActivity;
@@ -57,9 +58,9 @@ public class MiChatHelper {
         return mOption.fileDirName;
     }
 
-    public ArrayList<MessageHolder> getGroupMembers() {
-        return mOption.groupMembers;
-    }
+//    public ArrayList<MessageHolder> getGroupMembers() {
+//        return mOption.groupMembers;
+//    }
 
     public boolean isOpenEmotion() {
         return mOption.isOpenEmotion;
@@ -108,17 +109,28 @@ public class MiChatHelper {
     }
 
 
-    public void gotoChat(Context context, String chatGroupId, String chatGroupName, @ChatGroupType int groupType) {
+    public void gotoChat(Context context, ChatGroupDetail chatGroupDetail) {
+        gotoChat(context, chatGroupDetail.getMessageGroupId(), chatGroupDetail.getMessageGroupName(), chatGroupDetail.getMessageGroupDes(), chatGroupDetail.getGroupMembers());
+    }
+
+    public void gotoChat(Context context, String chatGroupId, String chatGroupName, String chatGroupDetail, ArrayList<MessageHolder> groupMembers) {
         if (mOption.messageHolder == null) {
             throw new NullPointerException("The MessageHolder of Option con`t be null");
         }
         Intent intent = new Intent(context, ChatActivity.class);
-        intent.putExtra("chatGroupId", chatGroupId);
-        intent.putExtra("chatGroupName", chatGroupName);
-        intent.putExtra("chatGroupType", groupType);
+        intent.putExtra(CHAT_GROUP_ID, chatGroupId);
+        intent.putExtra(CHAT_GROUP_NAME, chatGroupName);
+        intent.putExtra(CHAT_GROUP_DETAIL, chatGroupDetail);
+        intent.putExtra(CHAT_GROUP_MEMBER, groupMembers);
+//        intent.putExtra("chatGroupType", groupType);
 
         context.startActivity(intent);
     }
+
+    public final static String CHAT_GROUP_ID = "chatGroupId";
+    public final static String CHAT_GROUP_NAME = "chatGroupName";
+    public final static String CHAT_GROUP_DETAIL = "chatGroupDetail";
+    public final static String CHAT_GROUP_MEMBER = "chatGroupMember";
 
     public static class Option {
         private boolean isOpenEmotion = true;//是否开启表情
@@ -131,14 +143,14 @@ public class MiChatHelper {
         private String fileDirName = Environment.getExternalStorageDirectory().getPath() + "/hy/";//视屏、图片、音频文件保存路径
         private String netTimeUrl = "http://www.baidu.com";//获取网络时间的地址
         private MessageHolder messageHolder;
-        private ArrayList<MessageHolder> groupMembers;//群成员列表
+        //        private ArrayList<MessageHolder> groupMembers;//群成员列表
         private BaseChatAdapter adapter = new ChatAdapter();
         OnChatInputListener onChatInputListener;
 
-        public Option setGroupMembers(ArrayList<MessageHolder> groupMembers) {
-            this.groupMembers = groupMembers;
-            return this;
-        }
+//        public Option setGroupMembers(ArrayList<MessageHolder> groupMembers) {
+//            this.groupMembers = groupMembers;
+//            return this;
+//        }
 
         public Option setMessageHolder(MessageHolder messageHolder) {
             this.messageHolder = messageHolder;
