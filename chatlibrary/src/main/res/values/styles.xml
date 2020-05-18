@@ -28,9 +28,13 @@
 
 
     <!-- 自定义圆角ImageView -->
-    <declare-styleable name="CornerImageView">
-        <attr name="circle" format="boolean" />
-        <attr name="radius" format="dimension" />
+    <declare-styleable name="SmartImageView">
+        <attr name="smart_circle" format="boolean" />
+        <attr name="smart_radius" format="dimension" />
     </declare-styleable>
 
+    <declare-styleable name="CornerTextView">
+        <attr name="auto_background" format="boolean"/>
+        <attr name="radius"  format="dimension" />
+    </declare-styleable>
 </resources>

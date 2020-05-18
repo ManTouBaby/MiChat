@@ -10,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
@@ -22,7 +21,7 @@ import com.hrw.chatlibrary.R;
  * @date:2020/04/01 9:15
  * @desc:
  */
-public class CornerImageView extends AppCompatImageView {
+public class SmartImageView extends AppCompatImageView {
     private final float density;
     private Paint paint;
     private Paint paintBorder;
@@ -32,17 +31,18 @@ public class CornerImageView extends AppCompatImageView {
      */
     private float mRadius;
     private boolean mIsCircle;
+    private Bitmap mBitmap;
 
-    public CornerImageView(final Context context) {
+    public SmartImageView(final Context context) {
         this(context, null);
     }
 
-    public CornerImageView(Context context, AttributeSet attrs) {
+    public SmartImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
         density = context.getResources().getDisplayMetrics().density;
-        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.CornerImageView, 0, 0);
-        mRadius = ta.getDimension(R.styleable.CornerImageView_radius, 0);
-        mIsCircle = ta.getBoolean(R.styleable.CornerImageView_circle, false);
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.SmartImageView, 0, 0);
+        mRadius = ta.getDimension(R.styleable.SmartImageView_smart_radius, 0);
+        mIsCircle = ta.getBoolean(R.styleable.SmartImageView_smart_circle, false);
         int srcResource = attrs.getAttributeResourceValue("http://schemas.android.com/apk/res/android", "src", 0);
         if (srcResource != 0)
             mSrcBitmap = BitmapFactory.decodeResource(getResources(), srcResource);
@@ -56,17 +56,15 @@ public class CornerImageView extends AppCompatImageView {
 
     @Override
     public void onDraw(Canvas canvas) {
-        int width = canvas.getWidth() - getPaddingLeft() - getPaddingRight();
-        int height = canvas.getHeight() - getPaddingTop() - getPaddingBottom();
-        Bitmap image = drawableToBitmap(getDrawable());
-        if (image == null) return;
-//        System.out.println("执行绘制动作：" + getWidth() + " " + getHeight());
+        int width = getWidth() - getPaddingLeft() - getPaddingRight();
+        int height = getHeight() - getPaddingTop() - getPaddingBottom();
+        mBitmap = drawableToBitmap(getDrawable());
+        if (mBitmap == null) return;
         if (mIsCircle) {
-            Bitmap reSizeImage = reSizeImageC(image, width, height);
-            canvas.drawBitmap(createCircleImage(reSizeImage, width, height), getPaddingLeft(), getPaddingTop(), null);
+            canvas.drawBitmap(createCircleImage(mBitmap, width, height), getPaddingLeft(), getPaddingTop(), null);
         } else {
-            Bitmap reSizeImage = reSizeImage(image, width, height);
-            Bitmap resultImage = createRoundImage(reSizeImage, width, height);
+            mBitmap = reSizeImage(mBitmap, width, height);
+            Bitmap resultImage = createRoundImage(mBitmap);
             canvas.drawBitmap(resultImage, getPaddingLeft(), getPaddingTop(), null);
         }
 
@@ -77,11 +75,9 @@ public class CornerImageView extends AppCompatImageView {
      * 画圆角
      *
      * @param source
-     * @param width
-     * @param height
      * @return
      */
-    private Bitmap createRoundImage(Bitmap source, int width, int height) {
+    private Bitmap createRoundImage(Bitmap source) {
         Paint paint = new Paint();
         paint.setAntiAlias(true);
         Bitmap target = Bitmap.createBitmap(source.getWidth(), source.getHeight(), Bitmap.Config.ARGB_8888);
@@ -107,8 +103,7 @@ public class CornerImageView extends AppCompatImageView {
         paint.setAntiAlias(true);
         Bitmap target = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(target);
-        canvas.drawCircle(width / 2, height / 2, Math.min(width, height) / 2,
-                paint);
+        canvas.drawCircle(width / 2, height / 2, Math.min(width, height) / 2, paint);
         // 核心代码取两个图片的交集部分
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(source, (width - source.getWidth()) / 2, (height - source.getHeight()) / 2, paint);
@@ -117,44 +112,41 @@ public class CornerImageView extends AppCompatImageView {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        System.out.println("CornerImageView执行测量");
-        Bitmap image = drawableToBitmap(getDrawable());
-        int widthmode = MeasureSpec.getMode(widthMeasureSpec);
-        int heightmode = MeasureSpec.getMode(heightMeasureSpec);
-        if (widthmode == MeasureSpec.EXACTLY && heightmode == MeasureSpec.EXACTLY) {
-            int width = MeasureSpec.getSize(widthMeasureSpec);
-            int height = MeasureSpec.getSize(heightMeasureSpec);
-            setMeasuredDimension(width, height);
-            return;
-        }
-        if (image != null) {
-            int height = image.getHeight();
-            int width = image.getWidth();
-            float scale = (float) height / (float) width;
-            if (scale > 2.5) {//高度至少是宽度的2.5倍，设置一个固定的宽高
-                int viewWidth = (int) (110 * density);
-                int viewHeight = (int) (258 * density);
-                setMeasuredDimension(viewWidth, viewHeight);
-            } else if (scale > 2.0) {//高度至少是宽度的2倍,设置一个固定的宽度，高度按比例缩放
-                float widthScale = (float) width / 110;
-                int viewWidth = (int) (110 * density);
-                int viewHeight = (int) ((int) ((float) height / widthScale) * density);
-                setMeasuredDimension(viewWidth, viewHeight);
-            } else if (scale > 1.0) {////高度至少是宽度的1倍,设置一个固定的宽度，高度按比例缩放
-                float widthScale = (float) width / 128.0f;
-                int viewWidth = (int) (128.0f * density);
-                int viewHeight = (int) ((int) ((float) height / widthScale) * density);
-                setMeasuredDimension(viewWidth, viewHeight);
-            } else if (scale > 0.5) {//高度至少是宽度的0.5倍,设置宽度固定，高度按比例缩小
-                float widthScale = (float) width / 152.0f;
-                int viewWidth = (int) (152.0f * density);
-                int viewHeight = (int) ((int) ((float) height / widthScale) * density);
-                setMeasuredDimension(viewWidth, viewHeight);
+        Drawable drawable = getDrawable();
+        if (drawable != null) {
+            int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+            int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+            if (widthMode == MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY) {
+                super.onMeasure(widthMeasureSpec, heightMeasureSpec);
             } else {
-                float widthScale = (float) width / 180.0f;
-                int viewWidth = (int) (180.0f * density);
-                int viewHeight = (int) ((int) ((float) height / widthScale) * density);
-                setMeasuredDimension(viewWidth, viewHeight);
+                int height = drawable.getIntrinsicHeight();
+                int width = drawable.getIntrinsicWidth();
+                int viewWidth;
+                int viewHeight;
+                float scale = (float) height / (float) width;
+                if (scale > 2.5) {//高度至少是宽度的2.5倍，设置一个固定的宽高
+                    viewWidth = (int) (110 * density);
+                    viewHeight = (int) (258 * density);
+                } else if (scale > 2.0) {//高度至少是宽度的2倍,设置一个固定的宽度，高度按比例缩放
+                    float widthScale = (float) width / 110;
+                    viewWidth = (int) (110 * density);
+                    viewHeight = (int) ((int) ((float) height / widthScale) * density);
+                } else if (scale > 1.0) {////高度至少是宽度的1倍,设置一个固定的宽度，高度按比例缩放
+                    float widthScale = (float) width / 128.0f;
+                    viewWidth = (int) (128.0f * density);
+                    viewHeight = (int) ((int) ((float) height / widthScale) * density);
+                } else if (scale > 0.5) {//高度至少是宽度的0.5倍,设置宽度固定，高度按比例缩小
+                    float widthScale = (float) width / 188.0f;
+                    viewWidth = (int) (188.0f * density);
+                    viewHeight = (int) ((int) ((float) height / widthScale) * density);
+                } else {
+                    float widthScale = (float) width / 236.0f;
+                    viewWidth = (int) (236.0f * density);
+                    viewHeight = (int) ((int) ((float) height / widthScale) * density);
+                }
+                int measureSpecWidth = MeasureSpec.makeMeasureSpec(viewWidth, MeasureSpec.EXACTLY);
+                int measureSpecHeight = MeasureSpec.makeMeasureSpec(viewHeight, MeasureSpec.EXACTLY);
+                super.onMeasure(measureSpecWidth, measureSpecHeight);
             }
         } else {
             super.onMeasure(widthMeasureSpec, heightMeasureSpec);
@@ -168,21 +160,14 @@ public class CornerImageView extends AppCompatImageView {
      * @return
      */
     private Bitmap drawableToBitmap(Drawable drawable) {
-        if (drawable == null) {
-            if (mSrcBitmap != null) {
-                return mSrcBitmap;
-            } else {
-                return null;
-            }
-        } else if (drawable instanceof BitmapDrawable) {
-            return ((BitmapDrawable) drawable).getBitmap();
-        }
-        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(),
-                drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
+        if (drawable == null) return null;
+        Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
         drawable.draw(canvas);
+
         return bitmap;
+
     }
 
     /**

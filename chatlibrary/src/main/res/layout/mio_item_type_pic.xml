@@ -11,27 +11,18 @@
     <include layout="@layout/include_chat_o_item_pro" />
 
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/mi_content_container"
         style="@style/chat_o_pro_content_space"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/mi_item_pro"
-        android:layout_toRightOf="@+id/mi_item_pro">
-        <!--
-                <ImageView
-                    android:id="@+id/mi_item_pic"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:maxWidth="136dp"
-                    android:adjustViewBounds="true"
-                    android:maxHeight="208dp"
-                    android:src="@mipmap/bms"
-                    android:scaleType="fitXY" />-->
-        <ImageView
-            android:id="@+id/mi_item_pic"
-            android:layout_width="110dp"
-            android:layout_height="168dp"
-            android:scaleType="fitXY" />
-    </RelativeLayout>
+        android:layout_toRightOf="@+id/mi_item_pro"
+        android:orientation="vertical">
+
+        <include layout="@layout/include_group_show_name" />
+
+        <include layout="@layout/include_item_image" />
+
+    </LinearLayout>
 </RelativeLayout>

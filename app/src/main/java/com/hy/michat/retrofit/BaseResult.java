@@ -1,4 +1,4 @@
-package com.hy.michat.rabbitMQ;
+package com.hy.michat.retrofit;
 
 /**
  * @author:MtBaby

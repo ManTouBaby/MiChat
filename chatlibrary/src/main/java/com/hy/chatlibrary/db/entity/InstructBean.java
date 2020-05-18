@@ -1,4 +1,4 @@
-package com.hy.chatlibrary.db;
+package com.hy.chatlibrary.db.entity;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.hy.chatlibrary.bean.MessageHolder;
+import com.hy.chatlibrary.db.converter.ConverterMessageHolders;
 
 import java.io.Serializable;
 import java.util.List;
@@ -19,11 +20,11 @@ import java.util.List;
  * @desc:
  */
 @Entity(indices = {@Index("id"), @Index("createMillis")}, tableName = "instructModel")
-@TypeConverters(InstructAcceptorConverter.class)
+@TypeConverters(ConverterMessageHolders.class)
 public class InstructBean implements Serializable {
     private String              title;      //指令标题
     private String              content;     //指令内容
-    private List<MessageHolder> accepters;  //接收人员信息
+    private List<MessageHolder> acceptors;  //接收人员信息
     private String              netFilePath;//网络地址
     private long                duration;   //视频时长
     private float               fileSize;   //文件大小
@@ -125,12 +126,12 @@ public class InstructBean implements Serializable {
         this.content = content;
     }
 
-    public List<MessageHolder> getAccepters() {
-        return accepters;
+    public List<MessageHolder> getAcceptors() {
+        return acceptors;
     }
 
-    public void setAccepters(List<MessageHolder> accepters) {
-        this.accepters = accepters;
+    public void setAcceptors(List<MessageHolder> acceptors) {
+        this.acceptors = acceptors;
     }
 
     public String getNetFilePath() {

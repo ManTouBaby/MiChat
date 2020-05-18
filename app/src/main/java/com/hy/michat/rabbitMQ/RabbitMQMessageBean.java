@@ -7,7 +7,7 @@ import java.util.List;
  * @date:2020/04/21 18:32
  * @desc:
  */
-public class BaseRabbitBean {
+public class RabbitMQMessageBean {
 
     /**
      * branchProcessStep : [{"processId":"msg-send-process"}]

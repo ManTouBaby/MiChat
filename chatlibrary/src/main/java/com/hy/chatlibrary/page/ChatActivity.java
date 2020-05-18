@@ -10,17 +10,13 @@ import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.PagerSnapHelper;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
@@ -34,21 +30,25 @@ import com.hrw.gdlibrary.CodeManager;
 import com.hrw.gdlibrary.GDHelper;
 import com.hy.chatlibrary.MiChatHelper;
 import com.hy.chatlibrary.adapter.BaseChatAdapter;
-import com.hy.chatlibrary.adapter.ItemControlAdapter;
+import com.hy.chatlibrary.adapter.ChatAdapter;
 import com.hy.chatlibrary.adapter.OnItemChildClickListener;
 import com.hy.chatlibrary.adapter.OnItemChildLongClickListener;
 import com.hy.chatlibrary.adapter.PhotoVideoBigShowAdapter;
-import com.hy.chatlibrary.bean.ControlTypeBean;
 import com.hy.chatlibrary.bean.MessageHolder;
-import com.hy.chatlibrary.db.ChatMessage;
 import com.hy.chatlibrary.db.ChatMessageCreator;
-import com.hy.chatlibrary.db.ChatMessageDAO;
 import com.hy.chatlibrary.db.DBHelper;
-import com.hy.chatlibrary.db.InstructBean;
+import com.hy.chatlibrary.db.dao.ChatMessageDAO;
+import com.hy.chatlibrary.db.entity.ChatMessage;
+import com.hy.chatlibrary.db.entity.InstructBean;
 import com.hy.chatlibrary.listener.OnChatInputListener;
 import com.hy.chatlibrary.listener.OnLocalMessageControl;
-import com.hy.chatlibrary.listener.OnNetMessageControl;
+import com.hy.chatlibrary.service.EBChatGroupControl;
+import com.hy.chatlibrary.service.EBUpdateChatDisplayName;
+import com.hy.chatlibrary.utils.DateUtil;
+import com.hy.chatlibrary.utils.PopupWindowsHelper;
+import com.hy.chatlibrary.utils.SPHelper;
 import com.hy.chatlibrary.utils.StatusBarUtil;
+import com.hy.chatlibrary.utils.StringUtil;
 import com.hy.chatlibrary.utils.animation.RevealAnimation;
 import com.hy.chatlibrary.utils.glide.GlideLoader;
 import com.hy.chatlibrary.widget.chatinput.MiChatInputGroup;
@@ -57,9 +57,15 @@ import com.mt.camera.CameraHelper;
 import com.mt.filepicker.ImagePicker;
 import com.mt.filepicker.data.MediaFile;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.hy.chatlibrary.MiChatHelper.CHAT_GROUP_MEMBER_GROUP_NAME;
+import static com.hy.chatlibrary.base.ResultCode.REQUEST_GROUP_DETAIL;
 import static com.hy.chatlibrary.base.ResultCode.REQUEST_SELECT_IMAGES_CODE;
 import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_INSTRUCT_CODE;
 import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_LOCAL_CODE;
@@ -72,7 +78,7 @@ import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_VIDEO_CODE;
  * @date:2020/03/30 15:16
  * @desc:
  */
-public class ChatActivity extends AppCompatActivity implements OnNetMessageControl, OnLocalMessageControl {
+public class ChatActivity extends AppCompatActivity implements OnLocalMessageControl {
     private BaseChatAdapter mChatAdapter;
     private PhotoVideoBigShowAdapter mShowAdapter;
     private MiChatHelper miChatHelper;
@@ -94,12 +100,14 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
     private ArrayList<MessageHolder> mGroupMembers;
     private String mChatGroupDetail;
     private String mChatGroupName;
-    private String mChatGroupId;
+    public static String mChatGroupId;
     public final static String CHAT_MEMBER = "CHAT_MEMBER";
 
     private OnChatInputListener mOnChatInputListener;
     private AMapLocationListener aMapLocationListener;
-
+    private String initMemberError;
+    private MessageHolder mMessageHolder;
+    private String mOriginalName;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
@@ -107,37 +115,47 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
         super.onCreate(savedInstanceState);
         StatusBarUtil.setStatueColor(this, R.color.mi_chat_main_bg, true);
         setContentView(R.layout.mi_activity_chat_layout);
+        System.out.println("ChatActivity---onCreate");
+        EventBus.getDefault().register(this);
         Intent intent = getIntent();
-        mGroupMembers = (ArrayList<MessageHolder>) intent.getSerializableExtra(MiChatHelper.CHAT_GROUP_MEMBER);
         mChatGroupId = intent.getStringExtra(MiChatHelper.CHAT_GROUP_ID);
         mChatGroupName = intent.getStringExtra(MiChatHelper.CHAT_GROUP_NAME);
         mChatGroupDetail = intent.getStringExtra(MiChatHelper.CHAT_GROUP_DETAIL);
-//        int mChatGroupType = intent.getIntExtra("chatGroupType", MiChatHelper.CHAT_GROUP);//聊天类型
+
         miChatHelper = MiChatHelper.getInstance();
         mRevealAnimation = new RevealAnimation();
-        MessageHolder mMessageHolder = miChatHelper.getMessageHolder();
+        mRevealAnimation.setOnTargViewVisibleListener(isVisible -> {
+            if (!isVisible) mShowAdapter.onDestroy();
+        });
+
+        mMessageHolder = miChatHelper.getMessageHolder();
+        String memberChatGroup = SPHelper.getInstance(this).getString(mMessageHolder.getId() + "-" + mChatGroupId);
+        mMessageHolder.setGroupName(TextUtils.isEmpty(memberChatGroup) ? mMessageHolder.getName() : memberChatGroup);
+
         mOnChatInputListener = miChatHelper.getOnChatInputListener();
         mChatMessageCreator = new ChatMessageCreator(mChatGroupId, mChatGroupName, miChatHelper, mMessageHolder, mHandler, this);
         mChatMessageDAO = DBHelper.getInstance(getApplicationContext()).getChatMessageDAO();
         mGdHelper = new GDHelper.Builder().setNaviType(NaviType.GPS).build(getApplicationContext());
         initShowView();
         initChatInputGroup();
-//        mChatMessageDAO.deleteAllMessage();
         mGdHelper.startContinueLocation(aMapLocationListener = aMapLocation -> {
             if (aMapLocation.getErrorCode() == 0) mAMapLocation = aMapLocation;
             Log.d("Location-->", aMapLocation.getAddress());
         });
-        List<ChatMessage> chatMessages = mChatMessageDAO.queryMessageByCount(mChatGroupId, localHistoryStartIndex, pageCount);
-        mChatAdapter.addNetMessages(chatMessages);
-        miChatInputGroup.scrollToBottom();
 
         findViewById(R.id.mi_chat_list_menu).setOnClickListener(v -> {
+            if (mGroupMembers == null) {
+                Toast.makeText(this, initMemberError == null ? "群成员未进行舒适化" : initMemberError, Toast.LENGTH_SHORT).show();
+                return;
+            }
             Intent gotoDetail = new Intent(this, ChatGroupDetailActivity.class);
             gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_MEMBER, mGroupMembers);
             gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_ID, mChatGroupId);
+            gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_MEMBER_ID, mMessageHolder.getId());
+            gotoDetail.putExtra(CHAT_GROUP_MEMBER_GROUP_NAME, mMessageHolder.getGroupName());
             gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_NAME, mChatGroupName);
             gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_DETAIL, mChatGroupDetail);
-            startActivity(gotoDetail);
+            startActivityForResult(gotoDetail, REQUEST_GROUP_DETAIL);
         });
         findViewById(R.id.mi_iv_back).setOnClickListener(v -> {
             if (miChatInputGroup.isSoftInputGroupShow()) {
@@ -146,17 +164,42 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
                 finish();
             }
         });
-
         //获取已同步的最新消息
         ChatMessage mChatMessage = mChatMessageDAO.queryMessageByTopAndSynchronization(mChatGroupId);
-        mOnChatInputListener.onInitChatList(mChatMessage, this);
+        mOnChatInputListener.onInitChatList(mChatMessage, mChatGroupId);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        System.out.println("ChatActivity---onResume");
+        String scrollTo = SPHelper.getInstance(this).getString("scrollTo");
+        if (!TextUtils.isEmpty(scrollTo)) {
+
+            SPHelper.getInstance(this).putString("scrollTo", null);
+            new Thread(() -> {
+                ChatMessage firstItem = mChatAdapter.getFirstItem();
+                ChatMessage chatMessage = mChatMessageDAO.queryByGroupIdAndMessageId(mChatGroupId, scrollTo);
+                if (mChatAdapter.isContainer(chatMessage)) {
+                    runOnUiThread(() -> miChatInputGroup.scrollToPosition(chatMessage));
+                } else {
+                    List<ChatMessage> messages = mChatMessageDAO.queryMessageByMilli(mChatGroupId, chatMessage.getMessageSTMillis(), firstItem.getMessageSTMillis());
+                    runOnUiThread(() -> {
+                        mChatAdapter.addOldMessages(messages);
+                        miChatInputGroup.scrollToPosition(mChatAdapter.getFirstItem());
+                    });
+                }
+            }).start();
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void initChatInputGroup() {
+        BaseChatAdapter adapter = miChatHelper.getAdapter();
+        if (adapter == null) adapter = new ChatAdapter();
         miChatInputGroup = findViewById(R.id.mi_cig_view);
         miChatInputGroup.setFilePathDir(miChatHelper.getFileDirName());
-        miChatInputGroup.setChatListAdapter(mChatAdapter = miChatHelper.getAdapter());
+        miChatInputGroup.setChatListAdapter(mChatAdapter = adapter);
 
         mChatAdapter.setOnSendFailTagClickListener(message -> {
             sendAgainId.add(message.getMessageId());
@@ -165,20 +208,15 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
             mOnChatInputListener.onMessageSend(message, mChatMessageCreator.getChatMessageJson(message));
         });
         mChatAdapter.setOnItemChildClickListener((OnItemChildClickListener<ChatMessage>) (view, chatMessage) -> {
-            if (view.getId() == R.id.mi_content_container) {
-                if (chatMessage.getItemType() == 2 || chatMessage.getItemType() == 3) {
+            int viewId = view.getId();
+            if (viewId == R.id.mi_content_container || viewId == R.id.mi_instruct_pic || viewId == R.id.mi_instruct_video_container) {
+                if (chatMessage.getItemType() == 2 || chatMessage.getItemType() == 3 || chatMessage.getItemType() == 6) {
                     mCurrentClickItemView = view;
                     List<ChatMessage> chatMessages = mChatMessageDAO.queryMessageByPhotoAndVideo();
                     mShowAdapter.setChatMessages(chatMessages);
-                    int clickPosition = -1;
-                    for (int i = 0; i < chatMessages.size(); i++) {
-                        ChatMessage message = chatMessages.get(i);
-                        if (message.getMessageId().equals(chatMessage.getMessageId())) {
-                            clickPosition = i;
-                        }
-                    }
+
                     mRevealAnimation.launchRevealAnimation(mShowPhotoVideoContainer, mCurrentClickItemView);
-                    if (clickPosition != -1) mShowAdapter.showPosition(clickPosition);
+                    mShowAdapter.showPosition(chatMessage);
                 }
                 if (chatMessage.getItemType() == 4) {
                     if (mAMapLocation == null) {
@@ -190,68 +228,53 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
                     mGdHelper.openNavigation(ChatActivity.this, mMyLocal, destination);
                 }
             }
-            if (view.getId() == R.id.mi_item_pro) {
+            if (viewId == R.id.mi_item_pro) {
                 Intent intent = new Intent(this, ChatPersonalActivity.class);
                 intent.putExtra(CHAT_MEMBER, chatMessage.getMessageHolder());
                 startActivity(intent);
+            }
+            if (viewId == R.id.mi_quote_reply_notify) {
+                miChatInputGroup.scrollToPosition(chatMessage.getChatMessage());
             }
 
         });
         mChatAdapter.setOnItemChildLongClickListener((OnItemChildLongClickListener<ChatMessage>) (view, chatMessage) -> {
 
-            boolean openCopy = chatMessage.getItemType() == 0;
-            boolean openTranslate = chatMessage.getItemType() == 1;
-            boolean openInstruct = chatMessage.getItemType() == 6;
+            if (view.getId() == R.id.mi_item_pro) {
+//                if (!miChatInputGroup.isSoftInputGroupShow()) miChatInputGroup.openSoftInput();
+                miChatInputGroup.addATQuote(chatMessage.getMessageHolder().getGroupName());
+            }
+            if (view.getId() == R.id.mi_content_container) {
+                PopupWindowsHelper.showItemControlWindows(view, chatMessage, (view1, data) -> {
+                    switch (data.getControlTypeIndex()) {
+                        case 0:
+                            //获取剪贴板管理器：
+                            ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                            // 创建普通字符型ClipData
+                            ClipData mClipData = ClipData.newPlainText("Label", chatMessage.getMessageContent());
+                            // 将ClipData内容放到系统剪贴板里。
+                            cm.setPrimaryClip(mClipData);
+                            Toast.makeText(ChatActivity.this, "复制成功", Toast.LENGTH_SHORT).show();
+                            break;
+                        case 1:
+                        case 2:
+                            mQuoteChatMessage = chatMessage;
+                            miChatInputGroup.showQuoteEdit(mQuoteChatMessage.getMessageContent());
+                            miChatInputGroup.openSoftInput();
+                            break;
+                        case 3:
+                            if (mOnChatInputListener != null) {
+                                mOnChatInputListener.onChatMessageCallBack(chatMessage);
+                            }
+                            break;
+                        case 4:
 
-            List<ControlTypeBean> controlTypeBeans = new ArrayList<>();
-            controlTypeBeans.add(new ControlTypeBean(0, "复制", openCopy));
-            controlTypeBeans.add(new ControlTypeBean(1, "引用", true));
-            controlTypeBeans.add(new ControlTypeBean(2, "回复", openInstruct));//用于指令
-            controlTypeBeans.add(new ControlTypeBean(3, "撤回", true));//用于撤回，一定时间内发出的消息可以进行撤回
-            controlTypeBeans.add(new ControlTypeBean(4, "翻译", openTranslate));//用于语音,对语音进行翻译
-            View itemMenu = LayoutInflater.from(this).inflate(R.layout.popup_item_control_menu, null);
-            PopupWindow window = new PopupWindow(itemMenu, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            RecyclerView recyclerView = itemMenu.findViewById(R.id.show_item_control_menu);
-            recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-            ItemControlAdapter baseAdapter;
-            recyclerView.setAdapter(baseAdapter = new ItemControlAdapter(controlTypeBeans));
-            baseAdapter.setOnItemClickListener((view1, data) -> {
-                window.dismiss();
-                switch (data.getControlTypeIndex()) {
-                    case 0:
-                        //获取剪贴板管理器：
-                        ClipboardManager cm = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
-                        // 创建普通字符型ClipData
-                        ClipData mClipData = ClipData.newPlainText("Label", chatMessage.getMessageContent());
-                        // 将ClipData内容放到系统剪贴板里。
-                        cm.setPrimaryClip(mClipData);
-                        Toast.makeText(ChatActivity.this, "复制成功", Toast.LENGTH_SHORT).show();
-                        break;
-                    case 1:
-                    case 2:
-                        mQuoteChatMessage = chatMessage;
-                        miChatInputGroup.showQuoteEdite(mQuoteChatMessage.getMessageContent());
-                        miChatInputGroup.openSoftInput();
-                        break;
-                    case 3:
-                        if (mOnChatInputListener != null) {
-                            mOnChatInputListener.onChatMessageCallBack(chatMessage);
-                        }
-                        break;
-                    case 4:
-                        break;
-                }
-            });
-
-            window.setBackgroundDrawable(new DrawerArrowDrawable(this));
-            window.setOutsideTouchable(true);
-            window.setFocusable(true);
-            if (chatMessage.getMessageOwner() == 0) {
-                window.showAsDropDown(view, -3 * 160, 0, Gravity.RIGHT);
-            } else {
-                window.showAsDropDown(view, 3 * 164, 0, Gravity.LEFT);
+                            break;
+                    }
+                });
             }
         });
+
         miChatInputGroup.setOnContentTypeClickListener(contentType -> {
             switch (contentType) {
                 case PIC:
@@ -287,25 +310,44 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
             }
         });
         miChatInputGroup.setOnTextSubmitListener(textLabel -> {
-            mChatMessageCreator.createChatMessage(0, mAMapLocation, textLabel, chatMessage -> {
-                mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
+            if (mQuoteChatMessage != null) {
+                mChatMessageCreator.createChatMessage(mAMapLocation, mQuoteChatMessage, textLabel, chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
+                miChatInputGroup.closeQuote();
+            } else {
+                List<String> stringList = StringUtil.getSubUtil(textLabel, "@(.*?) ");
+                if (stringList.size() > 0) {
+                    List<MessageHolder> messageHolders = new ArrayList<>();
+                    for (String holderId : stringList) {
+                        for (MessageHolder messageHolder : mGroupMembers) {
+                            if (holderId.equals(messageHolder.getName()) && !messageHolders.contains(messageHolder)) {
+                                messageHolders.add(messageHolder);
+                                break;
+                            }
+                        }
+                    }
+                    mChatMessageCreator.createChatMessage(mAMapLocation, messageHolders, textLabel, chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
+                } else {
+                    mChatMessageCreator.createChatMessage(mAMapLocation, textLabel, chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
+                }
+//                System.out.println("数据：" + stringList.toString());
+            }
+        });
+        miChatInputGroup.setOnPullDownLoadMoreListener((firstChatMessage) -> new Thread(() -> {
+            List<ChatMessage> chatMessages = mChatMessageDAO.queryMessageByMilli(mChatGroupId, firstChatMessage.getMessageSTMillis(), pageCount);
+            runOnUiThread(() -> {
+                mChatAdapter.addOldMessages(chatMessages);
+                if (chatMessages.size() < pageCount) {
+                    mChatAdapter.setLoadMoreComplete();
+                } else {
+                    mChatAdapter.setLoadMoreSuccess();
+                }
             });
 
-        });
-        miChatInputGroup.setOnPullDownLoadMoreListener(() -> mHandler.postDelayed(() -> {
-            localHistoryStartIndex++;
-            List<ChatMessage> chatMessages = mChatMessageDAO.queryMessageByCount(mChatGroupId, pageCount * localHistoryStartIndex, pageCount);
-            mChatAdapter.addOldMessages(chatMessages);
-            if (chatMessages.size() < pageCount) {
-                miChatInputGroup.setLoadMoreComplete();
-            } else {
-                miChatInputGroup.setLoadMoreSuccess();
-            }
-        }, 1000));
+        }).start());
         miChatInputGroup.setOnAudioRecordListener(new OnAudioRecordListener() {
             @Override
             public void onAudioRecord(String filePath, long duration) {
-                mChatMessageCreator.createChatMessage(1, mAMapLocation, filePath, duration, chatMessage -> {
+                mChatMessageCreator.createChatMessage(1, mAMapLocation, "[语音消息]", filePath, duration, chatMessage -> {
                     mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
                 });
 
@@ -332,10 +374,8 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
         mShowPhotoVideo.setLayoutManager(layout);
         mShowPhotoVideo.setAdapter(mShowAdapter = new PhotoVideoBigShowAdapter());
         pagerSnapHelper.attachToRecyclerView(mShowPhotoVideo);
-
 //        mShowAdapter.setOnBigShowItemClickListener(chatMessage -> mRevealAnimation.launchRevealAnimation(mShowPhotoVideoContainer, mCurrentClickItemView));
     }
-
 
     @Override
     public void onBackPressed() {
@@ -346,25 +386,6 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
         } else {
             super.onBackPressed();
         }
-    }
-
-
-    @Override
-    public void onSendFail(ChatMessage message) {
-        runOnUiThread(() -> {
-            message.setMessageStatus(1);
-            mChatAdapter.updateMessage(message);
-            mChatMessageDAO.updateChatMessage(message);
-        });
-    }
-
-    @Override
-    public void onSendSuccess(ChatMessage message) {
-        runOnUiThread(() -> {
-            message.setMessageStatus(0);
-            mChatAdapter.updateMessage(message);
-            mChatMessageDAO.updateChatMessage(message);
-        });
     }
 
 
@@ -382,8 +403,89 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
         miChatInputGroup.scrollToBottom();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void chatMessageControl(EBChatGroupControl groupControl) {
+        switch (groupControl.getType()) {
+            case EBChatGroupControl.TYPE_SEND_SUCCESS:
+                onSendSuccess(groupControl.getChatMessage());
+                break;
+            case EBChatGroupControl.TYPE_SEND_ERROR:
+                onSendFail(groupControl.getChatMessage(), groupControl.getErrorLabel());
+                break;
 
-    @Override
+            case EBChatGroupControl.TYPE_GROUP_INIT:
+                setNetMessages(groupControl.getChatMessages());
+                break;
+            case EBChatGroupControl.TYPE_GROUP_MEMBER_INIT:
+                setGroupMembers((ArrayList<MessageHolder>) groupControl.getMessageHolders());
+                initMemberError = groupControl.getErrorLabel();
+                break;
+            case EBChatGroupControl.TYPE_ADD_MQ:
+                addMQMessage(groupControl.getChatMessage());
+                break;
+            case EBChatGroupControl.TYPE_MQ_UPDATE_CHAT_DISPLAY_NAME:
+                EBUpdateChatDisplayName updateChatDisplayName = groupControl.getUpdateChatDisplayName();
+                switch (updateChatDisplayName.getStatus()) {
+                    case EBUpdateChatDisplayName.UPDATE_MQ:
+                        //更新Adapter中群聊显示名称
+                        List<ChatMessage> adapterChatMessages = mChatAdapter.getChatMessages();
+                        for (ChatMessage chatMessage : adapterChatMessages) {
+                            chatMessage.getMessageHolder().setGroupName(updateChatDisplayName.getNewChatGroupName());
+                            chatMessage.setMessageHolderShowName(updateChatDisplayName.getNewChatGroupName());
+                        }
+                        mChatAdapter.notifyDataSetChanged();
+                        break;
+                    case EBUpdateChatDisplayName.TYPE_ERROR:
+                        SPHelper.getInstance(this).putString(CHAT_GROUP_MEMBER_GROUP_NAME, mOriginalName);
+                        Toast.makeText(this, "群聊显示名称修改失败", Toast.LENGTH_SHORT).show();
+                        break;
+                }
+                break;
+            case EBChatGroupControl.TYPE_REMOVE_ERROR:
+                onRemoveFail(groupControl.getChatMessage(), groupControl.getErrorLabel());
+                break;
+            case EBChatGroupControl.TYPE_REMOVE_SUCCESS:
+            case EBChatGroupControl.TYPE_NOTIFY_REMOVE:
+                onRemoveSuccess(groupControl.getChatMessage());
+                break;
+        }
+    }
+
+    //消息发送失败
+    public void onSendFail(ChatMessage message, String label) {
+        runOnUiThread(() -> {
+            message.setMessageStatus(1);
+            mChatAdapter.updateMessage(message);
+            mChatMessageDAO.updateChatMessage(message);
+        });
+    }
+
+    //消息发送成功
+    public void onSendSuccess(ChatMessage message) {
+        runOnUiThread(() -> {
+            message.setMessageStatus(0);
+            mChatAdapter.updateMessage(message);
+            mChatMessageDAO.updateChatMessage(message);
+        });
+    }
+
+    //消息撤销成功
+    public void onRemoveSuccess(ChatMessage message) {
+        runOnUiThread(() -> {
+            mChatAdapter.removeMessage(message);
+            mChatMessageDAO.deleteChatMessage(message);
+        });
+    }
+
+    //消息撤销失败
+    public void onRemoveFail(ChatMessage message, String label) {
+        runOnUiThread(() -> {
+            mChatAdapter.removeMessage(message);
+            mChatMessageDAO.deleteChatMessage(message);
+        });
+    }
+
+    //新消息
     public void addMQMessage(ChatMessage chatMessage) {
         runOnUiThread(() -> {
             mChatMessageDAO.insertChatMessage(chatMessage);
@@ -392,33 +494,62 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
         });
     }
 
-    @Override
-    public void addNetMessages(List<ChatMessage> chatMessages) {
-        //进行消息同步
-        List<ChatMessage> localChats = mChatMessageDAO.queryAllMessageByUnchronization(mChatGroupId);
-        for (ChatMessage message : chatMessages) {
-            boolean isExist = false;
-            if (miChatHelper.getMessageHolder().getId().equals(message.getMessageHolder().getId())) {
-                message.setMessageOwner(0);
-            } else {
-                message.setMessageOwner(1);
-            }
-            for (int i = 0; i < localChats.size(); i++) {
-                ChatMessage localMessage = localChats.get(i);
-                if (localMessage.getMessageId().equals(message.getMessageId())) {
-                    isExist = true;
-                    localMessage.setMessageContent(message.getMessageContent());
-                    localMessage.setInstructBean(message.getInstructBean());
-                    localMessage.setSynchronization(true);
-                    mChatMessageDAO.updateChatMessage(localMessage);
+    public void setGroupMembers(ArrayList<MessageHolder> mGroupMembers) {
+        this.mGroupMembers = mGroupMembers;
+    }
+
+    //初始化聊天列表
+    public void setNetMessages(List<ChatMessage> chatMessages) {
+        new Thread(() -> DateUtil.getNetDate(miChatHelper.getNetTimeUrl(), date -> {
+            if (chatMessages != null) {//新消息存在则进行消息同步
+                List<ChatMessage> localChats = mChatMessageDAO.queryAllMessageByUnchronization(mChatGroupId);
+                for (ChatMessage message : chatMessages) {
+                    boolean isExist = false;
+                    if (miChatHelper.getMessageHolder().getId().equals(message.getMessageHolder().getId())) {
+                        message.setMessageOwner(0);
+                    } else {
+                        message.setMessageOwner(1);
+                    }
+                    for (int i = 0; i < localChats.size(); i++) {
+                        ChatMessage localMessage = localChats.get(i);
+                        if (localMessage.getMessageId().equals(message.getMessageId())) {
+                            isExist = true;
+                            localMessage.setMessageContent(message.getMessageContent());
+                            localMessage.setInstructBean(message.getInstructBean());
+                            localMessage.setSynchronization(true);
+                            mChatMessageDAO.updateChatMessage(localMessage);
+                        }
+                    }
+                    if (!isExist) {
+                        mChatMessageDAO.insertChatMessage(message);
+                    }
+
                 }
             }
-            if (!isExist) {
-                mChatMessageDAO.insertChatMessage(message);
-            }
 
-        }
-        miChatInputGroup.scrollToBottom();
+            List<ChatMessage> localChats = mChatMessageDAO.queryMessageByMilli(mChatGroupId, date.getTime(), pageCount);
+            runOnUiThread(() -> {
+                if (chatMessages == null) {
+                    if (localChats == null || localChats.size() < pageCount) {//本地数据量小于PageCount或者不存在
+                        mChatAdapter.setLoadMoreComplete();//设置没有更多数据可加载
+                        miChatInputGroup.setStackFromEnd(false);//设置列表栈，
+                    } else {
+                        miChatInputGroup.setStackFromEnd(true);
+                    }
+                } else {
+                    int itemCount = chatMessages.size() + localChats.size();
+                    if (itemCount < pageCount) {
+                        mChatAdapter.setLoadMoreComplete();
+                        miChatInputGroup.setStackFromEnd(false);
+                    } else {
+                        miChatInputGroup.setStackFromEnd(true);
+                    }
+                }
+                mChatAdapter.addNetMessages(localChats);
+                miChatInputGroup.scrollToBottom();
+            });
+        })).start();
+
     }
 
     @Override
@@ -430,12 +561,12 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
                     MediaFile mediaFile = imagePaths.get(i);
                     if (mediaFile.getDuration() > 0) {
 //                        System.out.println("选择到的视屏:  \"" + mediaFile.getPath() + "\"," + mediaFile.getDuration());
-                        mChatMessageCreator.createChatMessage(2, mAMapLocation, mediaFile.getPath(), mediaFile.getDuration(), chatMessage -> {
+                        mChatMessageCreator.createChatMessage(2, mAMapLocation, "[视屏消息]", mediaFile.getPath(), mediaFile.getDuration(), chatMessage -> {
                             mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
                         });
 
                     } else {
-                        mChatMessageCreator.createChatMessage(3, mAMapLocation, mediaFile.getPath(), chatMessage -> {
+                        mChatMessageCreator.createChatMessage(3, mAMapLocation, "[图片消息]", mediaFile.getPath(), 0, chatMessage -> {
                             mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
                         });
                     }
@@ -444,7 +575,7 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
             if (requestCode == REQUEST_TAKE_PHOTO_CODE) {
                 String path = data.getStringExtra(CameraHelper.DATA);
                 String pathOrigin = data.getStringExtra(CameraHelper.DATA_ORIGIN);
-                mChatMessageCreator.createChatMessage(3, mAMapLocation, path, chatMessage -> {
+                mChatMessageCreator.createChatMessage(3, mAMapLocation, "[图片消息]", path, 0, chatMessage -> {
                     mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
                 });
             }
@@ -452,7 +583,7 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
                 String path = data.getStringExtra(CameraHelper.DATA);
                 String pathOrigin = data.getStringExtra(CameraHelper.DATA_ORIGIN);
                 long realDuration = data.getLongExtra(CameraHelper.DATA_REAL_DURATION, (long) 0F);
-                mChatMessageCreator.createChatMessage(2, mAMapLocation, path, realDuration, chatMessage -> {
+                mChatMessageCreator.createChatMessage(2, mAMapLocation, "[视屏消息]", path, realDuration, chatMessage -> {
                     mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
                 });
             }
@@ -469,16 +600,30 @@ public class ChatActivity extends AppCompatActivity implements OnNetMessageContr
                     mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
                 });
             }
+            if (requestCode == REQUEST_GROUP_DETAIL) {
+                boolean isChangeShow = data.getBooleanExtra("isChangeShow", false);
+                String changeName = data.getStringExtra("changeName");
+                mOriginalName = data.getStringExtra("originalName");
+                if (isChangeShow) {
+                    mChatAdapter.notifyDataSetChanged();
+                }
+                if (changeName != null) {
+                    mMessageHolder.setGroupName(changeName);
+                    mChatMessageCreator = new ChatMessageCreator(mChatGroupId, mChatGroupName, miChatHelper, mMessageHolder, mHandler, this);
+                    mOnChatInputListener.changeChatDisplayName(mChatGroupId, mMessageHolder.getId(), changeName);
+                }
+            }
         }
 
     }
 
     @Override
     protected void onDestroy() {
+        super.onDestroy();
+        System.out.println("ChatActivity销毁");
         mChatAdapter.onDestroy();
         mGdHelper.closeLocationListener(aMapLocationListener);
-        mOnChatInputListener.onDestroy();
-        super.onDestroy();
+        EventBus.getDefault().unregister(this);
     }
 
 

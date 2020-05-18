@@ -9,50 +9,60 @@
 
     <include layout="@layout/include_chat_o_item_pro" />
 
-    <RelativeLayout
-        android:id="@+id/mi_content_container"
+
+    <LinearLayout
         style="@style/chat_o_pro_content_space"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/mi_item_pro"
         android:layout_toRightOf="@+id/mi_item_pro"
-        android:background="@mipmap/icon_o_txt_bg"
-        android:padding="12dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/mi_file_name"
+        <include layout="@layout/include_group_show_name" />
+        <RelativeLayout
+            android:id="@+id/mi_content_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/mi_file_type_tag"
-            android:layout_toLeftOf="@+id/mi_file_type_tag"
-            android:ellipsize="end"
-            android:gravity="left"
-            android:lineSpacingExtra="6dp"
-            android:maxLines="2"
-            android:text="文件称文件名称文件名称件名称"
-            android:textColor="@color/mi_text_black" />
+            android:background="@mipmap/icon_o_txt_bg"
+            android:padding="12dp">
 
-        <TextView
-            android:id="@+id/mi_file_size"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/mi_file_name"
-            android:layout_alignParentLeft="true"
-            android:layout_marginTop="4dp"
-            android:text="12.2k"
-            android:textSize="12sp" />
+            <TextView
+                android:id="@+id/mi_file_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@+id/mi_file_type_tag"
+                android:layout_toLeftOf="@+id/mi_file_type_tag"
+                android:ellipsize="end"
+                android:gravity="left"
+                android:lineSpacingExtra="6dp"
+                android:maxLines="2"
+                android:text="文件称文件名称文件名称件名称"
+                android:textColor="@color/mi_text_black" />
 
-
-        <ImageView
-            android:id="@+id/mi_file_type_tag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="8dp"
-            android:scaleType="centerInside"
-            android:src="@mipmap/icon_zip" />
+            <TextView
+                android:id="@+id/mi_file_size"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/mi_file_name"
+                android:layout_alignParentLeft="true"
+                android:layout_marginTop="4dp"
+                android:text="12.2k"
+                android:textSize="12sp" />
 
 
-    </RelativeLayout>
+            <ImageView
+                android:id="@+id/mi_file_type_tag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="8dp"
+                android:scaleType="centerInside"
+                android:src="@mipmap/icon_zip" />
+
+
+        </RelativeLayout>
+    </LinearLayout>
+
+
 </RelativeLayout>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/mi_chat_main_bg"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:id="@+id/mi_toolbar_container"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:background="@color/mi_chat_main_bg"
+        android:gravity="center_vertical">
+
+        <EditText
+            android:id="@+id/mi_history_search_input"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginRight="58dp"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/icon_edit_text_bg"
+            android:gravity="center_vertical"
+            android:hint="搜索"
+            android:paddingLeft="36dp"
+            android:textSize="14sp" />
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="24dp"
+            android:src="@mipmap/icon_search" />
+
+        <TextView
+            android:id="@+id/mi_cancel_search_history"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_alignParentRight="true"
+            android:layout_marginLeft="4dp"
+            android:layout_marginRight="16dp"
+            android:gravity="center_vertical"
+            android:text="取消"
+            android:textColor="@color/mi_text_gray"
+            android:textSize="14sp" />
+    </RelativeLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/mi_show_history"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:visibility="gone"
+        android:focusable="true" />
+
+
+    <LinearLayout
+        android:id="@+id/mi_quick_search_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="68dp"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="快捷搜索" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:gravity="center_horizontal">
+
+            <TextView
+                android:id="@+id/mi_video_photo_search"
+                android:layout_width="98dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="视频/图片" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/mi_gray_bg" />
+
+            <TextView
+                android:id="@+id/mi_local_search"
+                android:layout_width="98dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="位置" />
+
+            <View
+                android:layout_width="1dp"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@color/mi_gray_bg" />
+
+            <TextView
+                android:id="@+id/mi_instruct_search"
+                android:layout_width="98dp"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="指令" />
+
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

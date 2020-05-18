@@ -21,7 +21,7 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<SmartVH> {
     private OnItemChildClickListener mOnItemChildClickListener;
     private OnItemChildLongClickListener mOnItemChildLongClickListener;
 
-    private List<T> mDates = new ArrayList<>();
+    protected List<T> mDates = new ArrayList<>();
     private int mResLayout;
 
 
@@ -42,6 +42,10 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<SmartVH> {
         return new SmartVH(view);
     }
 
+    public void setDates(List<T> mDates) {
+        this.mDates = mDates;
+        notifyDataSetChanged();
+    }
 
     public void setOnItemClickListener(OnItemClickListener mOnItemClickListener) {
         this.mOnItemClickListener = mOnItemClickListener;
@@ -95,6 +99,8 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<SmartVH> {
             });
         }
     }
+
+
 
     protected abstract void onBindView(SmartVH holder, T data, int position);
 

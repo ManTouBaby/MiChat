@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/chat_item_padding"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+
+    <include layout="@layout/include_chat_item_time_tip" />
+
+    <include layout="@layout/include_chat_o_item_pro" />
+
+
+    <LinearLayout
+        android:id="@+id/mi_content_container"
+        style="@style/chat_o_pro_content_space"
+        android:layout_width="wrap_content"
+        android:orientation="vertical"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/mi_item_pro"
+        android:layout_toRightOf="@+id/mi_item_pro">
+
+        <include layout="@layout/include_group_show_name" />
+
+        <TextView
+            android:id="@+id/mi_chat_item_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@mipmap/icon_o_txt_bg"
+            android:gravity="start"
+            android:paddingLeft="14dp"
+            android:paddingTop="10dp"
+            android:paddingRight="10dp"
+            android:paddingBottom="10dp"
+            android:text=""
+            android:textColor="@color/mi_text_black" />
+
+        <TextView
+            android:id="@+id/mi_quote_reply_notify"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:layout_marginLeft="4dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/icon_corner_deep_gray_bg"
+            android:ellipsize="end"
+            android:lines="1"
+            android:maxWidth="208dp"
+            android:paddingLeft="8dp"
+            android:paddingTop="4dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="4dp"
+            android:text="张三：图片" />
+    </LinearLayout>
+
+</RelativeLayout>

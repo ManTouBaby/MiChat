@@ -25,6 +25,7 @@
                 android:id="@+id/mi_chat_item_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:maxWidth="238dp"
                 android:background="@mipmap/icon_m_txt_bg"
                 android:gravity="start"
                 android:paddingLeft="10dp"

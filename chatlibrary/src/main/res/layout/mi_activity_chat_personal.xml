@@ -35,13 +35,21 @@
         android:orientation="horizontal"
         android:padding="16dp">
 
-        <com.hy.chatlibrary.widget.CornerImageView
+        <!--      <com.hy.chatlibrary.widget.SmartImageView
+                  android:id="@+id/mi_member_por"
+                  android:layout_width="68dp"
+                  android:layout_height="68dp"
+                  android:scaleType="fitXY"
+                  android:src="@mipmap/b_o"
+                  app:smart_radius="4dp" />-->
+        <com.hy.chatlibrary.widget.CornerTextView
             android:id="@+id/mi_member_por"
             android:layout_width="68dp"
             android:layout_height="68dp"
-            android:scaleType="fitXY"
-            android:src="@mipmap/b_o"
-            app:radius="4dp" />
+            android:gravity="center"
+            app:auto_background="true"
+            app:radius="4dp"
+            android:text="sss" />
 
         <LinearLayout
             android:layout_width="match_parent"

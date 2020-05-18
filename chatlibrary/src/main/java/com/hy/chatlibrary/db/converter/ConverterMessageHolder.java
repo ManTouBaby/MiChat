@@ -1,4 +1,4 @@
-package com.hy.chatlibrary.db;
+package com.hy.chatlibrary.db.converter;
 
 import android.arch.persistence.room.TypeConverter;
 
@@ -11,7 +11,7 @@ import com.hy.chatlibrary.bean.MessageHolder;
  * @date:2020/04/29 11:22
  * @desc:
  */
-public class MessageHolderConverter {
+public class ConverterMessageHolder {
     @TypeConverter
     public MessageHolder json2Object(String json) {
         return JSON.parseObject(json, MessageHolder.class);

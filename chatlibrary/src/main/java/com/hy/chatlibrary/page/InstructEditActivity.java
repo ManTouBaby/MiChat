@@ -10,12 +10,13 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.hrw.chatlibrary.R;
 import com.hy.chatlibrary.bean.MessageHolder;
-import com.hy.chatlibrary.db.InstructBean;
+import com.hy.chatlibrary.db.entity.InstructBean;
 import com.hy.chatlibrary.utils.StatusBarUtil;
 import com.hy.chatlibrary.utils.glide.GlideLoader;
 import com.mt.filepicker.ImagePicker;
@@ -24,7 +25,7 @@ import com.mt.filepicker.data.MediaFile;
 import java.io.File;
 import java.util.ArrayList;
 
-import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_INSTRUCT_MEMBSER;
+import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_INSTRUCT_MEMBERS;
 import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_INSTRUCT_MODEL;
 import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_PHOTO_VIDEO;
 
@@ -34,22 +35,23 @@ import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_PHOTO_VIDEO;
  * @desc:
  */
 public class InstructEditActivity extends AppCompatActivity {
-    EditText mInstructTitle;
-    EditText mInstructContent;
-    ImageView mShow;
-    ImageView mSelectImage;
-    RelativeLayout mShowContainer;
+    private ImageView mShow;
+    private ImageView mSelectImage;
+    private TextView mAcceptorCount;
+    private EditText mInstructTitle;
+    private EditText mInstructContent;
+    private RelativeLayout mShowContainer;
 
-    ArrayList<MediaFile> mMediaFiles;
+    private ArrayList<MediaFile> mMediaFiles;
     private InstructBean mInstructBean;
-    ArrayList<MessageHolder> mSelectAcceptor = new ArrayList<>();
-    private MediaFile mMediaFile;
+    private ArrayList<MessageHolder> mSelectAcceptor = new ArrayList<>();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         StatusBarUtil.setStatueColor(this, R.color.mi_chat_main_bg, true);
         setContentView(R.layout.mi_activity_instruct_edit);
+        mAcceptorCount = findViewById(R.id.mi_acceptor_cont);
         mInstructTitle = findViewById(R.id.mi_et_instruct_title);
         mInstructContent = findViewById(R.id.mi_instruct_content);
         mShow = findViewById(R.id.mi_select_photo_show);
@@ -62,7 +64,7 @@ public class InstructEditActivity extends AppCompatActivity {
             Intent intent = new Intent(this, InstructAcceptorActivity.class);
             intent.putExtra("AcceptorList", mGroupMembers);
             intent.putExtra("AcceptorListSelect", mSelectAcceptor);
-            startActivityForResult(intent, REQUEST_TAKE_INSTRUCT_MEMBSER);
+            startActivityForResult(intent, REQUEST_TAKE_INSTRUCT_MEMBERS);
         });
         findViewById(R.id.mi_delete_select).setOnClickListener(v -> {
             mShowContainer.setVisibility(View.GONE);
@@ -94,7 +96,7 @@ public class InstructEditActivity extends AppCompatActivity {
             }
             mInstructBean.setTitle(instructTitle);
             mInstructBean.setContent(instructContent);
-            mInstructBean.setAccepters(mGroupMembers);
+            mInstructBean.setAcceptors(mSelectAcceptor);
 
             Intent intent = new Intent();
             intent.putExtra("InstructItem", mInstructBean);
@@ -114,7 +116,6 @@ public class InstructEditActivity extends AppCompatActivity {
                     .setImageLoader(new GlideLoader())//设置自定义图片加载器
                     .start(this, REQUEST_TAKE_PHOTO_VIDEO);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
         });
-
     }
 
     private void goBack() {
@@ -145,7 +146,7 @@ public class InstructEditActivity extends AppCompatActivity {
                     mShowContainer.setVisibility(View.GONE);
                     mSelectImage.setVisibility(View.VISIBLE);
                 } else {
-                    mMediaFile = mMediaFiles.get(0);
+                    MediaFile mMediaFile = mMediaFiles.get(0);
                     String path = mMediaFile.getPath();
                     mShowContainer.setVisibility(View.VISIBLE);
                     mSelectImage.setVisibility(View.GONE);
@@ -157,8 +158,9 @@ public class InstructEditActivity extends AppCompatActivity {
                 mInstructTitle.setText(mInstructBean.getTitle());
                 mInstructContent.setText(mInstructBean.getContent());
             }
-            if (requestCode == REQUEST_TAKE_INSTRUCT_MEMBSER) {
-                mSelectAcceptor = (ArrayList<MessageHolder>) data.getSerializableExtra("AcceptorList");
+            if (requestCode == REQUEST_TAKE_INSTRUCT_MEMBERS) {
+                mSelectAcceptor = (ArrayList<MessageHolder>) data.getSerializableExtra("AcceptorListSelect");
+                mAcceptorCount.setText(mSelectAcceptor.size() + "人");
             }
         }
     }

@@ -1,6 +1,6 @@
 package com.hy.michat.rabbitMQ;
 
-import com.hy.chatlibrary.db.ChatMessage;
+import com.hy.chatlibrary.db.entity.ChatMessage;
 
 /**
  * @author:MtBaby

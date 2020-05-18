@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
     <uses-permission
         android:name="android.permission.MOUNT_UNMOUNT_FILESYSTEMS"
         tools:ignore="ProtectedPermissions" />
@@ -20,8 +21,16 @@
         <activity android:name="com.hy.chatlibrary.page.InstructModelActivity" />
         <activity android:name="com.hy.chatlibrary.page.InstructModelEditActivity" />
         <activity android:name="com.hy.chatlibrary.page.InstructAcceptorActivity" />
-        <activity android:name="com.hy.chatlibrary.page.ChatGroupDetailActivity" />
-        <activity android:name="com.hy.chatlibrary.page.ChatPersonalActivity" />
+        <activity
+            android:name="com.hy.chatlibrary.page.ChatGroupDetailActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name="com.hy.chatlibrary.page.ChatPersonalActivity"
+            android:launchMode="singleTask" />
+        <activity android:name="com.hy.chatlibrary.page.ChatGroupHistoryActivity"
+            android:windowSoftInputMode="stateHidden"
+            android:launchMode="singleTask"/>
         <!--        android:windowSoftInputMode="stateHidden|adjustResize"-->
 
         <provider
@@ -34,8 +43,9 @@
                 android:resource="@xml/file_path" />
         </provider>
 
-<!--        <meta-data-->
-<!--            android:name="com.hy.chatlibrary.utils.MyGlideModule"-->
-<!--            android:value="GlideModule" />-->
+        <!--        <meta-data-->
+        <!--            android:name="com.hy.chatlibrary.utils.MyGlideModule"-->
+        <!--            android:value="GlideModule" />-->
+        <service android:name="com.hy.chatlibrary.service.ChatService" />
     </application>
 </manifest>

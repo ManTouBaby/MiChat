@@ -1,4 +1,4 @@
-package com.hy.chatlibrary.db;
+package com.hy.chatlibrary.db.converter;
 
 import android.arch.persistence.room.TypeConverter;
 
@@ -13,7 +13,7 @@ import java.util.List;
  * @date:2020/04/29 18:38
  * @desc:
  */
-public class InstructAcceptorConverter {
+public class ConverterMessageHolders {
 
     @TypeConverter
     public List<MessageHolder> json2Object(String json) {

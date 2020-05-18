@@ -1,14 +1,5 @@
 package com.hy.chatlibrary.bean;
 
-import com.hy.chatlibrary.db.ChatMessage;
-import com.hy.chatlibrary.utils.DateUtil;
-import com.hy.chatlibrary.utils.UUIDUtil;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
-
 /**
  * @author:MtBaby
  * @date:2020/04/01 9:28
@@ -109,84 +100,5 @@ public class DateModel {
     }
 
 
-    private static int mCount = 0;
 
-    public static void createChatMessageByTime(String messageGroupId, final onChatMessageCreateListener messageCreateListener) {
-        mCount = 0;
-        final Timer timer = new Timer();
-        timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                mCount += 1;
-                ChatMessage chatMessage = createChatMessage(messageGroupId);
-                messageCreateListener.onChatMessageCreate(chatMessage);
-                if (mCount == 80) timer.cancel();
-            }
-        }, 0, 3000);
-
-
-    }
-
-    public static List<ChatMessage> getChatMessages(int count, String messageGroupId) {
-        List<ChatMessage> chatMessages = new ArrayList<>();
-        for (int i = 0; i < count; i++) {
-            ChatMessage chatMessage = createChatMessage(messageGroupId);
-            chatMessages.add(chatMessage);
-        }
-        return chatMessages;
-    }
-
-    private static ChatMessage createChatMessage(String messageGroupId) {
-        int holderType = (int) (Math.random() * 2);
-        int itemType = (int) (Math.random() * 6);
-        int index = (int) (Math.random() * 10);
-        ChatMessage chatMessage = createChatMessage(holderType, itemType);
-        chatMessage.setMessageGroupId(messageGroupId);
-        switch (itemType) {
-            case 0:
-                chatMessage.setMessageContent(labels[index]);
-                chatMessage.setMessageLocalContent(labels[index]);
-                break;
-            case 1:
-                chatMessage.setMessageContent(voices[index].content);
-                chatMessage.setMessageLocalContent(voices[index].content);
-                chatMessage.setDuration(voices[index].duration);
-                break;
-            case 2:
-                chatMessage.setMessageContent(videos[index].content);
-                chatMessage.setMessageLocalContent(videos[index].content);
-                chatMessage.setDuration(videos[index].duration);
-                break;
-            case 3:
-                chatMessage.setMessageContent(images[index]);
-                chatMessage.setMessageLocalContent(images[index]);
-                break;
-            case 4:
-                LocationBO locationBO = locationBOS[index];
-                chatMessage.setLatitude(locationBO.latitude);
-                chatMessage.setLongitude(locationBO.longitude);
-                chatMessage.setLocationAddress(locationBO.locationAddress);
-                chatMessage.setLocationRoad(locationBO.locationRoad);
-                break;
-        }
-
-        return chatMessage;
-    }
-
-    private static ChatMessage createChatMessage(int holder, int contentType) {
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setMessageId(UUIDUtil.getUUID());
-        chatMessage.setMessageOwner(holder);
-        chatMessage.setItemType(contentType);
-        chatMessage.setMessageCT(DateUtil.getSystemTime());
-        chatMessage.setMessageCTMillis(DateUtil.getSystemTimeMilli());
-        chatMessage.setMessageST(DateUtil.getSystemTime());
-        chatMessage.setMessageSTMillis(DateUtil.getSystemTimeMilli());
-        chatMessage.setMessageStatus(0);
-        return chatMessage;
-    }
-
-    public static interface onChatMessageCreateListener {
-        void onChatMessageCreate(ChatMessage chatMessage);
-    }
 }

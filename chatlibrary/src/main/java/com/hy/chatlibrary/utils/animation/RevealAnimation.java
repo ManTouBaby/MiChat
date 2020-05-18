@@ -12,6 +12,7 @@ import android.view.ViewAnimationUtils;
 public class RevealAnimation {
     private boolean preShowing;//动画是否正在执行
     private boolean isShow;//揭露对象是否显示
+    private OnTargViewVisibleListener mOnTargViewVisibleListener;
 
     public boolean isShow() {
         return isShow;
@@ -56,6 +57,9 @@ public class RevealAnimation {
             } else {
                 tagView.setVisibility(View.GONE);
             }
+            if (mOnTargViewVisibleListener!=null){
+                mOnTargViewVisibleListener.onVisibleChange(false);
+            }
 //            StatusBarUtil.setStatueColor(this, R.color.mi_chat_main_bg, true);
             isShow = false;
         } else {//显示 揭露对象
@@ -90,9 +94,18 @@ public class RevealAnimation {
             } else {
                 tagView.setVisibility(View.VISIBLE);
             }
-
+            if (mOnTargViewVisibleListener!=null){
+                mOnTargViewVisibleListener.onVisibleChange(true);
+            }
             isShow = true;
         }
     }
 
+    public void setOnTargViewVisibleListener(OnTargViewVisibleListener mOnTargViewVisibleListener) {
+        this.mOnTargViewVisibleListener = mOnTargViewVisibleListener;
+    }
+
+    public static interface OnTargViewVisibleListener {
+        void onVisibleChange(boolean isVisible);
+    }
 }

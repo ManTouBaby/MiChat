@@ -3,14 +3,21 @@ package com.hy.chatlibrary.widget.chatinput;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SimpleItemAnimator;
 import android.text.Editable;
+import android.text.Selection;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.style.ForegroundColorSpan;
 import android.util.AttributeSet;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -29,6 +36,7 @@ import com.hrw.chatlibrary.R;
 import com.hy.chatlibrary.adapter.BaseChatAdapter;
 import com.hy.chatlibrary.adapter.OnPullDownLoadMoreListener;
 import com.hy.chatlibrary.bean.ChatContentType;
+import com.hy.chatlibrary.db.entity.ChatMessage;
 import com.hy.chatlibrary.utils.DateUtil;
 import com.hy.chatlibrary.utils.audio.AudioManager;
 import com.hy.chatlibrary.utils.audio.AudioRecordHelp;
@@ -134,10 +142,26 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
 
     }
 
-    public void showQuoteEdite(String label) {
+    public void showQuoteEdit(String label) {
         mQuoteContainer.setVisibility(VISIBLE);
         mQuoteLabel.setText(label);
     }
+
+    //添加@引用
+    public void addATQuote(String label) {
+        if (editText != null && editText.getText() != null) {
+            SpannableStringBuilder spannableString = new SpannableStringBuilder(editText.getText());
+            label =  "@" +label+" ";
+            spannableString.append(label);
+            ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#6f6f6f"));
+            spannableString.setSpan(colorSpan, spannableString.length() - label.length(), spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+            editText.setText(spannableString);
+            editText.setSelection(spannableString.length());
+        }
+    }
+
+
+
 
     public void setFilePathDir(String filePathDir) {
         this.filePathDir = filePathDir;
@@ -231,6 +255,32 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
 
             }
         });
+
+        editText.setOnKeyListener((v, keyCode, event) -> {
+            if (keyCode == KeyEvent.KEYCODE_DEL && event.getAction() == KeyEvent.ACTION_DOWN) {
+                final int selectionStart = Selection.getSelectionStart(editText.getText());
+                final int selectionEnd = Selection.getSelectionEnd(editText.getText());
+
+                String string = editText.getText().toString();
+                String[] split = string.split(" @");
+
+
+                final ForegroundColorSpan spans[] = editText.getText().getSpans(selectionStart, selectionEnd, ForegroundColorSpan.class);
+                for (ForegroundColorSpan span : spans) {
+                    if (span == null) {
+                        continue;
+                    }
+                    if (editText.getText().getSpanEnd(span) == selectionStart) {
+                        final int spanStart = editText.getText().getSpanStart(span);
+                        final int spanEnd = editText.getText().getSpanEnd(span);
+//                        System.out.println("要删除的对象:"+editText.getText().subSequence(spanStart, spanEnd));
+                        Selection.setSelection(editText.getText(), spanStart, spanEnd);//选中要删除的字段
+                        return false;
+                    }
+                }
+            }
+            return false;
+        });
     }
 
     //初始化输入框底部布局
@@ -245,7 +295,7 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
         contentTypes.add(new ChatContentType(ContentType.TAKE_PHOTO, "拍照", R.mipmap.icon_type_takephoto));
         contentTypes.add(new ChatContentType(ContentType.TAKE_VIDEO, "录像", R.mipmap.icon_type_takevideo));
         contentTypes.add(new ChatContentType(ContentType.LOCAL, "位置", R.mipmap.icon_type_local));
-        contentTypes.add(new ChatContentType(ContentType.FILE, "文件", R.mipmap.icon_type_file));
+//        contentTypes.add(new ChatContentType(ContentType.FILE, "文件", R.mipmap.icon_type_file));
         contentTypes.add(new ChatContentType(ContentType.INSTRUCT, "指令", R.mipmap.icon_type_command));
 
         rvSendContent = findViewById(R.id.mi_other_send_content);
@@ -259,23 +309,20 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
     @SuppressLint("ClickableViewAccessibility")
     private void initChatList() {
         rvChatList = findViewById(R.id.mi_chat_list);
-//        ((SimpleItemAnimator)rvChatList.getItemAnimator()).setSupportsChangeAnimations(false);
+        rvChatList.setItemViewCacheSize(20);
+        rvChatList.setDrawingCacheEnabled(true);
+        rvChatList.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
+        ((SimpleItemAnimator) rvChatList.getItemAnimator()).setSupportsChangeAnimations(false);
         linearLayoutManager = new LinearLayoutManager(getContext());
         rvChatList.setLayoutManager(linearLayoutManager);
-        rvChatList.setHasFixedSize(true);
+//        rvChatList.setHasFixedSize(true);
+//        rvChatList.setItemViewCacheSize(12);
         rvChatList.setOnTouchListener((v, event) -> {
             closeSoftInputGroup();
             return false;
         });
     }
 
-    public void setLoadMoreComplete() {
-        mBaseChatAdapter.setLoadMoreComplete();
-    }
-
-    public void setLoadMoreSuccess() {
-        mBaseChatAdapter.setLoadMoreSuccess();
-    }
 
     public void setStackFromEnd(boolean stackFromEnd) {
         linearLayoutManager.setStackFromEnd(stackFromEnd);
@@ -284,6 +331,18 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
     //滚动聊天列表到底部
     public void scrollToBottom() {
         linearLayoutManager.scrollToPositionWithOffset(rvChatList.getAdapter().getItemCount() - 1, Integer.MIN_VALUE);
+    }
+
+    public void scrollToPosition(ChatMessage message) {
+        int position = -1;
+        for (int i = 0; i < mBaseChatAdapter.getItemCount(); i++) {
+            List<ChatMessage> chatMessages = mBaseChatAdapter.getChatMessages();
+            if (message.getMessageId().equals(chatMessages.get(i).getMessageId())) {
+                position = i;
+                break;
+            }
+        }
+        linearLayoutManager.scrollToPosition(position);
     }
 
 
@@ -299,22 +358,9 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
         if (id == R.id.emotion_voice) {
             isShowTakeVoiceBtn = !isShowTakeVoiceBtn;
             if (isShowTakeVoiceBtn) {
-                ivVoice.setImageResource(R.mipmap.icon_keyboad);
-                tvVoiceClick.setVisibility(VISIBLE);
-                mLabelMsgContainer.setVisibility(GONE);
-                closeSoftInput();
-                hideContent();
-                hideSendBtn();
+                showTakeVoiceBtn();
             } else {
-                ivVoice.setImageResource(R.mipmap.icon_chat_voice);
-                tvVoiceClick.setVisibility(GONE);
-                mLabelMsgContainer.setVisibility(VISIBLE);
-                openSoftInput();
-                if (editText.getText().length() > 0) {
-                    showSendBtn();
-                } else {
-                    hideSendBtn();
-                }
+                showEditText();
             }
 
         }
@@ -328,6 +374,7 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
                 openSoftInput();
                 hideContent();
             } else {
+                showEditText();
                 showContent();
 //                if (!isOpenSoftKeyBoard) emotionContainer.requestLayout();
                 closeSoftInput();
@@ -341,11 +388,38 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
             }
         }
         if (id == R.id.mi_close_quote) {
-            mQuoteContainer.setVisibility(GONE);
-            mQuoteLabel.setText("");
-            if (mOnCloseQuoteListener != null) {
-                mOnCloseQuoteListener.onCloseQuoteEdite();
-            }
+            closeQuote();
+        }
+    }
+
+    private void showTakeVoiceBtn() {
+        isShowTakeVoiceBtn = true;
+        ivVoice.setImageResource(R.mipmap.icon_keyboad);
+        tvVoiceClick.setVisibility(VISIBLE);
+        mLabelMsgContainer.setVisibility(GONE);
+        closeSoftInput();
+        hideContent();
+        hideSendBtn();
+    }
+
+    private void showEditText() {
+        isShowTakeVoiceBtn = false;
+        ivVoice.setImageResource(R.mipmap.icon_chat_voice);
+        tvVoiceClick.setVisibility(GONE);
+        mLabelMsgContainer.setVisibility(VISIBLE);
+        openSoftInput();
+        if (editText.getText().length() > 0) {
+            showSendBtn();
+        } else {
+            hideSendBtn();
+        }
+    }
+
+    public void closeQuote() {
+        mQuoteContainer.setVisibility(GONE);
+        mQuoteLabel.setText("");
+        if (mOnCloseQuoteListener != null) {
+            mOnCloseQuoteListener.onCloseQuoteEdite();
         }
     }
 
@@ -394,6 +468,14 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
     public void openSoftInput() {
         isOpenSoftKeyBoard = true;
         editText.requestFocus();
+        inputMethodManager.showSoftInput(editText, 0);
+    }
+
+    public void openSoftInput(String label) {
+        isOpenSoftKeyBoard = true;
+        editText.requestFocus();
+        editText.setText(label);
+        editText.setSelection(label.length());
         inputMethodManager.showSoftInput(editText, 0);
 //        int softHeight = getSupportSoftInputHeight();
     }

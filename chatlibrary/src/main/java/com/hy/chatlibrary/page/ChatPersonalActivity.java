@@ -3,13 +3,12 @@ package com.hy.chatlibrary.page;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.hrw.chatlibrary.R;
 import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.utils.StatusBarUtil;
-import com.hy.chatlibrary.utils.glide.GlideHelper;
+import com.hy.chatlibrary.widget.CornerTextView;
 
 /**
  * @author:MtBaby
@@ -17,7 +16,7 @@ import com.hy.chatlibrary.utils.glide.GlideHelper;
  * @desc:
  */
 public class ChatPersonalActivity extends AppCompatActivity {
-    ImageView chatMemberPor;
+    CornerTextView chatMemberPor;
     TextView memberName;
     TextView memberDepart;
     TextView memberDuty;
@@ -35,10 +34,11 @@ public class ChatPersonalActivity extends AppCompatActivity {
         MessageHolder messageHolder = (MessageHolder) getIntent().getSerializableExtra(ChatActivity.CHAT_MEMBER);
         StatusBarUtil.setStatueColor(this, R.color.mi_chat_main_bg, true);
         chatMemberPor = findViewById(R.id.mi_member_por);
-        GlideHelper.loadIntoUseNoCorner(this, messageHolder.getPortrait(), chatMemberPor);
+//        GlideHelper.loadIntoUseNoCorner(this, messageHolder.getPortrait(), chatMemberPor);
         memberName.setText(messageHolder.getName());
         memberDepart.setText(messageHolder.getDepartName());
         memberDuty.setText(messageHolder.getDuty());
         memberPhone.setText(messageHolder.getMobile());
+        chatMemberPor.setAutoBackGroundText(messageHolder.getName());
     }
 }

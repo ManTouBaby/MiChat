@@ -13,7 +13,7 @@ import android.widget.TextView;
 
 import com.hrw.chatlibrary.R;
 import com.hy.chatlibrary.base.SmartVH;
-import com.hy.chatlibrary.db.InstructBean;
+import com.hy.chatlibrary.db.entity.InstructBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -76,7 +76,7 @@ public class InstructModelAdapter extends RecyclerView.Adapter<SmartVH> {
                     .setMessage("确定删除当前指令模板？")
                     .setPositiveButton("确定", (dialog, which) -> {
                         if (mOnInstructItemControlListener != null) {
-                            mOnInstructItemControlListener.onInstructItemRemove(mInstructBean);
+                            mOnInstructItemControlListener.onInstructItemRemove(instructBean);
                         }
                     })
                     .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
@@ -144,7 +144,7 @@ public class InstructModelAdapter extends RecyclerView.Adapter<SmartVH> {
     }
 
     public void removeInstructBean(InstructBean instructBean) {
-        if (instructBean.getId().equals(mInstructBean.getId())) {
+        if (mInstructBean != null && instructBean.getId().equals(mInstructBean.getId())) {
             mInstructBean = null;
             if (mOnInstructItemControlListener != null) {
                 mOnInstructItemControlListener.onInstructItemSelect(mInstructBean);

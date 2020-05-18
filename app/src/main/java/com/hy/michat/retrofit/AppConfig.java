@@ -1,4 +1,4 @@
-package com.hy.chatlibrary.utils.retrofit;
+package com.hy.michat.retrofit;
 
 /**
  * @author:MtBaby

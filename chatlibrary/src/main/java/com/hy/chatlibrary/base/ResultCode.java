@@ -14,5 +14,6 @@ public interface ResultCode {
     int REQUEST_TAKE_PHOTO_VIDEO = 0x006;//指令编辑，获取图片、视屏
     int REQUEST_TAKE_INSTRUCT_MODEL = 0x007;//指令编辑，获取模板
     int REQUEST_TAKE_INSTRUCT_NEW_MODEL = 0x008;//指令编辑，获取模板
-    int REQUEST_TAKE_INSTRUCT_MEMBSER = 0x009;//指令编辑，设置接收人员
+    int REQUEST_TAKE_INSTRUCT_MEMBERS = 0x009;//指令编辑，设置接收人员
+    int REQUEST_GROUP_DETAIL = 0x010;//群组设置
 }

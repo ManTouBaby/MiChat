@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:paddingTop="6dp"
-    android:paddingBottom="16dp"
+    android:paddingBottom="12dp"
     android:text="time"
     android:textColor="#888"
     android:visibility="visible">

@@ -1,5 +1,9 @@
 package com.hy.chatlibrary.bean;
 
+import android.arch.persistence.room.Ignore;
+
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.io.Serializable;
 
 /**
@@ -12,6 +16,7 @@ public class MessageHolder implements Serializable {
     //信息持有者
     private String id;//消息发送人的唯一Id
     private String name;//消息发送人名称
+    private String groupName;//消息发送人群聊名称
     private String departId;//消息发送人所在单位ID
     private String departName;//消息发送人所在单位名称
     private String duty;//消息发送人职务
@@ -19,7 +24,25 @@ public class MessageHolder implements Serializable {
     private String mobile;//移动电话
     private int gender;//性别 男:0  女:1
 
+    @Ignore
+    @JSONField(serialize = false)
+   private boolean isSelect;
 
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
+    }
+
+    public boolean isSelect() {
+        return isSelect;
+    }
+
+    public void setSelect(boolean select) {
+        isSelect = select;
+    }
 
     public String getId() {
         return id;

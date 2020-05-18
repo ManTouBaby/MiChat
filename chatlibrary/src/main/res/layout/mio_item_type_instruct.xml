@@ -10,94 +10,104 @@
 
     <include layout="@layout/include_chat_o_item_pro" />
 
-
-    <RelativeLayout
-        android:id="@+id/mi_content_container"
+    <LinearLayout
         style="@style/chat_o_pro_content_space"
-        android:layout_width="238dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/mi_item_pro"
         android:layout_toRightOf="@+id/mi_item_pro"
-        android:background="@drawable/icon_item_type_instruct_bg"
-        android:padding="8dp">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/mi_instruct_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="标题"
-            android:textColor="@color/mi_text_white"
-            android:textSize="16sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/mi_instruct_holder"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/mi_instruct_title"
-            android:text="指令发布者"
-            android:textColor="@color/mi_text_white"
-            android:textSize="14sp" />
+        <include layout="@layout/include_group_show_name" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:id="@+id/mi_content_container"
+            android:layout_width="238dp"
             android:layout_height="wrap_content"
-            android:layout_below="@id/mi_instruct_holder"
-            android:layout_marginTop="8dp"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:background="@drawable/icon_item_type_instruct_bg"
+            android:padding="8dp">
 
             <TextView
-                android:id="@+id/mi_instruct_content"
+                android:id="@+id/mi_instruct_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/icon_edit_text_bg"
-                android:padding="8dp"
-                android:text="指令内容"
-                android:textColor="@color/mi_text_gray"
-                android:textSize="12sp" />
+                android:text="标题"
+                android:textColor="@color/mi_text_white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
 
-            <ImageView
-                android:id="@+id/mi_instruct_pic"
-                android:layout_width="238dp"
-                android:layout_height="168dp"
-                android:layout_marginTop="2dp"
-                android:background="@color/mi_white_bg"
-                android:scaleType="fitXY"
-                android:src="@mipmap/bms" />
-
-            <RelativeLayout
-                android:id="@+id/mi_instruct_video_container"
+            <TextView
+                android:id="@+id/mi_instruct_holder"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="2dp"
-                android:background="@color/mi_white_bg">
+                android:layout_below="@+id/mi_instruct_title"
+                android:text="指令发布者"
+                android:textColor="@color/mi_text_white"
+                android:textSize="14sp" />
 
-                <ImageView
-                    android:id="@+id/mi_instruct_video_bg"
-                    android:layout_width="238dp"
-                    android:layout_height="168dp"
-                    android:scaleType="fitXY"
-                    android:src="@mipmap/bms" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:layout_centerVertical="true"
-                    android:src="@mipmap/icon_video_player_tag" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/mi_instruct_holder"
+                android:layout_marginTop="8dp"
+                android:orientation="vertical">
 
                 <TextView
-                    android:id="@+id/mi_instruct_video_time"
-                    android:layout_width="wrap_content"
+                    android:id="@+id/mi_instruct_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_alignRight="@+id/mi_item_video_bg"
-                    android:layout_alignBottom="@+id/mi_item_video_bg"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginBottom="8dp"
-                    android:text="0:15"
-                    android:textColor="@color/mi_text_white" />
-            </RelativeLayout>
-        </LinearLayout>
+                    android:background="@drawable/icon_edit_text_bg"
+                    android:padding="8dp"
+                    android:text="指令内容"
+                    android:textColor="@color/mi_text_gray"
+                    android:textSize="12sp" />
 
-    </RelativeLayout>
+                <com.hy.chatlibrary.widget.SmartImageView
+                    android:id="@+id/mi_instruct_pic"
+                    android:layout_width="222dp"
+                    android:layout_height="168dp"
+                    android:layout_marginTop="8dp"
+                    app:smart_radius="4dp" />
+                <RelativeLayout
+                    android:id="@+id/mi_instruct_video_container"
+                    android:layout_width="222dp"
+                    android:layout_height="168dp"
+                    android:layout_marginTop="8dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <com.hy.chatlibrary.widget.SmartImageView
+                            android:id="@+id/mi_instruct_video_bg"
+                            android:layout_width="222dp"
+                            android:layout_height="168dp"
+                            app:smart_radius="4dp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerHorizontal="true"
+                        android:layout_centerVertical="true"
+                        android:src="@mipmap/icon_video_player_tag" />
+
+                    <TextView
+                        android:id="@+id/mi_instruct_video_time"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
+                        android:layout_marginRight="8dp"
+                        android:layout_marginBottom="8dp"
+                        android:text="0:15"
+                        android:textColor="@color/mi_text_white" />
+                </RelativeLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+
 </RelativeLayout>

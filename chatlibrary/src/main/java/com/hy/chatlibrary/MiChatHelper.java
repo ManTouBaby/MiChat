@@ -6,15 +6,24 @@ import android.os.Environment;
 import android.support.annotation.IntDef;
 
 import com.hy.chatlibrary.adapter.BaseChatAdapter;
-import com.hy.chatlibrary.adapter.ChatAdapter;
 import com.hy.chatlibrary.bean.ChatGroupDetail;
 import com.hy.chatlibrary.bean.MessageHolder;
+import com.hy.chatlibrary.db.entity.ChatMessage;
+import com.hy.chatlibrary.listener.IChatMessageControl;
 import com.hy.chatlibrary.listener.OnChatInputListener;
 import com.hy.chatlibrary.page.ChatActivity;
+import com.hy.chatlibrary.service.ChatService;
+import com.hy.chatlibrary.service.EBChatMessageControl;
+import com.hy.chatlibrary.service.EBInitChatGroup;
+import com.hy.chatlibrary.service.EBInitChatGroupMember;
+import com.hy.chatlibrary.service.EBUpdateChatDisplayName;
+import com.hy.chatlibrary.service.IMQManager;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author:MtBaby
@@ -22,6 +31,14 @@ import java.util.ArrayList;
  * @desc:
  */
 public class MiChatHelper {
+    public final static String CHAT_GROUP_ID = "chatGroupId";
+    public final static String CHAT_GROUP_MEMBER_ID = "chatGroupMemberId";
+    public final static String CHAT_GROUP_MEMBER_GROUP_NAME = "chatGroupMemberGroupName";
+    public final static String CHAT_GROUP_NAME = "chatGroupName";
+    public final static String CHAT_GROUP_DETAIL = "chatGroupDetail";
+    public final static String CHAT_GROUP_MEMBER = "chatGroupMember";
+
+    private static ChatMessageControl chatMessageControl = new ChatMessageControl();
     private static MiChatHelper mMiChatHelper;
     private static Option mOption;
 
@@ -35,7 +52,6 @@ public class MiChatHelper {
 
 
     private MiChatHelper() {
-
     }
 
     public static MiChatHelper getInstance() {
@@ -49,18 +65,107 @@ public class MiChatHelper {
         return mMiChatHelper;
     }
 
-    public MiChatHelper setOption(Option option) {
-        mOption = option;
+    //登录聊天
+    public MiChatHelper loginIM(Context context, MessageHolder messageHolder, String userMQPW, IMQManager imqManager, OnChatInputListener onChatInputListener) {
+        mOption = new MiChatHelper.Option();
+        mOption.setFileDirName(context.getPackageName())
+                .setNetTimeUrl("http://www.baidu.com")
+                .setOpenNetTime(true)
+                .setMessageHolder(messageHolder)
+                .setOnChatInputListener(onChatInputListener);
+
+        Intent intent = new Intent(context, ChatService.class);
+        intent.putExtra(ChatService.LOGIN_MEMBER, messageHolder);
+        intent.putExtra(ChatService.LOGIN_PW, userMQPW);
+        context.startService(intent);
+        ChatService.setImqManager(imqManager);
         return mMiChatHelper;
+    }
+
+    //设置推送
+    public void addMQMessage(ChatMessage chatMessage) {
+        EventBus.getDefault().post(chatMessage);
+    }
+
+    //群聊初始化
+    public void initChatGroupList(List<ChatMessage> chatMessages, String initChatMessageID, String errorLabel) {
+        EventBus.getDefault().post(new EBInitChatGroup(chatMessages, initChatMessageID, errorLabel));
+    }
+
+    //群聊成员初始化
+    public void initChatGroupMember(List<MessageHolder> messageHolders, String initChatMessageID, String errorLabel) {
+        EventBus.getDefault().post(new EBInitChatGroupMember(messageHolders, initChatMessageID, errorLabel));
+    }
+
+    //更新群聊显示名称
+    public void updateChatGroupShowName(String mChatGroupId, String holderId, String newChatGroupName) {
+        EventBus.getDefault().post(new EBUpdateChatDisplayName(EBUpdateChatDisplayName.UPDATE_MQ, mChatGroupId, holderId, newChatGroupName));
+    }
+
+    //进入聊天界面一
+    public ChatMessageControl gotoChat(Context context, ChatGroupDetail chatGroupDetail) {
+        return gotoChat(context, chatGroupDetail.getMessageGroupId(), chatGroupDetail.getMessageGroupName(), chatGroupDetail.getMessageGroupDes());
+    }
+
+    //进入聊天界面二
+    public ChatMessageControl gotoChat(Context context, String chatGroupId, String chatGroupName, String chatGroupDetail) {
+        if (mOption.messageHolder == null) {
+            throw new NullPointerException("The MessageHolder of Option con`t be null");
+        }
+        Intent intent = new Intent(context, ChatActivity.class);
+        intent.putExtra(CHAT_GROUP_ID, chatGroupId);
+        intent.putExtra(CHAT_GROUP_NAME, chatGroupName);
+        intent.putExtra(CHAT_GROUP_DETAIL, chatGroupDetail);
+        context.startActivity(intent);
+        return chatMessageControl;
+    }
+
+
+    public static class ChatMessageControl implements IChatMessageControl {
+
+        @Override
+        public void onSendFail(ChatMessage chatMessage, String msg) {
+            EventBus.getDefault().post(new EBChatMessageControl(EBChatMessageControl.TYPE_ERROR, chatMessage));
+        }
+
+        @Override
+        public void onSendSuccess(ChatMessage chatMessage) {
+            EventBus.getDefault().post(new EBChatMessageControl(EBChatMessageControl.TYPE_SUCCESS, chatMessage));
+        }
+
+        @Override
+        public void onRemoveSuccess(ChatMessage chatMessage) {
+            EventBus.getDefault().post(new EBChatMessageControl(EBChatMessageControl.TYPE_REMOVE_SUCCESS, chatMessage));
+        }
+
+        @Override
+        public void onRemoveFail(ChatMessage chatMessage, String msg) {
+            EventBus.getDefault().post(new EBChatMessageControl(EBChatMessageControl.TYPE_REMOVE_ERROR, chatMessage));
+        }
+
+        @Override
+        public void onUpdateChatDisplayNameFail(String mChatGroupId, String memberId, String msg) {
+            EventBus.getDefault().post(new EBUpdateChatDisplayName(EBUpdateChatDisplayName.TYPE_ERROR, mChatGroupId, memberId, null, msg));
+        }
+
+        @Override
+        public void onUpdateChatDisplayNameSuccess(String mChatGroupId, String memberId, String newChatGroupName) {
+            EventBus.getDefault().post(new EBUpdateChatDisplayName(EBUpdateChatDisplayName.TYPE_SUCCESS, mChatGroupId, memberId, newChatGroupName, null));
+        }
+
+        @Override
+        public void notifyRemove(ChatMessage message) {
+            EventBus.getDefault().post(new EBChatMessageControl(EBChatMessageControl.TYPE_NOTIFY_REMOVE, message));
+        }
+    }
+
+    public ChatMessageControl getChatMessageControl() {
+        return chatMessageControl;
     }
 
     public String getFileDirName() {
         return mOption.fileDirName;
     }
-
-//    public ArrayList<MessageHolder> getGroupMembers() {
-//        return mOption.groupMembers;
-//    }
 
     public boolean isOpenEmotion() {
         return mOption.isOpenEmotion;
@@ -108,30 +213,6 @@ public class MiChatHelper {
         return mOption.onChatInputListener;
     }
 
-
-    public void gotoChat(Context context, ChatGroupDetail chatGroupDetail) {
-        gotoChat(context, chatGroupDetail.getMessageGroupId(), chatGroupDetail.getMessageGroupName(), chatGroupDetail.getMessageGroupDes(), chatGroupDetail.getGroupMembers());
-    }
-
-    public void gotoChat(Context context, String chatGroupId, String chatGroupName, String chatGroupDetail, ArrayList<MessageHolder> groupMembers) {
-        if (mOption.messageHolder == null) {
-            throw new NullPointerException("The MessageHolder of Option con`t be null");
-        }
-        Intent intent = new Intent(context, ChatActivity.class);
-        intent.putExtra(CHAT_GROUP_ID, chatGroupId);
-        intent.putExtra(CHAT_GROUP_NAME, chatGroupName);
-        intent.putExtra(CHAT_GROUP_DETAIL, chatGroupDetail);
-        intent.putExtra(CHAT_GROUP_MEMBER, groupMembers);
-//        intent.putExtra("chatGroupType", groupType);
-
-        context.startActivity(intent);
-    }
-
-    public final static String CHAT_GROUP_ID = "chatGroupId";
-    public final static String CHAT_GROUP_NAME = "chatGroupName";
-    public final static String CHAT_GROUP_DETAIL = "chatGroupDetail";
-    public final static String CHAT_GROUP_MEMBER = "chatGroupMember";
-
     public static class Option {
         private boolean isOpenEmotion = true;//是否开启表情
         private boolean isOpenRadio = true;//是否开启录音功能
@@ -144,7 +225,7 @@ public class MiChatHelper {
         private String netTimeUrl = "http://www.baidu.com";//获取网络时间的地址
         private MessageHolder messageHolder;
         //        private ArrayList<MessageHolder> groupMembers;//群成员列表
-        private BaseChatAdapter adapter = new ChatAdapter();
+        private BaseChatAdapter adapter;
         OnChatInputListener onChatInputListener;
 
 //        public Option setGroupMembers(ArrayList<MessageHolder> groupMembers) {

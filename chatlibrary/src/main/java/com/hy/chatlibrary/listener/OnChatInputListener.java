@@ -1,6 +1,6 @@
 package com.hy.chatlibrary.listener;
 
-import com.hy.chatlibrary.db.ChatMessage;
+import com.hy.chatlibrary.db.entity.ChatMessage;
 
 /**
  * @author:MtBaby
@@ -15,7 +15,9 @@ public interface OnChatInputListener {
     void onChatMessageCallBack(ChatMessage message);
 
     //初始化列表
-    void onInitChatList(ChatMessage chatMessage, OnNetMessageControl onNetMessageControl);
+    void onInitChatList(ChatMessage chatMessage,String mChatGroupId);
 
-    void onDestroy();
+    //修改群聊显示名称
+    void changeChatDisplayName(String mChatGroupId,String memberId,String newChatGroupName);
+
 }

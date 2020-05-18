@@ -1,6 +1,5 @@
 package com.hy.chatlibrary.adapter;
 
-import android.graphics.Rect;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,7 +10,7 @@ import android.view.ViewGroup;
 
 import com.hrw.chatlibrary.R;
 import com.hy.chatlibrary.base.SmartVH;
-import com.hy.chatlibrary.db.ChatMessage;
+import com.hy.chatlibrary.db.entity.ChatMessage;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -62,14 +61,14 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
                 mOnSendFailTagClickListener.onSendFailTagClick(chatMessage);
             }
         });
-        View itemView = holder.getItemView();
-        itemView.setOnLongClickListener(v -> {
-            Rect rect = new Rect();
-            //1、获取main在窗体的可视区域
-            itemView.getWindowVisibleDisplayFrame(rect);
-            System.out.println("可视化区域位置:" + rect.toString());
-            return true;
-        });
+//        View itemView = holder.getItemView();
+//        itemView.setOnLongClickListener(v -> {
+//            Rect rect = new Rect();
+//            //1、获取main在窗体的可视区域
+//            itemView.getWindowVisibleDisplayFrame(rect);
+//            System.out.println("可视化区域位置:" + rect.toString());
+//            return true;
+//        });
     }
 
     @Override
@@ -82,10 +81,12 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
                 if (onLoadMoreComplete) return;
                 LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
                 int firstVisibleItemPosition = linearLayoutManager.findFirstCompletelyVisibleItemPosition();
+//                System.out.println("下拉检查:"+firstVisibleItemPosition+"  是否真正下拉:"+onPullDowning);
                 if (firstVisibleItemPosition == 0 && newState == RecyclerView.SCROLL_STATE_IDLE && !onPullDowning) {
                     onPullDowning = true;
                     if (mOnPullDownLoadMoreListener != null) {
-                        mOnPullDownLoadMoreListener.onLoadMore();
+//                        System.out.println("下拉加载...");
+                        mOnPullDownLoadMoreListener.onLoadMore(getFirstItem());
                     }
                 }
             }
@@ -93,7 +94,7 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
     }
 
     void addChildViewClick(View view, final ChatMessage chatMessage) {
-        view.setOnClickListener(v -> {
+        if (view != null) view.setOnClickListener(v -> {
             if (mOnChatItemChildClickListener != null) {
                 mOnChatItemChildClickListener.onItemChildClick(v, chatMessage);
             }
@@ -101,7 +102,7 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
     }
 
     void addChildViewLongClick(View view, final ChatMessage chatMessage) {
-        view.setOnLongClickListener(v -> {
+        if (view != null) view.setOnLongClickListener(v -> {
             if (mOnChatItemChildLongClickListener != null) {
                 mOnChatItemChildLongClickListener.onItemChildLongClick(v, chatMessage);
             }
@@ -119,7 +120,7 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
         if (chatMessage.getMessageOwner() == 0) {
             return chatMessage.getItemType();
         } else if (chatMessage.getMessageOwner() == 1) {
-            return chatMessage.getItemType() + 20;
+            return chatMessage.getItemType() + 100;
         } else {
             return -1;
         }
@@ -130,6 +131,33 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
         return mChatMessages.size();
     }
 
+    public List<ChatMessage> getChatMessages() {
+        return mChatMessages;
+    }
+
+    public boolean isContainer(ChatMessage chatMessage) {
+        boolean isExist = false;
+        for (ChatMessage message : mChatMessages) {
+            if (chatMessage.getMessageId().equals(message.getMessageId())) {
+                isExist = true;
+                break;
+            }
+        }
+        return isExist;
+    }
+
+    //获取第一个存在的Item
+    public ChatMessage getFirstItem() {
+        if (mChatMessages.size() == 0) {
+            return null;
+        } else {
+            if (mChatMessages.get(0).getItemType() == -1) {
+                return mChatMessages.get(1);
+            } else {
+                return mChatMessages.get(0);
+            }
+        }
+    }
 
     @Override
     public void addNetMessages(List<ChatMessage> chatMessages) {
@@ -164,26 +192,20 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
         notifyItemChanged(size);
     }
 
-    //下拉加载完成
-    public void setLoadMoreComplete() {
-        onLoadMoreComplete = true;
-        if (mChatMessages.size() > 0 && "-1".equals(mChatMessages.get(0).getMessageId())) {
-            mChatMessages.remove(0);
-            notifyItemRemoved(0);
+    @Override
+    public void removeMessage(ChatMessage message) {
+        int removePosition = -1;
+        for (int i = 0; i < mChatMessages.size(); i++) {
+            ChatMessage bean = mChatMessages.get(i);
+            if (bean.getMessageId().equals(message.getMessageId())) {
+                removePosition = i;
+                break;
+            }
         }
-    }
-
-    //下拉加载成功
-    public void setLoadMoreSuccess() {
-        onPullDowning = false;
-    }
-
-    private ChatMessage createLoadMoreChatMessage() {
-        ChatMessage chatMessage = new ChatMessage();
-        chatMessage.setMessageId("-1");
-        chatMessage.setItemType(-1);
-        chatMessage.setMessageOwner(-1);
-        return chatMessage;
+       if (removePosition!=-1){
+           this.mChatMessages.remove(removePosition);
+           notifyItemRemoved(removePosition);
+       }
     }
 
     @Override
@@ -206,6 +228,29 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
         mChatMessages.clear();
         notifyDataSetChanged();
     }
+
+    //下拉加载完成
+    public void setLoadMoreComplete() {
+        onLoadMoreComplete = true;
+        if (mChatMessages.size() > 0 && "-1".equals(mChatMessages.get(0).getMessageId())) {
+            mChatMessages.remove(0);
+            notifyItemRemoved(0);
+        }
+    }
+
+    //下拉加载成功
+    public void setLoadMoreSuccess() {
+        onPullDowning = false;
+    }
+
+    private ChatMessage createLoadMoreChatMessage() {
+        ChatMessage chatMessage = new ChatMessage();
+        chatMessage.setMessageId("-1");
+        chatMessage.setItemType(-1);
+        chatMessage.setMessageOwner(-1);
+        return chatMessage;
+    }
+
 
     public void setOnSendFailTagClickListener(OnSendFailTagClickListener mOnSendFailTagClickListener) {
         this.mOnSendFailTagClickListener = mOnSendFailTagClickListener;

@@ -20,12 +20,15 @@ import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MarkerOptions;
 import com.hrw.chatlibrary.R;
 import com.hy.chatlibrary.base.SmartVH;
-import com.hy.chatlibrary.db.ChatMessage;
-import com.hy.chatlibrary.db.InstructBean;
+import com.hy.chatlibrary.bean.MessageHolder;
+import com.hy.chatlibrary.db.entity.ChatMessage;
+import com.hy.chatlibrary.db.entity.InstructBean;
 import com.hy.chatlibrary.utils.DateUtil;
 import com.hy.chatlibrary.utils.MediaPlayerUtil;
+import com.hy.chatlibrary.utils.SPHelper;
 import com.hy.chatlibrary.utils.StringUtil;
 import com.hy.chatlibrary.utils.glide.GlideHelper;
+import com.hy.chatlibrary.widget.CornerTextView;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -53,14 +56,20 @@ public class ChatAdapter extends BaseChatAdapter {
         sparseIntArray.put(4, R.layout.mim_item_type_local);
         sparseIntArray.put(5, R.layout.mim_item_type_file);
         sparseIntArray.put(6, R.layout.mim_item_type_instruct);
+        sparseIntArray.put(7, R.layout.mim_item_type_quote_reply);
+        sparseIntArray.put(8, R.layout.mim_item_type_quote_reply);
+        sparseIntArray.put(9, R.layout.mim_item_type_txt);
 
-        sparseIntArray.put(20, R.layout.mio_item_type_txt);
-        sparseIntArray.put(21, R.layout.mio_item_type_voice);
-        sparseIntArray.put(22, R.layout.mio_item_type_video);
-        sparseIntArray.put(23, R.layout.mio_item_type_pic);
-        sparseIntArray.put(24, R.layout.mio_item_type_local);
-        sparseIntArray.put(25, R.layout.mio_item_type_file);
-        sparseIntArray.put(26, R.layout.mio_item_type_instruct);
+        sparseIntArray.put(100, R.layout.mio_item_type_txt);
+        sparseIntArray.put(101, R.layout.mio_item_type_voice);
+        sparseIntArray.put(102, R.layout.mio_item_type_video);
+        sparseIntArray.put(103, R.layout.mio_item_type_pic);
+        sparseIntArray.put(104, R.layout.mio_item_type_local);
+        sparseIntArray.put(105, R.layout.mio_item_type_file);
+        sparseIntArray.put(106, R.layout.mio_item_type_instruct);
+        sparseIntArray.put(107, R.layout.mio_item_type_quote_reply);
+        sparseIntArray.put(108, R.layout.mio_item_type_quote_reply);
+        sparseIntArray.put(109, R.layout.mio_item_type_txt);
         return sparseIntArray;
     }
 
@@ -68,23 +77,40 @@ public class ChatAdapter extends BaseChatAdapter {
     @Override
     public void onBindView(final SmartVH holder, final int position) {
         final ChatMessage chatMessage = mChatMessages.get(position);
-        TextView text = holder.getText(R.id.mi_message_time);
+        TextView msgTime = holder.getText(R.id.mi_message_time);
         View view = holder.getViewById(R.id.mi_content_container);   //item单击监听
-        addChildViewClick(holder.getImage(R.id.mi_item_pro), chatMessage);
-
-        if (text != null) {
-            text.setVisibility(TextUtils.isEmpty(chatMessage.getMessageST()) ? View.GONE : View.VISIBLE);
-            text.setText(chatMessage.getMessageST());
+        CornerTextView holderPro = holder.getViewById(R.id.mi_item_pro);
+        if (holderPro != null) {
+            addChildViewClick(holderPro, chatMessage);
+            holderPro.setAutoBackGroundText(chatMessage.getMessageHolder().getName());
         }
-        holder.itemView.setTag(chatMessage);
-        String filePath = chatMessage.getMessageLocalContent();
+        if (chatMessage.getMessageOwner() == 1 && holderPro != null)
+            addChildViewLongClick(holderPro, chatMessage);
+        if (msgTime != null) {
+            if (position > 0) {
+                ChatMessage message = mChatMessages.get(position - 1);
+                long spaceTime = chatMessage.getMessageSTMillis() - message.getMessageSTMillis();
+                if (spaceTime > 2 * 60 * 1000) {
+                    msgTime.setVisibility(View.VISIBLE);
+                    msgTime.setText(chatMessage.getMessageST());
+                } else {
+                    msgTime.setVisibility(View.GONE);
+                }
+            }else {
+                msgTime.setText(chatMessage.getMessageST());
+            }
+        }
+
+        String filePath = chatMessage.getMessageLocalPath();
         File file = new File(StringUtil.isEmpty(filePath));
         if (!file.exists()) {
-            filePath = chatMessage.getMessageContent();
+            filePath = chatMessage.getMessageNetPath();
         }
         if (view != null) addChildViewLongClick(view, chatMessage);
+        MessageHolder messageHolder = chatMessage.getMessageHolder();
         switch (chatMessage.getItemType()) {
             case 0:
+            case 9:
                 String content = chatMessage.getMessageContent();
                 holder.getText(R.id.mi_chat_item_text).setText(StringUtil.isEmpty(content));
                 break;
@@ -99,7 +125,7 @@ public class ChatAdapter extends BaseChatAdapter {
                 }
                 //处理语音
                 String finalFilePath = filePath;
-                view.setOnClickListener(v -> {
+                if (view != null) view.setOnClickListener(v -> {
                     //单击语音时不管所单击的Item是不是正在播放的语音，都进行停止
                     if (chatMessage.isPlayer()) {
                         stopVoicePlay();
@@ -114,19 +140,19 @@ public class ChatAdapter extends BaseChatAdapter {
                 });
                 break;
             case 2:
-                addChildViewClick(view, chatMessage);
+                if (view != null) addChildViewClick(view, chatMessage);
                 holder.getText(R.id.mi_item_video_time).setText(DateUtil.long2String(chatMessage.getDuration()));
                 GlideHelper.loadIntoUseNoCorner(holder.itemView.getContext(), filePath, holder.getImage(R.id.mi_item_video_bg));
                 break;
             case 3:
-                addChildViewClick(view, chatMessage);
+                if (view != null) addChildViewClick(view, chatMessage);
                 GlideHelper.loadIntoUseNoCorner(holder.itemView.getContext(), filePath, holder.getImage(R.id.mi_item_pic));
                 break;
             case 4://地图
-                addChildViewClick(view, chatMessage);
+                if (view != null) addChildViewClick(view, chatMessage);
                 TextureMapView textureMapView = holder.getViewById(R.id.tmv_show);
                 textureMapViews.add(textureMapView);
-                if (textureMapView != null) {
+                if (textureMapView != null && view != null) {
                     TextView localName = view.findViewById(R.id.mi_local_name);
                     TextView localRoad = view.findViewById(R.id.mi_local_road);
                     localName.setText(chatMessage.getLocationAddress());
@@ -162,10 +188,16 @@ public class ChatAdapter extends BaseChatAdapter {
                 RelativeLayout instructVideoContainer = holder.getViewById(R.id.mi_instruct_video_container);
                 instructTitle.setText(StringUtil.isEmpty(instructBean.getTitle()));
                 instructContent.setText(StringUtil.isEmpty(instructBean.getContent()));
-                instructHolder.setText(StringUtil.isEmpty(chatMessage.getMessageHolder().getName()));
+                instructHolder.setText(StringUtil.isEmpty(messageHolder.getName()));
 
-                String netFilePath = instructBean.getNetFilePath();
+                addChildViewClick(instructVideoContainer, chatMessage);
+                addChildViewClick(instructPic, chatMessage);
+
                 String localFilePath = instructBean.getLocalFilePath();
+                File instructFile = new File(StringUtil.isEmpty(localFilePath));
+                if (!instructFile.exists()) {
+                    localFilePath = instructBean.getNetFilePath();
+                }
                 long duration = instructBean.getDuration();
                 instructVideoContainer.setVisibility(View.GONE);
                 instructPic.setVisibility(View.GONE);
@@ -180,8 +212,22 @@ public class ChatAdapter extends BaseChatAdapter {
                     }
                 }
                 break;
+            case 7:
+            case 8:
+                ChatMessage quoteMessage = chatMessage.getChatMessage();
+                holder.getText(R.id.mi_chat_item_text).setText(StringUtil.isEmpty(chatMessage.getMessageContent()));
+                TextView quoteShow = holder.getText(R.id.mi_quote_reply_notify);
+                quoteShow.setText(quoteMessage.getMessageHolderShowName() + "：" + quoteMessage.getMessageContent());
+                addChildViewClick(quoteShow, chatMessage);
+                break;
         }
 
+        if (chatMessage.getMessageOwner() == 1) {
+            TextView groupShowName = holder.getText(R.id.mi_group_show_name);
+            boolean isOpenGroupName = SPHelper.getInstance(holder.getItemView().getContext()).getBoolean(SPHelper.IS_OPEN_GROUP_NAME);
+            groupShowName.setVisibility(isOpenGroupName ? View.VISIBLE : View.GONE);
+            groupShowName.setText(TextUtils.isEmpty(messageHolder.getGroupName()) ? messageHolder.getName() : messageHolder.getGroupName());
+        }
 
         //自己的信息
         if (chatMessage.getMessageOwner() == 0) {

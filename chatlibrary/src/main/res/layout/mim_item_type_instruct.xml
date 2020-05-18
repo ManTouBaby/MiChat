@@ -17,24 +17,23 @@
 
         <include layout="@layout/include_chat_send_status" />
 
-        <RelativeLayout
+        <LinearLayout
             android:id="@+id/mi_content_container"
             android:layout_width="238dp"
             android:layout_height="wrap_content"
-            android:layout_alignTop="@+id/mi_item_pro"
             android:layout_marginRight="8dp"
-            android:layout_toLeftOf="@+id/mi_item_pro"
             android:background="@drawable/icon_item_type_instruct_bg"
+            android:orientation="vertical"
             android:padding="8dp">
 
             <TextView
                 android:id="@+id/mi_instruct_title"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center_vertical"
                 android:text="标题"
                 android:textColor="@color/mi_text_white"
-                android:textSize="16sp"
-                android:textStyle="bold" />
+                android:textSize="17sp" />
 
             <TextView
                 android:id="@+id/mi_instruct_holder"
@@ -62,26 +61,30 @@
                     android:textColor="@color/mi_text_gray"
                     android:textSize="12sp" />
 
-                <ImageView
+                <com.hy.chatlibrary.widget.SmartImageView
                     android:id="@+id/mi_instruct_pic"
-                    android:layout_width="238dp"
+                    android:layout_width="222dp"
                     android:layout_height="168dp"
-                    android:layout_marginTop="2dp"
-                    android:scaleType="fitXY"
-                    android:src="@mipmap/bms" />
+                    android:layout_marginTop="8dp"
+                    app:smart_radius="4dp" />
 
                 <RelativeLayout
                     android:id="@+id/mi_instruct_video_container"
-                    android:layout_width="match_parent"
+                    android:layout_width="222dp"
                     android:layout_height="168dp"
-                    android:layout_marginTop="2dp">
+                    android:layout_marginTop="8dp">
 
-                    <ImageView
-                        android:id="@+id/mi_instruct_video_bg"
-                        android:layout_width="238dp"
-                        android:layout_height="168dp"
-                        android:scaleType="fitXY"
-                        android:src="@mipmap/bms" />
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content">
+
+                        <com.hy.chatlibrary.widget.SmartImageView
+                            android:id="@+id/mi_instruct_video_bg"
+                            android:layout_width="222dp"
+                            android:layout_height="168dp"
+                            app:smart_radius="4dp" />
+                    </LinearLayout>
+
 
                     <ImageView
                         android:layout_width="wrap_content"
@@ -94,8 +97,8 @@
                         android:id="@+id/mi_instruct_video_time"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignRight="@+id/mi_instruct_video_bg"
-                        android:layout_alignBottom="@+id/mi_instruct_video_bg"
+                        android:layout_alignParentRight="true"
+                        android:layout_alignParentBottom="true"
                         android:layout_marginRight="8dp"
                         android:layout_marginBottom="8dp"
                         android:text="0:15"
@@ -104,7 +107,7 @@
             </LinearLayout>
 
 
-        </RelativeLayout>
+        </LinearLayout>
 
         <include layout="@layout/include_chat_m_item_pro" />
     </LinearLayout>

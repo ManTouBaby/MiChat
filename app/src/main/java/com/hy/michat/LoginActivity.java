@@ -15,6 +15,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.hy.michat.rabbitMQ.MQLoginResult;
 import com.hy.michat.rabbitMQ.RabbitMQManager;
 
 import org.greenrobot.eventbus.EventBus;
@@ -28,7 +29,7 @@ import org.greenrobot.eventbus.ThreadMode;
  * @desc:
  */
 public class LoginActivity extends AppCompatActivity {
-    private RabbitMQManager mRabbitMQManager;
+    //    private RabbitMQManager mRabbitMQManager;
     private EditText loginUser;
     private EditText loginPW;
     private CheckBox checkBox;
@@ -44,7 +45,7 @@ public class LoginActivity extends AppCompatActivity {
         checkBox = findViewById(R.id.login_remember);
 
         EventBus.getDefault().register(this);
-        mRabbitMQManager = RabbitMQManager.getInstance();
+//        mRabbitMQManager = RabbitMQManager.getInstance();
         if (Build.VERSION.SDK_INT >= 21) {
             View decorView = getWindow().getDecorView();
             //让应用主题内容占用系统状态栏的空间,注意:下面两个参数必须一起使用 stable 牢固的
@@ -62,17 +63,26 @@ public class LoginActivity extends AppCompatActivity {
             loginUser.setText(loginUserLabel);
             loginPW.setText(loginPSLabel);
         }
-
-
         checkBox.setChecked(isRemember);
-        Button button = findViewById(R.id.mi_login_submit);
-        button.setOnClickListener(v -> {
-            mRabbitMQManager.connect(loginUser.getText().toString(), loginUser.getText().toString(), loginPW.getText().toString());
-            showLoginAnimate();
-        });
         checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> {
             mLoginRemember.edit().putBoolean("isRemember", isChecked).apply();
         });
+        Button button = findViewById(R.id.mi_login_submit);
+        //登录按钮
+        button.setOnClickListener(v -> {
+            showLoginAnimate();
+            String loginUser = this.loginUser.getText().toString();
+            String loginPW = this.loginPW.getText().toString();
+            ChatManager.getInstance().loginChatGroup(this, loginUser, loginPW,
+                    "440106970002",
+                    "政治处",
+                    "处长",
+                    0,
+                    "13829793053",
+                    "http://i0.hdslb.com/bfs/article/8e87829cde9559c8407892aa6110f83a4631c6b3.jpg",
+                    new RabbitMQManager());
+        });
+
     }
 
     private void showLoginAnimate() {
@@ -82,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void loginMsg(LoginTag isLogin) {
+    public void loginMsg(MQLoginResult isLogin) {
         if (dialog != null && dialog.isShowing()) dialog.dismiss();
         if (isLogin.isLogin) {
 
@@ -92,7 +102,6 @@ public class LoginActivity extends AppCompatActivity {
                 mLoginRemember.edit().putString("loginPS", loginPW.getText().toString()).apply();
             }
             startActivity(new Intent(this, MainActivity.class));
-            ChatManager.getInstance().loginChatGroup(getPackageName(), loginUser.getText().toString(), "440106970002", "政治处", "处长", 0, "13829793053", "http://i0.hdslb.com/bfs/article/8e87829cde9559c8407892aa6110f83a4631c6b3.jpg");
             finish();
         } else {
             Toast.makeText(this, "登录失败", Toast.LENGTH_SHORT).show();

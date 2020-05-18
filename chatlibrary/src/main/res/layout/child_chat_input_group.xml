@@ -51,14 +51,15 @@
                 <EditText
                     android:id="@+id/edit_text"
                     android:layout_width="match_parent"
-                    android:layout_height="36dp"
+                    android:layout_height="wrap_content"
+                    android:minHeight="36dp"
                     android:layout_marginBottom="6dp"
                     android:background="@drawable/icon_edit_text_bg"
                     android:clickable="true"
                     android:focusableInTouchMode="true"
-                    android:maxLines="3"
-                    android:paddingLeft="16dp"
-                    android:paddingRight="16dp"
+                    android:maxLines="2"
+                    android:paddingLeft="8dp"
+                    android:paddingRight="8dp"
                     android:textSize="16sp" />
 
                 <RelativeLayout

@@ -9,14 +9,23 @@
 
     <include layout="@layout/include_chat_o_item_pro" />
 
-    <RelativeLayout
-        android:id="@+id/mi_content_container"
+    <LinearLayout
         style="@style/chat_o_pro_content_space"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignTop="@+id/mi_item_pro"
-        android:layout_toRightOf="@+id/mi_item_pro">
+        android:layout_toRightOf="@+id/mi_item_pro"
+        android:orientation="vertical">
 
-        <include layout="@layout/include_video_player" />
-    </RelativeLayout>
+        <include layout="@layout/include_group_show_name" />
+
+        <RelativeLayout
+            android:id="@+id/mi_content_container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <include layout="@layout/include_video_player" />
+        </RelativeLayout>
+    </LinearLayout>
+
 </RelativeLayout>

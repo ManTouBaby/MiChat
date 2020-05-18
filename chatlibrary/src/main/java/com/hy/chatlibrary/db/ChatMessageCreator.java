@@ -8,11 +8,14 @@ import com.alibaba.fastjson.serializer.SimplePropertyPreFilter;
 import com.amap.api.location.AMapLocation;
 import com.hy.chatlibrary.MiChatHelper;
 import com.hy.chatlibrary.bean.MessageHolder;
+import com.hy.chatlibrary.db.entity.ChatMessage;
+import com.hy.chatlibrary.db.entity.InstructBean;
 import com.hy.chatlibrary.listener.OnLocalMessageControl;
 import com.hy.chatlibrary.utils.DateUtil;
 import com.hy.chatlibrary.utils.UUIDUtil;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * @author:MtBaby
@@ -37,25 +40,38 @@ public class ChatMessageCreator {
         this.localMessageControl = localMessageControl;
     }
 
+    //发送@
+    public void createChatMessage(AMapLocation mAMapLocation, List<MessageHolder> messageHolders,String content, OnChatMessageCreateListener onChatMessageCreateListener) {
+        createChatMessage(9, mAMapLocation, messageHolders,null, null, null, content, 0, null, null, 0, 0, onChatMessageCreateListener);
+    }
+
     //发送指令
     public void createChatMessage(AMapLocation mAMapLocation, InstructBean instructBean, OnChatMessageCreateListener onChatMessageCreateListener) {
-        createChatMessage(6, mAMapLocation, instructBean, "发送指令", 0, null, null, 0, 0, onChatMessageCreateListener);
+        createChatMessage(6, mAMapLocation,null, instructBean, null, null, "指令", 0, null, null, 0, 0, onChatMessageCreateListener);
+    }
+
+    //回复指令、引用
+    public void createChatMessage(AMapLocation mAMapLocation, ChatMessage chatMessage, String textLabel, OnChatMessageCreateListener onChatMessageCreateListener) {
+        int msgType = chatMessage.getItemType();
+        createChatMessage(msgType == 6 ? 8 : 7, mAMapLocation,null, null, chatMessage, null, textLabel, 0, null, null, 0, 0, onChatMessageCreateListener);
     }
 
     //位置发送
     public void createChatMessage(AMapLocation mAMapLocation, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
-        createChatMessage(4, mAMapLocation, null, "发送定位", 0, locationAddress, locationRoad, latitude, longitude, messageCreateListener);
+        createChatMessage(4, mAMapLocation,null, null, null, null, "位置", 0, locationAddress, locationRoad, latitude, longitude, messageCreateListener);
     }
 
-    public void createChatMessage(int contentType, AMapLocation mAMapLocation, String content, long duration, OnChatMessageCreateListener messageCreateListener) {
-        createChatMessage(contentType, mAMapLocation, null, content, duration, null, null, 0, 0, messageCreateListener);
+    //文件类型消息发送
+    public void createChatMessage(int contentType, AMapLocation mAMapLocation, String content, String filePath, long duration, OnChatMessageCreateListener messageCreateListener) {
+        createChatMessage(contentType, mAMapLocation,null, null, null, filePath, content, duration, null, null, 0, 0, messageCreateListener);
     }
 
-    public void createChatMessage(int contentType, AMapLocation mAMapLocation, String content, OnChatMessageCreateListener messageCreateListener) {
-        createChatMessage(contentType, mAMapLocation, null, content, 0, null, null, 0, 0, messageCreateListener);
+    //文本发送
+    public void createChatMessage( AMapLocation mAMapLocation, String content, OnChatMessageCreateListener messageCreateListener) {
+        createChatMessage(0, mAMapLocation,null, null, null, null, content, 0, null, null, 0, 0, messageCreateListener);
     }
 
-    public void createChatMessage(int contentType, AMapLocation mAMapLocation, InstructBean instructBean, String content, long duration, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
+    public void createChatMessage(int contentType, AMapLocation mAMapLocation,List<MessageHolder> messageHolders, InstructBean instructBean, ChatMessage quoteMessage, String filePath, String content, long duration, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
         DateUtil.getNetTimeMilliByURL(mMiChatHelper.getNetTimeUrl(), mHandler, netMilli -> {
             ChatMessage chatMessage = new ChatMessage();
             if (contentType == 4) {
@@ -71,13 +87,20 @@ public class ChatMessageCreator {
             chatMessage.setDuration(duration);
             chatMessage.setItemType(contentType);
             chatMessage.setInstructBean(instructBean);
+            chatMessage.setChatMessage(quoteMessage);
+            chatMessage.setMessageHolder(mMessageHolder);
+            chatMessage.setMessageHolderId(mMessageHolder.getId());
+            chatMessage.setMessageHolderName(mMessageHolder.getName());
+            chatMessage.setMessageHolderShowName(mMessageHolder.getGroupName());
+            chatMessage.setMessageHolders(messageHolders);
             File file = new File(content);
             if (file.exists()) {
                 chatMessage.setFileName(file.getName());
                 chatMessage.setFileSize(file.length());
             }
             chatMessage.setMessageContent(content);
-            chatMessage.setMessageLocalContent(content);
+            chatMessage.setMessageLocalPath(filePath);
+            chatMessage.setMessageNetPath(filePath);
             if (mAMapLocation != null) {
                 chatMessage.setMessageLatitude(mAMapLocation.getLatitude());
                 chatMessage.setMessageLongitude(mAMapLocation.getLongitude());

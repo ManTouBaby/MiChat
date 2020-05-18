@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Handler;
 
 import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -42,7 +43,7 @@ public class DateUtil {
         });
     }
 
-    private static void getNetDate(String url, Handler handler, OnNetDateListener onNetDateListener) {
+    public static void getNetDate(String url, OnNetDateListener onNetDateListener) {
         new Thread(() -> {
             Date date;
             try {
@@ -51,11 +52,41 @@ public class DateUtil {
                 conn.connect();  //连接对象网页
                 date = new Date(conn.getDate());  //获取对象网址时间
                 Date finalDate = date;
+                onNetDateListener.netMilli(finalDate);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    private static void getNetDate(String url, Handler handler, OnNetDateListener onNetDateListener) {
+        new Thread(() -> {
+            Date date;
+            HttpURLConnection conn = null;
+            try {
+                URL url1 = new URL(url);
+                conn = (HttpURLConnection) url1.openConnection();  //生成连接对象
+                conn.connect();  //连接对象网页
+                date = new Date(conn.getDate());  //获取对象网址时间
+                Date finalDate = date;
                 handler.post(() -> onNetDateListener.netMilli(finalDate));
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                if (conn != null) {
+                    try {
+                    //主动关闭inputStream
+                    //这里不需要进行判空操作
+                        conn.getInputStream().close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    conn.disconnect();
+                }
             }
         }).start();
     }
