@@ -35,16 +35,17 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
     Switch mIsOpenNoDisturbing;
     Switch mIsOpenName;
     EditText mChatGroupShowName;
-    TextView mGroupName;
+    EditText mChatGroupName;
     TextView mGroupDesc;
     private NoDisturbingDAO mNoDisturbingDAO;
     private NoDisturbing mNoDisturbing;
     private boolean isOpenGroupName;//是否显示群名称
     private boolean isChangeShow;//是否改变显示
-    private String mGroupMemberGroupName;//群聊显示名称
-    private String mOriginalName;//群聊原始显示名称
     private String mGroupId;
     private String mMemberId;
+    //    private String mGroupName;
+    private String mOriginalGroupMemberName;//群聊原始显示名称
+    private String mOriginalGroupName;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,17 +54,16 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
         ArrayList<MessageHolder> mGroupMembers = (ArrayList<MessageHolder>) getIntent().getSerializableExtra(MiChatHelper.CHAT_GROUP_MEMBER);
         mGroupId = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_ID);
         mMemberId = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_MEMBER_ID);
-        String groupName = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_NAME);
+        mOriginalGroupName = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_NAME);
         String groupDetail = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_DETAIL);
-        mGroupMemberGroupName = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_MEMBER_GROUP_NAME);
+        mOriginalGroupMemberName = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_MEMBER_GROUP_NAME);
 
-        mOriginalName = mGroupMemberGroupName;
         setContentView(R.layout.mi_activity_chat_detail);
         findViewById(R.id.mi_iv_back).setOnClickListener(v -> onBack());
         mIsOpenNoDisturbing = findViewById(R.id.mi_is_open_no_disturbing);
         mChatGroupShowName = findViewById(R.id.mi_group_member_name);
+        mChatGroupName = findViewById(R.id.mi_group_name);
         mIsOpenName = findViewById(R.id.mi_is_open_name);
-        mGroupName = findViewById(R.id.mi_group_name);
         mGroupDesc = findViewById(R.id.mi_group_desc);
         mGroupMemberCount = findViewById(R.id.mi_member_count);
 
@@ -86,9 +86,9 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
             });
         }).start();
 
-        mGroupName.setText(groupName);
+        mChatGroupName.setText(mOriginalGroupName);
         mGroupDesc.setText(groupDetail);
-        mChatGroupShowName.setText(mGroupMemberGroupName);
+        mChatGroupShowName.setText(mOriginalGroupMemberName);
         mGroupMemberCount.setText("(" + mGroupMembers.size() + ")");
 
         findViewById(R.id.mi_show_chat_history).setOnClickListener(v -> {
@@ -127,12 +127,16 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
 
     private void onBack() {
         String memberGroupShowName = mChatGroupShowName.getText().toString();
-        boolean isChangeShowName = !mGroupMemberGroupName.equals(memberGroupShowName);
+        String mNewGroupName = mChatGroupName.getText().toString();
+        boolean isChangeShowName = !mOriginalGroupMemberName.equals(memberGroupShowName);
+        boolean isChangeGroupName = !mOriginalGroupName.equals(mNewGroupName);
         SPHelper.getInstance(this).putString(mMemberId + "-" + mGroupId, memberGroupShowName);
         Intent intent = new Intent();
         intent.putExtra("isChangeShow", isChangeShow);
-        intent.putExtra("originalName", mOriginalName);
+        intent.putExtra("originalName", mOriginalGroupMemberName);
+        intent.putExtra("originalGroupName", mOriginalGroupName);
         if (isChangeShowName) intent.putExtra("changeName", memberGroupShowName);
+        if (isChangeGroupName) intent.putExtra("changeGroupName", mNewGroupName);
 
         setResult(RESULT_OK, intent);
         finish();

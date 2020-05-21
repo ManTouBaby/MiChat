@@ -19,9 +19,9 @@
             android:src="@mipmap/ic_back" />
 
         <TextView
+            android:id="@+id/mt_chat_group_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/app_name"
             android:textColor="@color/mi_text_black" />
 
         <View

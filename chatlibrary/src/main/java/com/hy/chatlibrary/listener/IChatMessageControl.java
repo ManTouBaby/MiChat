@@ -1,5 +1,6 @@
 package com.hy.chatlibrary.listener;
 
+import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.db.entity.ChatMessage;
 
 /**
@@ -17,9 +18,13 @@ public interface IChatMessageControl {
 
     void onRemoveFail(ChatMessage chatMessage, String msg);
 
-    void onUpdateChatDisplayNameFail(String mChatGroupId, String memberId, String msg);
+    void onUpdateChatDisplayNameFail(String mChatGroupId, MessageHolder messageHolder, String msg);
 
-    void onUpdateChatDisplayNameSuccess(String mChatGroupId, String memberId, String newChatGroupName);
+    void onUpdateChatDisplayNameSuccess(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName);
+
+    void onUpdateGroupNameFail(String mChatGroupId, MessageHolder messageHolder, String msg);
+
+    void onUpdateGroupNameSuccess(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName);
 
     void notifyRemove(ChatMessage message);
 }

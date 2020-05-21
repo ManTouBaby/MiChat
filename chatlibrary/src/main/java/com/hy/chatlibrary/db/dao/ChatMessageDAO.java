@@ -73,6 +73,10 @@ public interface ChatMessageDAO {
     @Query("Select * from chatmessage where messageGroupId=:mChatGroupId and isSynchronization = 1 order by messageSTMillis  asc limit 1")
     ChatMessage queryMessageByTopAndSynchronization(String mChatGroupId);
 
+    //获取自己的最新消息
+    @Query("Select * from chatmessage where messageGroupId=:mChatGroupId and messageHolderId = :messageHolderId order by messageSTMillis  asc limit 1")
+    ChatMessage queryMMessageByTop(String mChatGroupId,String messageHolderId);
+
     //获取未同步的所有消息
     @Query("Select * from chatmessage where messageGroupId=:mChatGroupId and isSynchronization =0 order by messageSTMillis  asc limit 1")
     List<ChatMessage> queryAllMessageByUnchronization(String mChatGroupId);

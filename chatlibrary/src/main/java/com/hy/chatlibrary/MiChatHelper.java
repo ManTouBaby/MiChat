@@ -16,7 +16,7 @@ import com.hy.chatlibrary.service.ChatService;
 import com.hy.chatlibrary.service.EBChatMessageControl;
 import com.hy.chatlibrary.service.EBInitChatGroup;
 import com.hy.chatlibrary.service.EBInitChatGroupMember;
-import com.hy.chatlibrary.service.EBUpdateChatDisplayName;
+import com.hy.chatlibrary.service.EBUpdateChat;
 import com.hy.chatlibrary.service.IMQManager;
 
 import org.greenrobot.eventbus.EventBus;
@@ -98,8 +98,13 @@ public class MiChatHelper {
     }
 
     //更新群聊显示名称
-    public void updateChatGroupShowName(String mChatGroupId, String holderId, String newChatGroupName) {
-        EventBus.getDefault().post(new EBUpdateChatDisplayName(EBUpdateChatDisplayName.UPDATE_MQ, mChatGroupId, holderId, newChatGroupName));
+    public void updateChatGroupShowName(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
+        EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.UPDATE_MQ, mChatGroupId, messageHolder, newChatGroupName));
+    }
+
+    //更新群聊名称
+    public void updateChatGroupName(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
+        EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.UPDATE_GROUP_NAME_MQ, mChatGroupId, messageHolder, newChatGroupName));
     }
 
     //进入聊天界面一
@@ -144,13 +149,23 @@ public class MiChatHelper {
         }
 
         @Override
-        public void onUpdateChatDisplayNameFail(String mChatGroupId, String memberId, String msg) {
-            EventBus.getDefault().post(new EBUpdateChatDisplayName(EBUpdateChatDisplayName.TYPE_ERROR, mChatGroupId, memberId, null, msg));
+        public void onUpdateChatDisplayNameFail(String mChatGroupId, MessageHolder messageHolder, String msg) {
+            EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.TYPE_ERROR, mChatGroupId, messageHolder, null, msg));
         }
 
         @Override
-        public void onUpdateChatDisplayNameSuccess(String mChatGroupId, String memberId, String newChatGroupName) {
-            EventBus.getDefault().post(new EBUpdateChatDisplayName(EBUpdateChatDisplayName.TYPE_SUCCESS, mChatGroupId, memberId, newChatGroupName, null));
+        public void onUpdateChatDisplayNameSuccess(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
+            EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.TYPE_SUCCESS, mChatGroupId, messageHolder, newChatGroupName, null));
+        }
+
+        @Override
+        public void onUpdateGroupNameFail(String mChatGroupId, MessageHolder messageHolder, String msg) {
+            EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.TYPE_UPDATE_GROUP_NAME_FAIL, mChatGroupId, messageHolder, null, null));
+        }
+
+        @Override
+        public void onUpdateGroupNameSuccess(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
+            EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.TYPE_UPDATE_GROUP_NAME_SUCCESS, mChatGroupId, messageHolder, newChatGroupName, null));
         }
 
         @Override

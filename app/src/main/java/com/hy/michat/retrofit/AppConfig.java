@@ -6,6 +6,6 @@ package com.hy.michat.retrofit;
  * @desc:
  */
 public interface AppConfig {
-    String HTTP_SERVER ="http://112.94.13.13:8006/";
+    String HTTP_SERVER ="http://112.94.13.13:50016/message/center/group/user/msg";
     String FILE_SERVER ="http://112.94.13.13:8006/file/downloadFile.do?id=";
 }

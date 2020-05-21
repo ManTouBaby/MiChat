@@ -35,6 +35,8 @@ import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
+import static com.hy.michat.retrofit.AppConfig.HTTP_SERVER;
+
 /**
  * @author:MtBaby
  * @date:2020/05/06 17:53
@@ -145,7 +147,7 @@ public class ChatManager implements OnChatInputListener {
     @Override
     public void onInitChatList(ChatMessage chatMessage, String mChatGroupId) {
         System.out.println("初始化onInitChatList");
-        RetrofitHelper.buildRetrofit().create(IChatControl.class).getChatGroupMember("http://112.94.13.13:50018/info/list/all", mChatGroupId, mMessageHolder.getId())
+        RetrofitHelper.buildRetrofit().create(IChatControl.class).getChatGroupMember(HTTP_SERVER+"/info/list/all", mChatGroupId, mMessageHolder.getId())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<BaseChatBO<List<GroupMemberBO>>>() {
@@ -188,8 +190,13 @@ public class ChatManager implements OnChatInputListener {
     }
 
     @Override
-    public void changeChatDisplayName(String mChatGroupId, String memberId, String newChatGroupName) {
-        new Thread(() -> mRabbitMQManager.sendChatDisPlayNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, memberId, newChatGroupName)).start();
+    public void changeChatDisplayName(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
+        new Thread(() -> mRabbitMQManager.sendChatDisPlayNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, messageHolder, newChatGroupName)).start();
+    }
+
+    @Override
+    public void changeChatGroupName(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
+        new Thread(() -> mRabbitMQManager.sendChatNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, messageHolder, newChatGroupName)).start();
     }
 
 

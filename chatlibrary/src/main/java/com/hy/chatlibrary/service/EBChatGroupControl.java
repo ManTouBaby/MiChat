@@ -34,7 +34,7 @@ public class EBChatGroupControl {
     private ChatMessage chatMessage;
     private List<ChatMessage> chatMessages;
     private List<MessageHolder> messageHolders;
-    private EBUpdateChatDisplayName updateChatDisplayName;
+    private EBUpdateChat updateChatDisplayName;
     private int type;
 
     //用于通知
@@ -48,7 +48,7 @@ public class EBChatGroupControl {
     }
 
     //用于更新群聊显示名称
-    public EBChatGroupControl(int type,EBUpdateChatDisplayName updateChatDisplayName, String errorLabel) {
+    public EBChatGroupControl(int type, EBUpdateChat updateChatDisplayName, String errorLabel) {
         this(type, null, null, null, updateChatDisplayName, errorLabel);
     }
 
@@ -56,7 +56,7 @@ public class EBChatGroupControl {
         this(type, null, chatMessages, messageHolders, null, errorLabel);
     }
 
-    private EBChatGroupControl(int type, ChatMessage chatMessage, List<ChatMessage> chatMessages, List<MessageHolder> messageHolders, EBUpdateChatDisplayName updateChatDisplayName, String errorLabel) {
+    private EBChatGroupControl(int type, ChatMessage chatMessage, List<ChatMessage> chatMessages, List<MessageHolder> messageHolders, EBUpdateChat updateChatDisplayName, String errorLabel) {
         this.errorLabel = errorLabel;
         this.chatMessage = chatMessage;
         this.chatMessages = chatMessages;
@@ -85,7 +85,7 @@ public class EBChatGroupControl {
         return messageHolders;
     }
 
-    public EBUpdateChatDisplayName getUpdateChatDisplayName() {
+    public EBUpdateChat getUpdateChatDisplayName() {
         return updateChatDisplayName;
     }
 }

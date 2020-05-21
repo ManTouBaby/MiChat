@@ -59,6 +59,7 @@ public class ChatAdapter extends BaseChatAdapter {
         sparseIntArray.put(7, R.layout.mim_item_type_quote_reply);
         sparseIntArray.put(8, R.layout.mim_item_type_quote_reply);
         sparseIntArray.put(9, R.layout.mim_item_type_txt);
+        sparseIntArray.put(10, R.layout.mimo_item_common_notify);
 
         sparseIntArray.put(100, R.layout.mio_item_type_txt);
         sparseIntArray.put(101, R.layout.mio_item_type_voice);
@@ -70,6 +71,7 @@ public class ChatAdapter extends BaseChatAdapter {
         sparseIntArray.put(107, R.layout.mio_item_type_quote_reply);
         sparseIntArray.put(108, R.layout.mio_item_type_quote_reply);
         sparseIntArray.put(109, R.layout.mio_item_type_txt);
+        sparseIntArray.put(110, R.layout.mimo_item_common_notify);
         return sparseIntArray;
     }
 
@@ -96,7 +98,7 @@ public class ChatAdapter extends BaseChatAdapter {
                 } else {
                     msgTime.setVisibility(View.GONE);
                 }
-            }else {
+            } else {
                 msgTime.setText(chatMessage.getMessageST());
             }
         }
@@ -109,6 +111,10 @@ public class ChatAdapter extends BaseChatAdapter {
         if (view != null) addChildViewLongClick(view, chatMessage);
         MessageHolder messageHolder = chatMessage.getMessageHolder();
         switch (chatMessage.getItemType()) {
+            case 10:
+                if (msgTime != null) msgTime.setVisibility(View.GONE);
+                holder.getText(R.id.mt_notify_content).setText(chatMessage.getMessageHolder().getGroupName() + chatMessage.getMessageContent());
+                break;
             case 0:
             case 9:
                 String content = chatMessage.getMessageContent();
@@ -222,7 +228,7 @@ public class ChatAdapter extends BaseChatAdapter {
                 break;
         }
 
-        if (chatMessage.getMessageOwner() == 1) {
+        if (chatMessage.getMessageOwner() == 1&& chatMessage.getItemType() != 10) {
             TextView groupShowName = holder.getText(R.id.mi_group_show_name);
             boolean isOpenGroupName = SPHelper.getInstance(holder.getItemView().getContext()).getBoolean(SPHelper.IS_OPEN_GROUP_NAME);
             groupShowName.setVisibility(isOpenGroupName ? View.VISIBLE : View.GONE);
@@ -230,7 +236,7 @@ public class ChatAdapter extends BaseChatAdapter {
         }
 
         //自己的信息
-        if (chatMessage.getMessageOwner() == 0) {
+        if (chatMessage.getMessageOwner() == 0 && chatMessage.getItemType() != 10) {
             //消息发送状态  0:发送成功 1：发送失败 2:发送中
             switch (chatMessage.getMessageStatus()) {
                 case 0:

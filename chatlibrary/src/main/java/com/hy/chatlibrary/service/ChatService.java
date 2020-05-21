@@ -174,18 +174,24 @@ public class ChatService extends Service {
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
-    public void updateChatGroupShowName(EBUpdateChatDisplayName ebUpdateChatGroupShowName) {//处理群聊名称显示
-        if (isChatActivityForeground(this, ebUpdateChatGroupShowName.getmChatGroupId())) {
-            EventBus.getDefault().post(new EBChatGroupControl(EBChatGroupControl.TYPE_MQ_UPDATE_CHAT_DISPLAY_NAME, ebUpdateChatGroupShowName, ebUpdateChatGroupShowName.getErrorLabel()));
-        } else {
-            //更新数据库中对应群聊、对应人员的群显示名称
-            List<ChatMessage> chatMessages = mChatMessageDAO.queryByGroupIdAndHolderId(ebUpdateChatGroupShowName.getmChatGroupId(), ebUpdateChatGroupShowName.getMemberId());
-            for (ChatMessage chatMessage : chatMessages) {
-                chatMessage.getMessageHolder().setGroupName(ebUpdateChatGroupShowName.getNewChatGroupName());
-                chatMessage.setMessageHolderShowName(ebUpdateChatGroupShowName.getNewChatGroupName());
-            }
-            mChatMessageDAO.updateChatMessage(chatMessages);
+    public void updateChatGroupShowName(EBUpdateChat ebUpdateChat) {//处理群聊名称显示
+        if (isChatActivityForeground(this, ebUpdateChat.getChatGroupId())) {
+            EventBus.getDefault().post(new EBChatGroupControl(EBChatGroupControl.TYPE_MQ_UPDATE_CHAT_DISPLAY_NAME, ebUpdateChat, ebUpdateChat.getErrorLabel()));
         }
+        //更新数据库中对应群聊、对应人员的群显示名称
+        List<ChatMessage> chatMessages = mChatMessageDAO.queryByGroupIdAndHolderId(ebUpdateChat.getChatGroupId(), ebUpdateChat.getMessageHolder().getId());
+        if (ebUpdateChat.getStatus() == EBUpdateChat.UPDATE_GROUP_NAME_MQ || ebUpdateChat.getStatus() == EBUpdateChat.TYPE_UPDATE_GROUP_NAME_SUCCESS || ebUpdateChat.getStatus() == EBUpdateChat.TYPE_UPDATE_GROUP_NAME_FAIL) {
+            for (ChatMessage chatMessage : chatMessages) {
+                chatMessage.setMessageGroupName(ebUpdateChat.getNewChatGroupName());
+            }
+        } else {
+            for (ChatMessage chatMessage : chatMessages) {
+                chatMessage.getMessageHolder().setGroupName(ebUpdateChat.getNewChatGroupName());
+                chatMessage.setMessageHolderShowName(ebUpdateChat.getNewChatGroupName());
+            }
+        }
+        mChatMessageDAO.updateChatMessage(chatMessages);
+
     }
 
     private void showNotification(ChatMessage chatMessage) {

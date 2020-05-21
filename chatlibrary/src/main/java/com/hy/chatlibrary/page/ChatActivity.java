@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
@@ -43,7 +44,7 @@ import com.hy.chatlibrary.db.entity.InstructBean;
 import com.hy.chatlibrary.listener.OnChatInputListener;
 import com.hy.chatlibrary.listener.OnLocalMessageControl;
 import com.hy.chatlibrary.service.EBChatGroupControl;
-import com.hy.chatlibrary.service.EBUpdateChatDisplayName;
+import com.hy.chatlibrary.service.EBUpdateChat;
 import com.hy.chatlibrary.utils.DateUtil;
 import com.hy.chatlibrary.utils.PopupWindowsHelper;
 import com.hy.chatlibrary.utils.SPHelper;
@@ -65,6 +66,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.hy.chatlibrary.MiChatHelper.CHAT_GROUP_MEMBER_GROUP_NAME;
+import static com.hy.chatlibrary.MiChatHelper.CHAT_GROUP_NAME;
 import static com.hy.chatlibrary.base.ResultCode.REQUEST_GROUP_DETAIL;
 import static com.hy.chatlibrary.base.ResultCode.REQUEST_SELECT_IMAGES_CODE;
 import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_INSTRUCT_CODE;
@@ -90,6 +92,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
 
     private MiChatInputGroup miChatInputGroup;
     private RelativeLayout mShowPhotoVideoContainer;
+    private TextView mGroupName;
 
     private int localHistoryStartIndex = 0;
     private int pageCount = 15;
@@ -108,36 +111,48 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
     private String initMemberError;
     private MessageHolder mMessageHolder;
     private String mOriginalName;
+    private String mOriginalGroupName;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        StatusBarUtil.setStatueColor(this, R.color.mi_chat_main_bg, true);
-        setContentView(R.layout.mi_activity_chat_layout);
         System.out.println("ChatActivity---onCreate");
         EventBus.getDefault().register(this);
+        mChatMessageDAO = DBHelper.getInstance(getApplicationContext()).getChatMessageDAO();
+        mGdHelper = new GDHelper.Builder().setNaviType(NaviType.GPS).build(getApplicationContext());
         Intent intent = getIntent();
         mChatGroupId = intent.getStringExtra(MiChatHelper.CHAT_GROUP_ID);
-        mChatGroupName = intent.getStringExtra(MiChatHelper.CHAT_GROUP_NAME);
+        mChatGroupName = intent.getStringExtra(CHAT_GROUP_NAME);
         mChatGroupDetail = intent.getStringExtra(MiChatHelper.CHAT_GROUP_DETAIL);
-
         miChatHelper = MiChatHelper.getInstance();
+        mMessageHolder = miChatHelper.getMessageHolder();
         mRevealAnimation = new RevealAnimation();
+        StatusBarUtil.setStatueColor(this, R.color.mi_chat_main_bg, true);
+        setContentView(R.layout.mi_activity_chat_layout);
+        mGroupName = findViewById(R.id.mt_chat_group_name);
+
+        mGroupName.setText(mChatGroupName);
+        initShowView();
+        initChatInputGroup();
         mRevealAnimation.setOnTargViewVisibleListener(isVisible -> {
             if (!isVisible) mShowAdapter.onDestroy();
         });
 
-        mMessageHolder = miChatHelper.getMessageHolder();
+        //获取已同步的最新消息
+        new Thread(() -> {
+            ChatMessage mChatMessage = mChatMessageDAO.queryMessageByTopAndSynchronization(mChatGroupId);
+            ChatMessage messageByTop = mChatMessageDAO.queryMMessageByTop(mChatGroupId, mMessageHolder.getId());
+            mOnChatInputListener.onInitChatList(mChatMessage, mChatGroupId);
+            if (messageByTop != null)
+                mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
+        }).start();
+
         String memberChatGroup = SPHelper.getInstance(this).getString(mMessageHolder.getId() + "-" + mChatGroupId);
         mMessageHolder.setGroupName(TextUtils.isEmpty(memberChatGroup) ? mMessageHolder.getName() : memberChatGroup);
-
         mOnChatInputListener = miChatHelper.getOnChatInputListener();
         mChatMessageCreator = new ChatMessageCreator(mChatGroupId, mChatGroupName, miChatHelper, mMessageHolder, mHandler, this);
-        mChatMessageDAO = DBHelper.getInstance(getApplicationContext()).getChatMessageDAO();
-        mGdHelper = new GDHelper.Builder().setNaviType(NaviType.GPS).build(getApplicationContext());
-        initShowView();
-        initChatInputGroup();
+
         mGdHelper.startContinueLocation(aMapLocationListener = aMapLocation -> {
             if (aMapLocation.getErrorCode() == 0) mAMapLocation = aMapLocation;
             Log.d("Location-->", aMapLocation.getAddress());
@@ -153,7 +168,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_ID, mChatGroupId);
             gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_MEMBER_ID, mMessageHolder.getId());
             gotoDetail.putExtra(CHAT_GROUP_MEMBER_GROUP_NAME, mMessageHolder.getGroupName());
-            gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_NAME, mChatGroupName);
+            gotoDetail.putExtra(CHAT_GROUP_NAME, mChatGroupName);
             gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_DETAIL, mChatGroupDetail);
             startActivityForResult(gotoDetail, REQUEST_GROUP_DETAIL);
         });
@@ -164,9 +179,8 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                 finish();
             }
         });
-        //获取已同步的最新消息
-        ChatMessage mChatMessage = mChatMessageDAO.queryMessageByTopAndSynchronization(mChatGroupId);
-        mOnChatInputListener.onInitChatList(mChatMessage, mChatGroupId);
+
+
     }
 
     @Override
@@ -185,6 +199,9 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                 } else {
                     List<ChatMessage> messages = mChatMessageDAO.queryMessageByMilli(mChatGroupId, chatMessage.getMessageSTMillis(), firstItem.getMessageSTMillis());
                     runOnUiThread(() -> {
+                        for (ChatMessage msg : messages) {
+                            msg.setMessageOwner(mMessageHolder.getId().equals(chatMessage.getMessageHolderId()) ? 0 : 1);
+                        }
                         mChatAdapter.addOldMessages(messages);
                         miChatInputGroup.scrollToPosition(mChatAdapter.getFirstItem());
                     });
@@ -327,7 +344,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                     }
                     mChatMessageCreator.createChatMessage(mAMapLocation, messageHolders, textLabel, chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
                 } else {
-                    mChatMessageCreator.createChatMessage(mAMapLocation, textLabel, chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
+                    mChatMessageCreator.createChatMessage(0, mAMapLocation, textLabel, chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
                 }
 //                System.out.println("数据：" + stringList.toString());
             }
@@ -335,6 +352,9 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
         miChatInputGroup.setOnPullDownLoadMoreListener((firstChatMessage) -> new Thread(() -> {
             List<ChatMessage> chatMessages = mChatMessageDAO.queryMessageByMilli(mChatGroupId, firstChatMessage.getMessageSTMillis(), pageCount);
             runOnUiThread(() -> {
+                for (ChatMessage chatMessage : chatMessages) {
+                    chatMessage.setMessageOwner(mMessageHolder.getId().equals(chatMessage.getMessageHolderId()) ? 0 : 1);
+                }
                 mChatAdapter.addOldMessages(chatMessages);
                 if (chatMessages.size() < pageCount) {
                     mChatAdapter.setLoadMoreComplete();
@@ -406,45 +426,78 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void chatMessageControl(EBChatGroupControl groupControl) {
         switch (groupControl.getType()) {
-            case EBChatGroupControl.TYPE_SEND_SUCCESS:
+            case EBChatGroupControl.TYPE_SEND_SUCCESS://消息发送成功
                 onSendSuccess(groupControl.getChatMessage());
                 break;
-            case EBChatGroupControl.TYPE_SEND_ERROR:
+            case EBChatGroupControl.TYPE_SEND_ERROR://消息发送失败
                 onSendFail(groupControl.getChatMessage(), groupControl.getErrorLabel());
                 break;
 
-            case EBChatGroupControl.TYPE_GROUP_INIT:
+            case EBChatGroupControl.TYPE_GROUP_INIT://群聊信息初始化
                 setNetMessages(groupControl.getChatMessages());
                 break;
-            case EBChatGroupControl.TYPE_GROUP_MEMBER_INIT:
+            case EBChatGroupControl.TYPE_GROUP_MEMBER_INIT://群组人员初始化
                 setGroupMembers((ArrayList<MessageHolder>) groupControl.getMessageHolders());
                 initMemberError = groupControl.getErrorLabel();
                 break;
-            case EBChatGroupControl.TYPE_ADD_MQ:
+            case EBChatGroupControl.TYPE_ADD_MQ://新消息
                 addMQMessage(groupControl.getChatMessage());
                 break;
-            case EBChatGroupControl.TYPE_MQ_UPDATE_CHAT_DISPLAY_NAME:
-                EBUpdateChatDisplayName updateChatDisplayName = groupControl.getUpdateChatDisplayName();
+            case EBChatGroupControl.TYPE_MQ_UPDATE_CHAT_DISPLAY_NAME://修改群聊通知
+                EBUpdateChat updateChatDisplayName = groupControl.getUpdateChatDisplayName();
                 switch (updateChatDisplayName.getStatus()) {
-                    case EBUpdateChatDisplayName.UPDATE_MQ:
+                    case EBUpdateChat.UPDATE_MQ://群成员更新群聊显示名称
                         //更新Adapter中群聊显示名称
                         List<ChatMessage> adapterChatMessages = mChatAdapter.getChatMessages();
                         for (ChatMessage chatMessage : adapterChatMessages) {
+                            MessageHolder holder = chatMessage.getMessageHolder();
+                            if (holder != null) {
+                                holder.setGroupName(updateChatDisplayName.getNewChatGroupName());
+                                chatMessage.setMessageHolderShowName(updateChatDisplayName.getNewChatGroupName());
+                            }
+                        }
+                        mChatAdapter.notifyDataSetChanged();
+                        break;
+                    case EBUpdateChat.TYPE_SUCCESS:
+                        //更新Adapter中群聊显示名称
+                        List<ChatMessage> chatMessages = mChatAdapter.getChatMessages();
+                        for (ChatMessage chatMessage : chatMessages) {
                             chatMessage.getMessageHolder().setGroupName(updateChatDisplayName.getNewChatGroupName());
                             chatMessage.setMessageHolderShowName(updateChatDisplayName.getNewChatGroupName());
                         }
                         mChatAdapter.notifyDataSetChanged();
+                        mChatMessageCreator.createChatMessage(10, mAMapLocation, "更新群聊显示名称", chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
+
                         break;
-                    case EBUpdateChatDisplayName.TYPE_ERROR:
+
+                    case EBUpdateChat.TYPE_ERROR://自己更新群聊显示名称失败
                         SPHelper.getInstance(this).putString(CHAT_GROUP_MEMBER_GROUP_NAME, mOriginalName);
                         Toast.makeText(this, "群聊显示名称修改失败", Toast.LENGTH_SHORT).show();
+                        break;
+                    case EBUpdateChat.UPDATE_GROUP_NAME_MQ:////群成员更新群聊名称
+                        mGroupName.setText(updateChatDisplayName.getNewChatGroupName());
+                        mChatGroupName = updateChatDisplayName.getNewChatGroupName();
+                        break;
+                    case EBUpdateChat.TYPE_UPDATE_GROUP_NAME_SUCCESS://自己更新群聊显示名称成功
+                        mGroupName.setText(updateChatDisplayName.getNewChatGroupName());
+                        mChatGroupName = updateChatDisplayName.getNewChatGroupName();
+                        mChatMessageCreator.createChatMessage(10, mAMapLocation, "更新群聊名称", chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
+                        break;
+                    case EBUpdateChat.TYPE_UPDATE_GROUP_NAME_FAIL://自己更新群名称失败
+                        mGroupName.setText(mOriginalGroupName);
+                        mChatGroupName = mOriginalGroupName;
+                        SPHelper.getInstance(this).putString(CHAT_GROUP_NAME, mOriginalGroupName);
+                        Toast.makeText(this, "群名称修改失败", Toast.LENGTH_SHORT).show();
                         break;
                 }
                 break;
             case EBChatGroupControl.TYPE_REMOVE_ERROR:
                 onRemoveFail(groupControl.getChatMessage(), groupControl.getErrorLabel());
                 break;
-            case EBChatGroupControl.TYPE_REMOVE_SUCCESS:
+            case EBChatGroupControl.TYPE_REMOVE_SUCCESS://消息撤回
+                onRemoveSuccess(groupControl.getChatMessage());
+                mChatMessageCreator.createChatMessage(10, mAMapLocation, "撤回消息", chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
+                break;
             case EBChatGroupControl.TYPE_NOTIFY_REMOVE:
                 onRemoveSuccess(groupControl.getChatMessage());
                 break;
@@ -488,6 +541,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
     //新消息
     public void addMQMessage(ChatMessage chatMessage) {
         runOnUiThread(() -> {
+            chatMessage.setMessageOwner(mMessageHolder.getId().equals(chatMessage.getMessageHolderId()) ? 0 : 1);
             mChatMessageDAO.insertChatMessage(chatMessage);
             mChatAdapter.addNewMessage(chatMessage);
             miChatInputGroup.scrollToBottom();
@@ -544,6 +598,9 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                     } else {
                         miChatInputGroup.setStackFromEnd(true);
                     }
+                }
+                for (ChatMessage chatMessage : localChats) {
+                    chatMessage.setMessageOwner(mMessageHolder.getId().equals(chatMessage.getMessageHolderId()) ? 0 : 1);
                 }
                 mChatAdapter.addNetMessages(localChats);
                 miChatInputGroup.scrollToBottom();
@@ -603,14 +660,20 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             if (requestCode == REQUEST_GROUP_DETAIL) {
                 boolean isChangeShow = data.getBooleanExtra("isChangeShow", false);
                 String changeName = data.getStringExtra("changeName");
+                String changeGroupName = data.getStringExtra("changeGroupName");
                 mOriginalName = data.getStringExtra("originalName");
+                mOriginalGroupName = data.getStringExtra("originalGroupName");
                 if (isChangeShow) {
                     mChatAdapter.notifyDataSetChanged();
                 }
                 if (changeName != null) {
                     mMessageHolder.setGroupName(changeName);
                     mChatMessageCreator = new ChatMessageCreator(mChatGroupId, mChatGroupName, miChatHelper, mMessageHolder, mHandler, this);
-                    mOnChatInputListener.changeChatDisplayName(mChatGroupId, mMessageHolder.getId(), changeName);
+                    mOnChatInputListener.changeChatDisplayName(mChatGroupId, mMessageHolder, changeName);
+                }
+                if (changeGroupName != null) {
+                    mChatMessageCreator = new ChatMessageCreator(mChatGroupId, changeGroupName, miChatHelper, mMessageHolder, mHandler, this);
+                    mOnChatInputListener.changeChatGroupName(mChatGroupId, mMessageHolder, changeGroupName);
                 }
             }
         }

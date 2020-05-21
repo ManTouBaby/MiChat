@@ -2,6 +2,8 @@ package com.hy.chatlibrary.service;
 
 import android.support.annotation.IntDef;
 
+import com.hy.chatlibrary.bean.MessageHolder;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -10,35 +12,42 @@ import java.lang.annotation.RetentionPolicy;
  * @date:2020/05/11 20:14
  * @desc:
  */
-public class EBUpdateChatDisplayName {
+public class EBUpdateChat {
     private String mChatGroupId;
-    private String memberId;
+    private MessageHolder messageHolder;
     private String newChatGroupName;
     private String errorLabel;
     private int status;
 
-    @IntDef({TYPE_ERROR, TYPE_SUCCESS,UPDATE_MQ})
+    @IntDef({TYPE_ERROR, TYPE_SUCCESS, TYPE_UPDATE_GROUP_NAME_SUCCESS, TYPE_UPDATE_GROUP_NAME_FAIL, UPDATE_MQ, UPDATE_GROUP_NAME_MQ})
     @Retention(RetentionPolicy.SOURCE)
     @interface UpdateChatDisplayNameStatus {
     }
 
     public final static int TYPE_ERROR = 1;
     public final static int TYPE_SUCCESS = 2;
-    public final static int UPDATE_MQ = 3;
+    public final static int TYPE_UPDATE_GROUP_NAME_SUCCESS = 3;
+    public final static int TYPE_UPDATE_GROUP_NAME_FAIL = 4;
+    public final static int UPDATE_MQ = 5;
+    public final static int UPDATE_GROUP_NAME_MQ = 6;
 
-    public EBUpdateChatDisplayName(@UpdateChatDisplayNameStatus int status,String mChatGroupId, String memberId, String newChatGroupName) {
+    public EBUpdateChat(@UpdateChatDisplayNameStatus int status, String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
         this.mChatGroupId = mChatGroupId;
-        this.memberId = memberId;
+        this.messageHolder = messageHolder;
         this.newChatGroupName = newChatGroupName;
         this.status = status;
     }
 
-    public EBUpdateChatDisplayName(@UpdateChatDisplayNameStatus int status, String mChatGroupId, String memberId, String newChatGroupName,String errorLabel) {
+    public EBUpdateChat(@UpdateChatDisplayNameStatus int status, String mChatGroupId, MessageHolder messageHolderd, String newChatGroupName, String errorLabel) {
         this.status = status;
         this.mChatGroupId = mChatGroupId;
-        this.memberId = memberId;
+        this.messageHolder = messageHolderd;
         this.newChatGroupName = newChatGroupName;
         this.errorLabel = errorLabel;
+    }
+
+    public MessageHolder getMessageHolder() {
+        return messageHolder;
     }
 
     public String getErrorLabel() {
@@ -49,12 +58,8 @@ public class EBUpdateChatDisplayName {
         return status;
     }
 
-    public String getmChatGroupId() {
+    public String getChatGroupId() {
         return mChatGroupId;
-    }
-
-    public String getMemberId() {
-        return memberId;
     }
 
     public String getNewChatGroupName() {

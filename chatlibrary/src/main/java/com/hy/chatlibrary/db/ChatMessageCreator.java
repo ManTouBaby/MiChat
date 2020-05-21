@@ -40,38 +40,40 @@ public class ChatMessageCreator {
         this.localMessageControl = localMessageControl;
     }
 
+
     //发送@
-    public void createChatMessage(AMapLocation mAMapLocation, List<MessageHolder> messageHolders,String content, OnChatMessageCreateListener onChatMessageCreateListener) {
-        createChatMessage(9, mAMapLocation, messageHolders,null, null, null, content, 0, null, null, 0, 0, onChatMessageCreateListener);
+    public void createChatMessage(AMapLocation mAMapLocation, List<MessageHolder> messageHolders, String content, OnChatMessageCreateListener onChatMessageCreateListener) {
+        createChatMessage(9, mAMapLocation, messageHolders, null, null, null, content, 0, null, null, 0, 0, onChatMessageCreateListener);
     }
 
     //发送指令
     public void createChatMessage(AMapLocation mAMapLocation, InstructBean instructBean, OnChatMessageCreateListener onChatMessageCreateListener) {
-        createChatMessage(6, mAMapLocation,null, instructBean, null, null, "指令", 0, null, null, 0, 0, onChatMessageCreateListener);
+        createChatMessage(6, mAMapLocation, null, instructBean, null, null, "指令", 0, null, null, 0, 0, onChatMessageCreateListener);
     }
 
     //回复指令、引用
     public void createChatMessage(AMapLocation mAMapLocation, ChatMessage chatMessage, String textLabel, OnChatMessageCreateListener onChatMessageCreateListener) {
         int msgType = chatMessage.getItemType();
-        createChatMessage(msgType == 6 ? 8 : 7, mAMapLocation,null, null, chatMessage, null, textLabel, 0, null, null, 0, 0, onChatMessageCreateListener);
+        createChatMessage(msgType == 6 ? 8 : 7, mAMapLocation, null, null, chatMessage, null, textLabel, 0, null, null, 0, 0, onChatMessageCreateListener);
     }
 
     //位置发送
     public void createChatMessage(AMapLocation mAMapLocation, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
-        createChatMessage(4, mAMapLocation,null, null, null, null, "位置", 0, locationAddress, locationRoad, latitude, longitude, messageCreateListener);
+        createChatMessage(4, mAMapLocation, null, null, null, null, "位置", 0, locationAddress, locationRoad, latitude, longitude, messageCreateListener);
     }
 
     //文件类型消息发送
     public void createChatMessage(int contentType, AMapLocation mAMapLocation, String content, String filePath, long duration, OnChatMessageCreateListener messageCreateListener) {
-        createChatMessage(contentType, mAMapLocation,null, null, null, filePath, content, duration, null, null, 0, 0, messageCreateListener);
+        createChatMessage(contentType, mAMapLocation, null, null, null, filePath, content, duration, null, null, 0, 0, messageCreateListener);
     }
 
-    //文本发送
-    public void createChatMessage( AMapLocation mAMapLocation, String content, OnChatMessageCreateListener messageCreateListener) {
-        createChatMessage(0, mAMapLocation,null, null, null, null, content, 0, null, null, 0, 0, messageCreateListener);
+    //文本发送 - 撤回消息提示、修改群名称提示、修改群显示名称提示
+    public void createChatMessage(int contentType, AMapLocation mAMapLocation, String content, OnChatMessageCreateListener messageCreateListener) {
+        createChatMessage(contentType, mAMapLocation, null, null, null, null, content, 0, null, null, 0, 0, messageCreateListener);
     }
 
-    public void createChatMessage(int contentType, AMapLocation mAMapLocation,List<MessageHolder> messageHolders, InstructBean instructBean, ChatMessage quoteMessage, String filePath, String content, long duration, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
+    public void createChatMessage(int contentType, AMapLocation mAMapLocation, List<MessageHolder> messageHolders, InstructBean instructBean, ChatMessage quoteMessage, String filePath, String content, long duration, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
+
         DateUtil.getNetTimeMilliByURL(mMiChatHelper.getNetTimeUrl(), mHandler, netMilli -> {
             ChatMessage chatMessage = new ChatMessage();
             if (contentType == 4) {
@@ -113,7 +115,6 @@ public class ChatMessageCreator {
             chatMessage.setMessageSTMillis(mMiChatHelper.isOpenNetTime() ? netMilli : DateUtil.getSystemTimeMilli());
             chatMessage.setMessageStatus(2);
 
-            chatMessage.setMessageHolder(mMessageHolder);
             messageCreateListener.chatMessageCreate(chatMessage);
             localMessageControl.sendMessage(chatMessage);
         });

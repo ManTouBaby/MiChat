@@ -37,6 +37,7 @@ public class ItemControlAdapter extends RecyclerView.Adapter<SmartVH> {
 
     @Override
     public void onBindViewHolder(SmartVH holder, int position) {
+        holder.getViewById(R.id.v_line).setVisibility(position == 0 ? View.GONE : View.VISIBLE);
         ControlTypeBean data = controlTypeBeans.get(position);
         holder.getText(R.id.control_title).setText(data.getControlTypeName());
         holder.getItemView().setOnClickListener(v -> {

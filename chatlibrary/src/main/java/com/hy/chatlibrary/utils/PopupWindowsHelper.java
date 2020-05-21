@@ -31,7 +31,7 @@ public class PopupWindowsHelper {
         boolean openCopy = chatMessage.getItemType() == 0;
         boolean openTranslate = chatMessage.getItemType() == 1;
         boolean openInstruct = chatMessage.getItemType() == 6;
-        boolean isCallBack = chatMessage.getMessageOwner()==0;
+        boolean isCallBack = chatMessage.getMessageOwner() == 0;
 
         List<ControlTypeBean> controlTypeBeans = new ArrayList<>();
         controlTypeBeans.add(new ControlTypeBean(0, "复制", openCopy));
@@ -52,10 +52,11 @@ public class PopupWindowsHelper {
         window.setBackgroundDrawable(new DrawerArrowDrawable(view.getContext()));
         window.setOutsideTouchable(true);
         window.setFocusable(true);
+        int offsetHeight =( -view.getMeasuredHeight() - 146);
         if (chatMessage.getMessageOwner() == 0) {
-            window.showAsDropDown(view, -3 * 160, 0, Gravity.RIGHT);
+            window.showAsDropDown(view, -3 * 160, offsetHeight, Gravity.RIGHT);
         } else {
-            window.showAsDropDown(view, 0, 0, Gravity.LEFT);
+            window.showAsDropDown(view, 0, offsetHeight, Gravity.LEFT);
         }
     }
 }

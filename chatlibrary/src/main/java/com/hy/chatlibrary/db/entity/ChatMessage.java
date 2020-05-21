@@ -27,8 +27,8 @@ import java.util.List;
 @TypeConverters({ConverterMessageHolder.class, ConverterInstruct.class, ConverterChatMessage.class, ConverterMessageHolders.class})
 public class ChatMessage extends BaseSmartBO {
 
-    //itemType: 自己的类型 0:文字 1:语音 2:视屏 3:图片 4:地图 5:文件 6：指令 7:引用 8:回复指令 9:@消息 10:撤回消息
-    //itemType：别人的类型 100:文字 101:语音 102:视屏 103:图片 104:地图 105:文件 106：指令 107:引用 108:回复指令  9:@消息 110:撤回消息
+    //itemType: 自己的类型 0:文字 1:语音 2:视屏 3:图片 4:地图 5:文件 6：指令 7:引用 8:回复指令 9:@消息  10：撤回消息提示、修改群名称提示、修改群显示名称提示
+    //itemType：别人的类型 100:文字 101:语音 102:视屏 103:图片 104:地图 105:文件 106：指令 107:引用 108:回复指令  9:@消息 110:撤回消息提示、修改群名称提示、修改群显示名称提示
     private String messageGroupId;//消息聊天组ID
     private String messageGroupName;//消息聊天组名称
     private String messageChatGroupDetail;//消息聊天描述

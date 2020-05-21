@@ -38,10 +38,12 @@
     <android.support.v4.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/mi_member_show"
                 android:layout_width="match_parent"
@@ -62,7 +64,7 @@
                     android:background="@color/mi_white_bg"
                     android:gravity="center_vertical"
                     android:paddingLeft="16dp"
-                    android:paddingRight="16dp">
+                    android:paddingRight="4dp">
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -76,20 +78,21 @@
                         android:layout_height="match_parent"
                         android:layout_weight="1" />
 
-                    <TextView
+                    <EditText
                         android:id="@+id/mi_group_name"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:background="@null"
                         android:text="群聊名称"
-                        android:textColor="@color/mi_text_deep_gray" />
+                        android:textColor="@color/mi_text_deep_gray"
+                        android:textSize="14sp" />
 
                     <ImageView
                         android:layout_width="20dp"
                         android:layout_height="20dp"
                         android:layout_marginRight="8dp"
                         android:padding="2dp"
-                        android:src="@mipmap/icon_go_to"
-                        android:visibility="gone" />
+                        android:src="@mipmap/icon_go_to" />
                 </LinearLayout>
 
                 <View
@@ -204,11 +207,13 @@
                         android:padding="2dp"
                         android:src="@mipmap/icon_go_to" />
                 </LinearLayout>
+
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
                     android:layout_marginLeft="16dp"
                     android:background="@color/mi_gray_bg" />
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="42dp"
