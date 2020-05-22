@@ -61,13 +61,13 @@ dependencies {
     api 'com.squareup.retrofit2:converter-gson:2.3.0'
     api 'com.squareup.retrofit2:adapter-rxjava:2.1.0'
 
-    implementation 'com.github.ManTouBaby:MineGDMap:1.0.70'
+    api 'com.github.ManTouBaby:MineGDMap:1.0.70'
 
     api 'com.github.yongjianx:ScaleImageView:v1.0'
 
     api 'org.greenrobot:eventbus:3.1.1'
 //    implementation project(path: ':imagepicker')
-    implementation 'com.github.ManTouBaby:FileSelectRepository:1.0.1'
+    api 'com.github.ManTouBaby:FileSelectRepository:1.0.1'
     implementation 'com.davemorrissey.labs:subsampling-scale-image-view:3.5.0'
 //    implementation files('libs/message-center-2.1.1-RELEASE.jar')
 }
