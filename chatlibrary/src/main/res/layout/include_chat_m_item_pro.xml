@@ -9,6 +9,7 @@
         style="@style/chat_pro_width_height"
         android:layout_alignParentRight="true"
         android:gravity="center"
+        android:clickable="true"
         app:auto_background="true"
         app:radius="4dp" />
 

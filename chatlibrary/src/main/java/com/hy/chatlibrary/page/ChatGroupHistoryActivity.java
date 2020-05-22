@@ -76,12 +76,11 @@ public class ChatGroupHistoryActivity extends AppCompatActivity {
 
         mRecyclerView.setOnTouchListener((v, event) -> {
             boolean active = inputMethodManager.isActive();
-            if (active){
+            if (active) {
                 closeSoftInput();
             }
             return false;
         });
-
 
 
         mEditText.addTextChangedListener(new TextWatcher() {
@@ -101,10 +100,10 @@ public class ChatGroupHistoryActivity extends AppCompatActivity {
                 if (!TextUtils.isEmpty(s)) {
                     mBaseAdapter.setDates(chatMessages);
                     mRecyclerView.setVisibility(View.VISIBLE);
-                    mQuickSearchContainer.setVisibility(View.GONE);
+                    if (false) mQuickSearchContainer.setVisibility(View.GONE);
                 } else {
                     mRecyclerView.setVisibility(View.GONE);
-                    mQuickSearchContainer.setVisibility(View.VISIBLE);
+                    if (false)  mQuickSearchContainer.setVisibility(View.VISIBLE);
                 }
             }
         });

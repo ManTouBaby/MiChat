@@ -83,13 +83,17 @@ public class ChatAdapter extends BaseChatAdapter {
         View view = holder.getViewById(R.id.mi_content_container);   //item单击监听
         CornerTextView holderPro = holder.getViewById(R.id.mi_holder_pro);
         ImageView leaderTag = holder.getViewById(R.id.iv_leader_tag);
+        MessageHolder messageHolder = chatMessage.getMessageHolder();
         if (holderPro != null) {
             addChildViewClick(holderPro, chatMessage);
-            holderPro.setAutoBackGroundText(chatMessage.getMessageHolder().getName());
-            leaderTag.setVisibility(chatMessage.getMessageHolder().getRole() == 1 ? View.VISIBLE : View.GONE);
+            if (messageHolder!=null){
+                holderPro.setAutoBackGroundText(messageHolder.getName());
+                leaderTag.setVisibility(messageHolder.getRole() == 1 ? View.VISIBLE : View.GONE);
+            }
         }
         if (chatMessage.getMessageOwner() == 1 && holderPro != null)
             addChildViewLongClick(holderPro, chatMessage);
+        if (view != null) addChildViewLongClick(view, chatMessage);
         if (msgTime != null) {
             if (position > 0) {
                 ChatMessage message = mChatMessages.get(position - 1);
@@ -110,12 +114,11 @@ public class ChatAdapter extends BaseChatAdapter {
         if (!file.exists()) {
             filePath = chatMessage.getMessageNetPath();
         }
-        if (view != null) addChildViewLongClick(view, chatMessage);
-        MessageHolder messageHolder = chatMessage.getMessageHolder();
+
         switch (chatMessage.getItemType()) {
             case 10:
                 if (msgTime != null) msgTime.setVisibility(View.GONE);
-                holder.getText(R.id.mt_notify_content).setText(chatMessage.getMessageHolder().getGroupName() + chatMessage.getMessageContent());
+                holder.getText(R.id.mt_notify_content).setText(messageHolder.getGroupName() + chatMessage.getMessageContent());
                 break;
             case 0:
             case 9:
@@ -234,7 +237,7 @@ public class ChatAdapter extends BaseChatAdapter {
             TextView groupShowName = holder.getText(R.id.mi_group_show_name);
             boolean isOpenGroupName = SPHelper.getInstance(holder.getItemView().getContext()).getBoolean(SPHelper.IS_OPEN_GROUP_NAME);
             groupShowName.setVisibility(isOpenGroupName ? View.VISIBLE : View.GONE);
-            groupShowName.setText(TextUtils.isEmpty(messageHolder.getGroupName()) ? messageHolder.getName() : messageHolder.getGroupName());
+           if (messageHolder!=null)groupShowName.setText(TextUtils.isEmpty(messageHolder.getGroupName()) ? messageHolder.getName() : messageHolder.getGroupName());
         }
 
         //自己的信息

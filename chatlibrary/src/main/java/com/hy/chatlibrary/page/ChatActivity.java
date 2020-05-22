@@ -144,8 +144,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             ChatMessage mChatMessage = mChatMessageDAO.queryMessageByTopAndSynchronization(mChatGroupId);
             ChatMessage messageByTop = mChatMessageDAO.queryMMessageByTop(mChatGroupId, mMessageHolder.getId());
             mOnChatInputListener.onInitChatList(mChatMessage, mChatGroupId);
-            if (messageByTop != null)
-                mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
+            if (messageByTop != null) mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
         }).start();
 
         String memberChatGroup = SPHelper.getInstance(this).getString(mMessageHolder.getId() + "-" + mChatGroupId);
@@ -245,7 +244,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                     mGdHelper.openNavigation(ChatActivity.this, mMyLocal, destination);
                 }
             }
-            if (viewId == R.id.mi_item_pro) {
+            if (viewId == R.id.mi_holder_pro) {
                 Intent intent = new Intent(this, ChatPersonalActivity.class);
                 intent.putExtra(CHAT_MEMBER, chatMessage.getMessageHolder());
                 startActivity(intent);

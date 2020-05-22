@@ -114,7 +114,7 @@
                         android:layout_height="42dp"
                         android:layout_gravity="start"
                         android:gravity="center"
-                        android:text="群聊描述"
+                        android:text="群公告"
                         android:textColor="@color/mi_text_black"
                         android:textSize="16sp" />
 
