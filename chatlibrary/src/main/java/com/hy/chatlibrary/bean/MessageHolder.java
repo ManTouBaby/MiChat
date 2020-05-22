@@ -23,10 +23,19 @@ public class MessageHolder implements Serializable {
     private String portrait;//消息发送人头像
     private String mobile;//移动电话
     private int gender;//性别 男:0  女:1
+    private int role;//角色  1:领导  2:其他普通成员
 
     @Ignore
     @JSONField(serialize = false)
-   private boolean isSelect;
+    private boolean isSelect;
+
+    public int getRole() {
+        return role;
+    }
+
+    public void setRole(int role) {
+        this.role = role;
+    }
 
     public String getGroupName() {
         return groupName;

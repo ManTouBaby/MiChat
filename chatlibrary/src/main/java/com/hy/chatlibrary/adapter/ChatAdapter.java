@@ -81,10 +81,12 @@ public class ChatAdapter extends BaseChatAdapter {
         final ChatMessage chatMessage = mChatMessages.get(position);
         TextView msgTime = holder.getText(R.id.mi_message_time);
         View view = holder.getViewById(R.id.mi_content_container);   //item单击监听
-        CornerTextView holderPro = holder.getViewById(R.id.mi_item_pro);
+        CornerTextView holderPro = holder.getViewById(R.id.mi_holder_pro);
+        ImageView leaderTag = holder.getViewById(R.id.iv_leader_tag);
         if (holderPro != null) {
             addChildViewClick(holderPro, chatMessage);
             holderPro.setAutoBackGroundText(chatMessage.getMessageHolder().getName());
+            leaderTag.setVisibility(chatMessage.getMessageHolder().getRole() == 1 ? View.VISIBLE : View.GONE);
         }
         if (chatMessage.getMessageOwner() == 1 && holderPro != null)
             addChildViewLongClick(holderPro, chatMessage);
@@ -228,7 +230,7 @@ public class ChatAdapter extends BaseChatAdapter {
                 break;
         }
 
-        if (chatMessage.getMessageOwner() == 1&& chatMessage.getItemType() != 10) {
+        if (chatMessage.getMessageOwner() == 1 && chatMessage.getItemType() != 10) {
             TextView groupShowName = holder.getText(R.id.mi_group_show_name);
             boolean isOpenGroupName = SPHelper.getInstance(holder.getItemView().getContext()).getBoolean(SPHelper.IS_OPEN_GROUP_NAME);
             groupShowName.setVisibility(isOpenGroupName ? View.VISIBLE : View.GONE);

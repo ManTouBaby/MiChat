@@ -1,9 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.hy.chatlibrary.widget.CornerTextView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mi_item_pro"
-    style="@style/chat_pro_width_height"
-    android:layout_alignParentRight="true"
-    app:auto_background="true"
-    android:gravity="center"
-    app:radius="4dp" />
+    style="@style/chat_pro_width_height">
+
+    <com.hy.chatlibrary.widget.CornerTextView
+        android:id="@+id/mi_holder_pro"
+        style="@style/chat_pro_width_height"
+        android:layout_alignParentRight="true"
+        android:gravity="center"
+        app:auto_background="true"
+        app:radius="4dp" />
+
+    <ImageView
+        android:id="@+id/iv_leader_tag"
+        android:layout_width="16dp"
+        android:layout_height="16dp"
+        android:layout_alignParentRight="true"
+        android:src="@mipmap/icon_leader" />
+</RelativeLayout>
+

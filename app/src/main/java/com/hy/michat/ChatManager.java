@@ -68,6 +68,7 @@ public class ChatManager implements OnChatInputListener {
         mRabbitMQManager = imqManager;
         mMessageHolder = new MessageHolder();
         mMessageHolder.setId(userName);
+//        mMessageHolder.setRole(1);
         mMessageHolder.setName(userName);
         mMessageHolder.setDepartId(departId);
         mMessageHolder.setDepartName(departName);
