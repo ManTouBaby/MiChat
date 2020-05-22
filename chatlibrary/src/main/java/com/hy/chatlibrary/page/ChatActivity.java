@@ -144,7 +144,8 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             ChatMessage mChatMessage = mChatMessageDAO.queryMessageByTopAndSynchronization(mChatGroupId);
             ChatMessage messageByTop = mChatMessageDAO.queryMMessageByTop(mChatGroupId, mMessageHolder.getId());
             mOnChatInputListener.onInitChatList(mChatMessage, mChatGroupId);
-            if (messageByTop != null) mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
+            if (messageByTop != null)
+                mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
         }).start();
 
         String memberChatGroup = SPHelper.getInstance(this).getString(mMessageHolder.getId() + "-" + mChatGroupId);
@@ -245,9 +246,14 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                 }
             }
             if (viewId == R.id.mi_holder_pro) {
-                Intent intent = new Intent(this, ChatPersonalActivity.class);
-                intent.putExtra(CHAT_MEMBER, chatMessage.getMessageHolder());
-                startActivity(intent);
+                MessageHolder messageHolder = chatMessage.getMessageHolder();
+                if (messageHolder == null) {
+                    Toast.makeText(this, "无法查看该成员详情", Toast.LENGTH_SHORT).show();
+                } else {
+                    Intent intent = new Intent(this, ChatPersonalActivity.class);
+                    intent.putExtra(CHAT_MEMBER, messageHolder);
+                    startActivity(intent);
+                }
             }
             if (viewId == R.id.mi_quote_reply_notify) {
                 miChatInputGroup.scrollToPosition(chatMessage.getChatMessage());

@@ -84,10 +84,14 @@ public class ChatAdapter extends BaseChatAdapter {
         CornerTextView holderPro = holder.getViewById(R.id.mi_holder_pro);
         ImageView leaderTag = holder.getViewById(R.id.iv_leader_tag);
         MessageHolder messageHolder = chatMessage.getMessageHolder();
+        String messageHolderShowName = chatMessage.getMessageHolderShowName();
+        String messageHolderName = chatMessage.getMessageHolderName();
+
+
         if (holderPro != null) {
             addChildViewClick(holderPro, chatMessage);
             if (messageHolder!=null){
-                holderPro.setAutoBackGroundText(messageHolder.getName());
+                holderPro.setAutoBackGroundText(messageHolderShowName);
                 leaderTag.setVisibility(messageHolder.getRole() == 1 ? View.VISIBLE : View.GONE);
             }
         }
@@ -118,7 +122,7 @@ public class ChatAdapter extends BaseChatAdapter {
         switch (chatMessage.getItemType()) {
             case 10:
                 if (msgTime != null) msgTime.setVisibility(View.GONE);
-                holder.getText(R.id.mt_notify_content).setText(messageHolder.getGroupName() + chatMessage.getMessageContent());
+                holder.getText(R.id.mt_notify_content).setText(messageHolderShowName + chatMessage.getMessageContent());
                 break;
             case 0:
             case 9:
@@ -199,7 +203,7 @@ public class ChatAdapter extends BaseChatAdapter {
                 RelativeLayout instructVideoContainer = holder.getViewById(R.id.mi_instruct_video_container);
                 instructTitle.setText(StringUtil.isEmpty(instructBean.getTitle()));
                 instructContent.setText(StringUtil.isEmpty(instructBean.getContent()));
-                instructHolder.setText(StringUtil.isEmpty(messageHolder.getName()));
+                instructHolder.setText(StringUtil.isEmpty(messageHolderShowName));
 
                 addChildViewClick(instructVideoContainer, chatMessage);
                 addChildViewClick(instructPic, chatMessage);
@@ -237,7 +241,7 @@ public class ChatAdapter extends BaseChatAdapter {
             TextView groupShowName = holder.getText(R.id.mi_group_show_name);
             boolean isOpenGroupName = SPHelper.getInstance(holder.getItemView().getContext()).getBoolean(SPHelper.IS_OPEN_GROUP_NAME);
             groupShowName.setVisibility(isOpenGroupName ? View.VISIBLE : View.GONE);
-           if (messageHolder!=null)groupShowName.setText(TextUtils.isEmpty(messageHolder.getGroupName()) ? messageHolder.getName() : messageHolder.getGroupName());
+           groupShowName.setText(TextUtils.isEmpty(messageHolderShowName) ? messageHolderName : messageHolderShowName);
         }
 
         //自己的信息
