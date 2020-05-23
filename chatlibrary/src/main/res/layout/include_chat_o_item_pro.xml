@@ -2,6 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mi_item_pro"
+    android:layout_margin="0dp"
     style="@style/chat_pro_width_height">
 
     <com.hy.chatlibrary.widget.CornerTextView

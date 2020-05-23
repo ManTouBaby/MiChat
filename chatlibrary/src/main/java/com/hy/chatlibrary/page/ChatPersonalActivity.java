@@ -39,6 +39,6 @@ public class ChatPersonalActivity extends AppCompatActivity {
         memberDepart.setText(messageHolder.getDepartName());
         memberDuty.setText(messageHolder.getDuty());
         memberPhone.setText(messageHolder.getMobile());
-        chatMemberPor.setAutoBackGroundText(messageHolder.getName());
+        chatMemberPor.setText(messageHolder.getName());
     }
 }

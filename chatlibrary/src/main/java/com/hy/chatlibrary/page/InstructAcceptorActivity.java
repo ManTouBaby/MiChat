@@ -69,7 +69,7 @@ public class InstructAcceptorActivity extends AppCompatActivity {
             holder.getImage(R.id.member_select_tag).setVisibility(data.isSelect() ? View.VISIBLE : View.GONE);
             CornerTextView image = holder.getViewById(R.id.mi_tag_por);
 //            GlideHelper.loadIntoUseNoCorner(InstructAcceptorActivity.this, data.getPortrait(), image);
-            image.setAutoBackGroundText(data.getName());
+            image.setText(data.getName());
             holder.getText(R.id.mi_member_name).setText(data.getName());
         }
 

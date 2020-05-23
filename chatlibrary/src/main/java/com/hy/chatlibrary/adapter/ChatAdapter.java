@@ -91,7 +91,7 @@ public class ChatAdapter extends BaseChatAdapter {
         if (holderPro != null) {
             addChildViewClick(holderPro, chatMessage);
             if (messageHolder!=null){
-                holderPro.setAutoBackGroundText(messageHolderShowName);
+                holderPro.setText(messageHolderName);
                 leaderTag.setVisibility(messageHolder.getRole() == 1 ? View.VISIBLE : View.GONE);
             }
         }

@@ -3,7 +3,6 @@ package com.hy.chatlibrary.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.v7.widget.AppCompatTextView;
@@ -62,6 +61,7 @@ public class CornerTextView extends AppCompatTextView {
             mRectF.left = mRectF.top = 0;
             mRectF.right = getMeasuredWidth();
             mRectF.bottom = getMeasuredHeight();
+            System.out.println("CornerTextView：" + mRectF);
             canvas.drawRoundRect(mRectF, mRadius, mRadius, mPaint);
         }
         super.onDraw(canvas);
@@ -69,30 +69,9 @@ public class CornerTextView extends AppCompatTextView {
 
     @Override
     public void setText(CharSequence text, BufferType type) {
-        if (text.length() > 2) {
-            text =  text.subSequence(text.length() - 2, text.length() );
-        }
-        String hexString = Integer.toHexString(Math.abs(text.hashCode()));
-        int length = hexString.length();
-        String substring;
-        if (length > 5) {
-            substring = hexString.substring(0, 6);
-            mStrokeColor = Color.parseColor("#" + substring);
-        } else if (length > 4) {
-            substring = hexString.substring(0, 5);
-            String s = substring.substring(4);
-            substring = substring + s;
-        } else if (length > 2) {
-            substring = hexString.substring(0, 3);
-            String a = substring.substring(0, 1);
-            String b = substring.substring(1, 2);
-            String c = substring.substring(2, 3);
-            substring = "" + a + a + b + b + c + c;
-        } else {
-            String aByte = hexString.substring(0, 1);
-            substring = "" + aByte + aByte + aByte + aByte + aByte + aByte;
-        }
-        mStrokeColor = Color.parseColor("#" + substring);
-        super.setText(text, type);
+        mStrokeColor = ColorUtils.getColorBySeed(text.toString());
+        String label =text.toString();
+        if (label.length()>2)label = label.substring(label.length()-2);
+        super.setText(label, type);
     }
 }

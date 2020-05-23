@@ -113,7 +113,7 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
             @Override
             protected void onBindView(SmartVH holder, MessageHolder data, int position) {
                 CornerTextView textView = holder.getViewById(R.id.mi_tag_por);
-                textView.setAutoBackGroundText(data.getName());
+                textView.setText(data.getName());
 //                GlideHelper.loadIntoUseNoCorner(ChatGroupDetailActivity.this, data.getPortrait(), image);
                 holder.getText(R.id.mi_member_name).setText(data.getName());
             }

@@ -2,15 +2,17 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/mi_item_pro"
+    android:layout_margin="0dp"
     style="@style/chat_pro_width_height">
 
     <com.hy.chatlibrary.widget.CornerTextView
         android:id="@+id/mi_holder_pro"
-        style="@style/chat_pro_width_height"
-        android:layout_alignParentRight="true"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center"
-        android:clickable="true"
+        android:textColor="@color/mi_text_white"
         app:auto_background="true"
+        android:text="名字中过"
         app:radius="4dp" />
 
     <ImageView

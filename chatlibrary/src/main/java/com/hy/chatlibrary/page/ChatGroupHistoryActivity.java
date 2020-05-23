@@ -65,7 +65,7 @@ public class ChatGroupHistoryActivity extends AppCompatActivity {
                 holder.getText(R.id.mi_message_date).setText(DateUtil.getStringTimeByMilli(data.getMessageSTMillis(), "MM月dd日"));
                 holder.getText(R.id.mi_message_content).setText(data.getMessageContent());
                 CornerTextView cornerTextView = holder.getViewById(R.id.mi_holder_pro);
-                cornerTextView.setAutoBackGroundText(data.getMessageHolderName());
+                cornerTextView.setText(data.getMessageHolderName());
             }
         });
 
