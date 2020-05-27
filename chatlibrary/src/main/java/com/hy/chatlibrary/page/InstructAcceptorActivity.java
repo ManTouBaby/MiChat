@@ -14,6 +14,7 @@ import com.hy.chatlibrary.adapter.BaseAdapter;
 import com.hy.chatlibrary.adapter.OnItemClickListener;
 import com.hy.chatlibrary.base.SmartVH;
 import com.hy.chatlibrary.bean.MessageHolder;
+import com.hy.chatlibrary.utils.StatusBarUtil;
 import com.hy.chatlibrary.widget.CornerTextView;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class InstructAcceptorActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        StatusBarUtil.setStatueColor(this, R.color.mi_white_bg, true);
         setContentView(R.layout.mi_activity_instruct_member_select);
 
         Intent intent = getIntent();

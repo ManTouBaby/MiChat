@@ -27,7 +27,7 @@ public class ColorUtils {
             "255,66,93", "147,224,255", "247,68,97", "185,227,217"
     };
 
-    public static int getColorBySeed(String seed) {
+    public static int getColorBySeed(CharSequence seed) {
         if (TextUtils.isEmpty(seed)) {
             String[] color = COLORS[0].split(",");
             return Color.rgb(Integer.parseInt(color[0]), Integer.parseInt(color[1]), Integer.parseInt(color[2]));

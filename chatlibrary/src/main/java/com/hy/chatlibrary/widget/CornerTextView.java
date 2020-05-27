@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
 import android.support.v7.widget.AppCompatTextView;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 
 import com.hrw.chatlibrary.R;
@@ -69,9 +70,12 @@ public class CornerTextView extends AppCompatTextView {
 
     @Override
     public void setText(CharSequence text, BufferType type) {
-        mStrokeColor = ColorUtils.getColorBySeed(text.toString());
-        String label =text.toString();
-        if (label.length()>2)label = label.substring(label.length()-2);
+        mStrokeColor = ColorUtils.getColorBySeed(text);
+        String label = null;
+        if (!TextUtils.isEmpty(text)) {
+            label = text.toString();
+            if (label.length() > 2) label = label.substring(label.length() - 2);
+        }
         super.setText(label, type);
     }
 }

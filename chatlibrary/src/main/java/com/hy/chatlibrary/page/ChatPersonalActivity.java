@@ -18,6 +18,7 @@ import com.hy.chatlibrary.widget.CornerTextView;
 public class ChatPersonalActivity extends AppCompatActivity {
     CornerTextView chatMemberPor;
     TextView memberName;
+    TextView memberGroupName;
     TextView memberDepart;
     TextView memberDuty;
     TextView memberPhone;
@@ -28,6 +29,7 @@ public class ChatPersonalActivity extends AppCompatActivity {
         setContentView(R.layout.mi_activity_chat_personal);
         findViewById(R.id.mi_iv_back).setOnClickListener(v -> finish());
         memberName = findViewById(R.id.mi_member_name);
+        memberGroupName = findViewById(R.id.mi_member_group_name);
         memberDepart = findViewById(R.id.mi_member_depart);
         memberDuty = findViewById(R.id.mi_member_duty);
         memberPhone = findViewById(R.id.mi_member_phone);
@@ -40,5 +42,6 @@ public class ChatPersonalActivity extends AppCompatActivity {
         memberDuty.setText(messageHolder.getDuty());
         memberPhone.setText(messageHolder.getMobile());
         chatMemberPor.setText(messageHolder.getName());
+        memberGroupName.setText(messageHolder.getGroupName());
     }
 }

@@ -14,5 +14,11 @@ import rx.Observable;
  */
 public interface IChatControl {
     @POST()
-    Observable<BaseChatBO<List<GroupMemberBO>>> getChatGroupMember(@Url String url, @Query("groupId") String groupId, @Query("userCode") String userCode);
+    Observable<BaseChatBO<List<GroupMemberBO>>> getChatGroupMember(@Url String url, @Query("groupId") String groupId);
+
+    @POST()
+    Observable<BaseChatBO<String>> addChatGroupMember(@Url String url, @Query("groupId") String groupId, @Query("userId") String userId);
+
+    @POST()
+    Observable<BaseChatBO<String>> existChatGroup(@Url String url, @Query("groupId") String groupId, @Query("userId") String userId);
 }

@@ -43,7 +43,7 @@ public class InstructModelActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        StatusBarUtil.setStatueColor(this, R.color.mi_chat_main_bg, true);
+        StatusBarUtil.setStatueColor(this, R.color.mi_white_bg, true);
         setContentView(R.layout.mi_activity_instruct_model);
         mMenuContainer = findViewById(R.id.ll_menu_container);
         mInstructShow = findViewById(R.id.mi_show_instruct_model);

@@ -28,7 +28,7 @@ public class InstructModelEditActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        StatusBarUtil.setStatueColor(this, R.color.mi_chat_main_bg, true);
+        StatusBarUtil.setStatueColor(this, R.color.mi_white_bg, true);
         setContentView(R.layout.mi_activity_instruct_model_edit);
         mInstructTitle = findViewById(R.id.mi_et_instruct_title);
         mInstructContent = findViewById(R.id.mi_et_instruct_content);

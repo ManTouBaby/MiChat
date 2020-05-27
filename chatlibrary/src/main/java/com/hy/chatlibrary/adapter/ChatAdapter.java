@@ -32,6 +32,7 @@ import com.hy.chatlibrary.widget.CornerTextView;
 
 import java.io.File;
 import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author:MtBaby
@@ -60,6 +61,10 @@ public class ChatAdapter extends BaseChatAdapter {
         sparseIntArray.put(8, R.layout.mim_item_type_quote_reply);
         sparseIntArray.put(9, R.layout.mim_item_type_txt);
         sparseIntArray.put(10, R.layout.mimo_item_common_notify);
+        sparseIntArray.put(11, R.layout.mimo_item_common_notify);
+        sparseIntArray.put(12, R.layout.mimo_item_common_notify);
+        sparseIntArray.put(13, R.layout.mimo_item_common_notify);
+        sparseIntArray.put(14, R.layout.mimo_item_common_notify);
 
         sparseIntArray.put(100, R.layout.mio_item_type_txt);
         sparseIntArray.put(101, R.layout.mio_item_type_voice);
@@ -72,6 +77,10 @@ public class ChatAdapter extends BaseChatAdapter {
         sparseIntArray.put(108, R.layout.mio_item_type_quote_reply);
         sparseIntArray.put(109, R.layout.mio_item_type_txt);
         sparseIntArray.put(110, R.layout.mimo_item_common_notify);
+        sparseIntArray.put(111, R.layout.mimo_item_common_notify);
+        sparseIntArray.put(112, R.layout.mimo_item_common_notify);
+        sparseIntArray.put(113, R.layout.mimo_item_common_notify);
+        sparseIntArray.put(114, R.layout.mimo_item_common_notify);
         return sparseIntArray;
     }
 
@@ -90,7 +99,7 @@ public class ChatAdapter extends BaseChatAdapter {
 
         if (holderPro != null) {
             addChildViewClick(holderPro, chatMessage);
-            if (messageHolder!=null){
+            if (messageHolder != null) {
                 holderPro.setText(messageHolderName);
                 leaderTag.setVisibility(messageHolder.getRole() == 1 ? View.VISIBLE : View.GONE);
             }
@@ -121,8 +130,18 @@ public class ChatAdapter extends BaseChatAdapter {
 
         switch (chatMessage.getItemType()) {
             case 10:
+            case 11:
+            case 12:
+            case 14:
                 if (msgTime != null) msgTime.setVisibility(View.GONE);
-                holder.getText(R.id.mt_notify_content).setText(messageHolderShowName + chatMessage.getMessageContent());
+                String tagLabel = TextUtils.isEmpty(messageHolderShowName) ? messageHolderName : messageHolderShowName;
+                holder.getText(R.id.mt_notify_content).setText(tagLabel + chatMessage.getMessageContent());
+                break;
+            case 13:
+                if (msgTime != null) msgTime.setVisibility(View.GONE);
+                List<MessageHolder> newHolders = chatMessage.getNewHolders();
+                String name = newHolders.get(0).getName();
+                holder.getText(R.id.mt_notify_content).setText(name + chatMessage.getMessageContent());
                 break;
             case 0:
             case 9:
@@ -237,34 +256,41 @@ public class ChatAdapter extends BaseChatAdapter {
                 break;
         }
 
-        if (chatMessage.getMessageOwner() == 1 && chatMessage.getItemType() != 10) {
-            TextView groupShowName = holder.getText(R.id.mi_group_show_name);
-            boolean isOpenGroupName = SPHelper.getInstance(holder.getItemView().getContext()).getBoolean(SPHelper.IS_OPEN_GROUP_NAME);
-            groupShowName.setVisibility(isOpenGroupName ? View.VISIBLE : View.GONE);
-           groupShowName.setText(TextUtils.isEmpty(messageHolderShowName) ? messageHolderName : messageHolderShowName);
-        }
+        if (chatMessage.getItemType() != 10 &&
+                chatMessage.getItemType() != 11 &&
+                chatMessage.getItemType() != 12 &&
+                chatMessage.getItemType() != 13 &&
+                chatMessage.getItemType() != 14) {
+            if (chatMessage.getMessageOwner() == 1) {
+                TextView groupShowName = holder.getText(R.id.mi_group_show_name);
+                boolean isOpenGroupName = SPHelper.getInstance(holder.getItemView().getContext()).getBoolean(SPHelper.IS_OPEN_GROUP_NAME);
+                groupShowName.setVisibility(isOpenGroupName ? View.VISIBLE : View.GONE);
+                groupShowName.setText(TextUtils.isEmpty(messageHolderShowName) ? messageHolderName : messageHolderShowName);
+            }
 
-        //自己的信息
-        if (chatMessage.getMessageOwner() == 0 && chatMessage.getItemType() != 10) {
-            //消息发送状态  0:发送成功 1：发送失败 2:发送中
-            switch (chatMessage.getMessageStatus()) {
-                case 0:
-                    holder.getViewById(R.id.mi_message_status_container).setVisibility(View.INVISIBLE);
-                    holder.getImage(R.id.mi_iv_send_fail).setVisibility(View.INVISIBLE);
-                    holder.getViewById(R.id.chat_item_progress).setVisibility(View.INVISIBLE);
-                    break;
-                case 1:
-                    holder.getViewById(R.id.mi_message_status_container).setVisibility(View.VISIBLE);
-                    holder.getImage(R.id.mi_iv_send_fail).setVisibility(View.VISIBLE);
-                    holder.getViewById(R.id.chat_item_progress).setVisibility(View.INVISIBLE);
-                    break;
-                case 2:
-                    holder.getViewById(R.id.mi_message_status_container).setVisibility(View.VISIBLE);
-                    holder.getImage(R.id.mi_iv_send_fail).setVisibility(View.INVISIBLE);
-                    holder.getViewById(R.id.chat_item_progress).setVisibility(View.VISIBLE);
-                    break;
+            //自己的信息
+            if (chatMessage.getMessageOwner() == 0) {
+                //消息发送状态  0:发送成功 1：发送失败 2:发送中
+                switch (chatMessage.getMessageStatus()) {
+                    case 0:
+                        holder.getViewById(R.id.mi_message_status_container).setVisibility(View.INVISIBLE);
+                        holder.getImage(R.id.mi_iv_send_fail).setVisibility(View.INVISIBLE);
+                        holder.getViewById(R.id.chat_item_progress).setVisibility(View.INVISIBLE);
+                        break;
+                    case 1:
+                        holder.getViewById(R.id.mi_message_status_container).setVisibility(View.VISIBLE);
+                        holder.getImage(R.id.mi_iv_send_fail).setVisibility(View.VISIBLE);
+                        holder.getViewById(R.id.chat_item_progress).setVisibility(View.INVISIBLE);
+                        break;
+                    case 2:
+                        holder.getViewById(R.id.mi_message_status_container).setVisibility(View.VISIBLE);
+                        holder.getImage(R.id.mi_iv_send_fail).setVisibility(View.INVISIBLE);
+                        holder.getViewById(R.id.chat_item_progress).setVisibility(View.VISIBLE);
+                        break;
+                }
             }
         }
+
     }
 
     @Override

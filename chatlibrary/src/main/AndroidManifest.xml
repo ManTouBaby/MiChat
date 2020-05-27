@@ -24,13 +24,17 @@
         <activity
             android:name="com.hy.chatlibrary.page.ChatGroupDetailActivity"
             android:launchMode="singleTask"
-            android:windowSoftInputMode="stateHidden|adjustResize" />
+            android:windowSoftInputMode="adjustResize" />
         <activity
             android:name="com.hy.chatlibrary.page.ChatPersonalActivity"
             android:launchMode="singleTask" />
-        <activity android:name="com.hy.chatlibrary.page.ChatGroupHistoryActivity"
-            android:windowSoftInputMode="stateHidden"
-            android:launchMode="singleTask"/>
+        <activity
+            android:name="com.hy.chatlibrary.page.ChatGroupHistoryActivity"
+            android:launchMode="singleTask"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
+            android:name="com.hy.chatlibrary.page.ChatFriendListActivity"
+            android:launchMode="singleTask" />
         <!--        android:windowSoftInputMode="stateHidden|adjustResize"-->
 
         <provider

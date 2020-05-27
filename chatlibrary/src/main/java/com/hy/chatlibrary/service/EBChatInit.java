@@ -9,13 +9,13 @@ import java.util.List;
  * @date:2020/05/10 17:20
  * @desc:
  */
-public class EBInitChatGroup {
+public class EBChatInit {
     private String errorLabel;
     private String  initChatMessageID;
     private List<ChatMessage> chatMessages;
 
 
-    public EBInitChatGroup(List<ChatMessage> chatMessages, String initChatMessageID,String errorLabel) {
+    public EBChatInit(List<ChatMessage> chatMessages, String initChatMessageID, String errorLabel) {
         this.errorLabel = errorLabel;
         this.chatMessages = chatMessages;
         this.initChatMessageID = initChatMessageID;

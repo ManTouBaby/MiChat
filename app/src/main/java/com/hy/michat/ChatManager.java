@@ -7,11 +7,11 @@ import android.text.TextUtils;
 import com.alibaba.fastjson.JSON;
 import com.hy.chatlibrary.MiChatHelper;
 import com.hy.chatlibrary.bean.ChatGroupDetail;
-import com.hy.chatlibrary.bean.DateModel;
 import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.db.entity.ChatMessage;
 import com.hy.chatlibrary.db.entity.InstructBean;
 import com.hy.chatlibrary.listener.OnChatInputListener;
+import com.hy.chatlibrary.listener.OnChatManagerListener;
 import com.hy.chatlibrary.utils.StringUtil;
 import com.hy.chatlibrary.utils.retrofit.RetrofitHelper;
 import com.hy.michat.rabbitMQ.RabbitMQManager;
@@ -32,6 +32,7 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import rx.Observer;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -42,7 +43,7 @@ import static com.hy.michat.retrofit.AppConfig.HTTP_SERVER;
  * @date:2020/05/06 17:53
  * @desc:
  */
-public class ChatManager implements OnChatInputListener {
+public class ChatManager implements OnChatInputListener, OnChatManagerListener {
     private static ChatManager mChatManager;
     private RabbitMQManager mRabbitMQManager;
     private MiChatHelper mMiChatHelper;
@@ -76,7 +77,7 @@ public class ChatManager implements OnChatInputListener {
         mMessageHolder.setGender(gender);
         mMessageHolder.setMobile(phone);
         mMessageHolder.setPortrait(portraitUrl);
-        mMiChatHelper = MiChatHelper.getInstance().loginIM(context, mMessageHolder, userMQPW, imqManager, this);
+        mMiChatHelper = MiChatHelper.getInstance().loginIM(context, mMessageHolder, userMQPW, imqManager, this, this);
 
     }
 
@@ -91,7 +92,7 @@ public class ChatManager implements OnChatInputListener {
 
     @Override
     public void onMessageSend(ChatMessage message, String chatMessageJson) {
-        System.out.println("发送消息:" + chatMessageJson);
+//        System.out.println("发送消息:" + chatMessageJson);
         if (message.getItemType() == 1 || message.getItemType() == 2 || message.getItemType() == 3 || message.getItemType() == 5 || message.getItemType() == 6 && !TextUtils.isEmpty(message.getInstructBean().getLocalFilePath())) {
             File file;
             final InstructBean instructBean = message.getInstructBean();
@@ -125,7 +126,7 @@ public class ChatManager implements OnChatInputListener {
                                 } else {
                                     message.setMessageNetPath(AppConfig.FILE_SERVER + baseResult.getData().getId());
                                 }
-                                mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, message.getMessageGroupId(), message.getMessageHolder().getId(), message);
+                                mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, message.getMessageGroupId(), message);
                             } catch (IOException e) {
                                 e.printStackTrace();
                                 onError(e);
@@ -134,7 +135,7 @@ public class ChatManager implements OnChatInputListener {
                     });
         } else {
             if (mRabbitMQManager.isLoginSuccess()) {
-                new Thread(() -> mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, message.getMessageGroupId(), message.getMessageHolder().getId(), message)).start();
+                new Thread(() -> mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, message.getMessageGroupId(), message)).start();
             }
         }
 
@@ -147,8 +148,8 @@ public class ChatManager implements OnChatInputListener {
 
     @Override
     public void onInitChatList(ChatMessage chatMessage, String mChatGroupId) {
-        System.out.println("初始化onInitChatList");
-        RetrofitHelper.buildRetrofit().create(IChatControl.class).getChatGroupMember(HTTP_SERVER+"/info/list/all", mChatGroupId, mMessageHolder.getId())
+//        System.out.println("初始化onInitChatList");
+        RetrofitHelper.buildRetrofit().create(IChatControl.class).getChatGroupMember(HTTP_SERVER + "/info/list/all", mChatGroupId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<BaseChatBO<List<GroupMemberBO>>>() {
@@ -171,12 +172,13 @@ public class ChatManager implements OnChatInputListener {
                             for (int i = 0; i < groupMemberBOList.size(); i++) {
                                 GroupMemberBO memberBO = groupMemberBOList.get(i);
                                 MessageHolder messageHolder = new MessageHolder();
-                                messageHolder.setPortrait(DateModel.images[i]);
+//                                messageHolder.setPortrait(DateModel.images[i]);
                                 messageHolder.setMobile("1111111111" + i);
                                 messageHolder.setGender(i % 2);
                                 messageHolder.setDepartName("政治处");
                                 messageHolder.setDuty("分局局长" + i);
                                 messageHolder.setName(memberBO.getUserId());
+                                messageHolder.setGroupName(memberBO.getUserId());
                                 messageHolder.setId(memberBO.getUserId());
                                 messageHolder.setDepartId("440106970002");
                                 groupMembers.add(messageHolder);
@@ -191,13 +193,85 @@ public class ChatManager implements OnChatInputListener {
     }
 
     @Override
-    public void changeChatDisplayName(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
-        new Thread(() -> mRabbitMQManager.sendChatDisPlayNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, messageHolder, newChatGroupName)).start();
+    public void onInitFriendList() {
+        List<MessageHolder> groupMembers = new ArrayList<>();
+        for (int i = 0; i < 15; i++) {
+            MessageHolder messageHolder = new MessageHolder();
+//            messageHolder.setPortrait(DateModel.images[i]);
+            messageHolder.setMobile("1111111111" + i);
+            messageHolder.setGender(i % 2);
+            messageHolder.setDepartName("政治处");
+            messageHolder.setDuty("分局局长" + i);
+            messageHolder.setName("test" + i);
+            messageHolder.setGroupName("test" + i);
+            messageHolder.setId("test" + i);
+            messageHolder.setDepartId("440106970002");
+            groupMembers.add(messageHolder);
+        }
+        mMiChatHelper.initFriendList(groupMembers, null);
     }
 
     @Override
-    public void changeChatGroupName(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
-        new Thread(() -> mRabbitMQManager.sendChatNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, messageHolder, newChatGroupName)).start();
+    public void changeChatDisplayName(String mChatGroupId, ChatMessage chatMessage) {
+        new Thread(() -> mRabbitMQManager.sendChatDisPlayNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+    }
+
+    @Override
+    public void changeChatGroupName(String mChatGroupId, ChatMessage chatMessage) {
+        new Thread(() -> mRabbitMQManager.sendChatNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+    }
+
+    @Override
+    public void addChatGroupMember(String mChatGroupId, ChatMessage chatMessage) {
+        List<MessageHolder> newHolders = chatMessage.getNewHolders();
+        MessageHolder messageHolder = newHolders.get(0);
+        RetrofitHelper.buildRetrofit().create(IChatControl.class).addChatGroupMember(HTTP_SERVER + "/info/insert", mChatGroupId, messageHolder.getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<BaseChatBO<String>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mChatGroupControl.addMemberFail(chatMessage.getMessageGroupId(), chatMessage, e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(BaseChatBO<String> stringBaseChatBO) {
+                        if (stringBaseChatBO.isSuccess()) {
+                            new Thread(() -> mRabbitMQManager.addChatMemberNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+                        }
+                    }
+                });
+    }
+
+    @Override
+    public void existChatGroup(String mChatGroupId, ChatMessage chatMessage) {
+        RetrofitHelper.buildRetrofit().create(IChatControl.class).existChatGroup(HTTP_SERVER + "/info/delete/pk", mChatGroupId, chatMessage.getMessageHolderId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<BaseChatBO<String>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        mChatGroupControl.onExistMemberFail(chatMessage.getMessageGroupId(), chatMessage, e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(BaseChatBO<String> stringBaseChatBO) {
+                        if (stringBaseChatBO.isSuccess()) {
+                            new Thread(() -> mRabbitMQManager.existChatGroupNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+                            mChatGroupControl.onExistMemberSuccess(mChatGroupId, chatMessage);
+                        }
+                    }
+                });
     }
 
 

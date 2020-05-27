@@ -67,12 +67,22 @@ public class ChatMessageCreator {
         createChatMessage(contentType, mAMapLocation, null, null, null, filePath, content, duration, null, null, 0, 0, messageCreateListener);
     }
 
-    //文本发送 - 撤回消息提示、修改群名称提示、修改群显示名称提示
+    //文本发送 - 撤回消息提示、退出群聊、拉人入群
     public void createChatMessage(int contentType, AMapLocation mAMapLocation, String content, OnChatMessageCreateListener messageCreateListener) {
         createChatMessage(contentType, mAMapLocation, null, null, null, null, content, 0, null, null, 0, 0, messageCreateListener);
     }
 
-    public void createChatMessage(int contentType, AMapLocation mAMapLocation, List<MessageHolder> messageHolders, InstructBean instructBean, ChatMessage quoteMessage, String filePath, String content, long duration, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
+    //修改群名称提示、修改群显示名称提示
+    public void createChatMessage(int contentType, AMapLocation mAMapLocation, String content, String newLabel, OnChatMessageCreateListener messageCreateListener) {
+        createChatMessage(contentType, mAMapLocation, null, null, null, null, content, 0, null, null, 0, 0, chatMessage -> {
+            chatMessage.setLabel(newLabel);
+            if (messageCreateListener != null) {
+                messageCreateListener.chatMessageCreate(chatMessage);
+            }
+        });
+    }
+
+    private void createChatMessage(int contentType, AMapLocation mAMapLocation, List<MessageHolder> messageHolders, InstructBean instructBean, ChatMessage quoteMessage, String filePath, String content, long duration, String locationAddress, String locationRoad, double latitude, double longitude, OnChatMessageCreateListener messageCreateListener) {
 
         DateUtil.getNetTimeMilliByURL(mMiChatHelper.getNetTimeUrl(), mHandler, netMilli -> {
             ChatMessage chatMessage = new ChatMessage();
@@ -116,7 +126,7 @@ public class ChatMessageCreator {
             chatMessage.setMessageStatus(2);
 
             messageCreateListener.chatMessageCreate(chatMessage);
-            localMessageControl.sendMessage(chatMessage);
+            if (localMessageControl != null) localMessageControl.sendMessage(chatMessage);
         });
     }
 

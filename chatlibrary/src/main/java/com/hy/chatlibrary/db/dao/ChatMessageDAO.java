@@ -51,6 +51,7 @@ public interface ChatMessageDAO {
     @Query("Select * from chatmessage where messageGroupId=:messageGroup and messageHolderId = :holderId")
     List<ChatMessage> queryByGroupIdAndHolderId(String messageGroup, String holderId);
 
+
     @Query("Select * from chatmessage where messageGroupId=:messageGroup and messageId = :messageId")
     ChatMessage queryByGroupIdAndMessageId(String messageGroup, String messageId);
 
@@ -59,7 +60,7 @@ public interface ChatMessageDAO {
 
     //查询指定群聊指定时间之前的前queryCount个消息
     @Query("Select * from chatmessage  where messageGroupId=:mChatGroupId and messageSTMillis < :lastNewMilli order by messageSTMillis  desc limit :queryCount")
-    List<ChatMessage> queryMessageByMilli(String mChatGroupId, long lastNewMilli, int queryCount);
+    List<ChatMessage> queryMessageByMilli(String mChatGroupId,  long lastNewMilli, int queryCount);
 
     //查询指定群聊指定时间之前的前queryCount个消息
     @Query("Select * from chatmessage  where messageGroupId=:mChatGroupId and messageSTMillis >= :beforeMilli and messageSTMillis < :afterMilli order by messageSTMillis  desc ")
@@ -73,9 +74,9 @@ public interface ChatMessageDAO {
     @Query("Select * from chatmessage where messageGroupId=:mChatGroupId and isSynchronization = 1 order by messageSTMillis  asc limit 1")
     ChatMessage queryMessageByTopAndSynchronization(String mChatGroupId);
 
-    //获取自己的最新消息
-    @Query("Select * from chatmessage where messageGroupId=:mChatGroupId and messageHolderId = :messageHolderId order by messageSTMillis  asc limit 1")
-    ChatMessage queryMMessageByTop(String mChatGroupId,String messageHolderId);
+    //获取最新消息
+    @Query("Select * from chatmessage where messageGroupId=:mChatGroupId and  messageHolderId=:messageHolderId  order by messageSTMillis  asc limit 1")
+    ChatMessage queryMMessageByTop(String mChatGroupId, String messageHolderId);
 
     //获取未同步的所有消息
     @Query("Select * from chatmessage where messageGroupId=:mChatGroupId and isSynchronization =0 order by messageSTMillis  asc limit 1")

@@ -11,12 +11,14 @@ import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.db.entity.ChatMessage;
 import com.hy.chatlibrary.listener.IChatMessageControl;
 import com.hy.chatlibrary.listener.OnChatInputListener;
+import com.hy.chatlibrary.listener.OnChatManagerListener;
 import com.hy.chatlibrary.page.ChatActivity;
 import com.hy.chatlibrary.service.ChatService;
-import com.hy.chatlibrary.service.EBChatMessageControl;
-import com.hy.chatlibrary.service.EBInitChatGroup;
+import com.hy.chatlibrary.service.EBChatMessage;
+import com.hy.chatlibrary.service.EBChatInit;
+import com.hy.chatlibrary.service.EBFriendInit;
 import com.hy.chatlibrary.service.EBInitChatGroupMember;
-import com.hy.chatlibrary.service.EBUpdateChat;
+import com.hy.chatlibrary.service.EBChatManager;
 import com.hy.chatlibrary.service.IMQManager;
 
 import org.greenrobot.eventbus.EventBus;
@@ -66,13 +68,14 @@ public class MiChatHelper {
     }
 
     //登录聊天
-    public MiChatHelper loginIM(Context context, MessageHolder messageHolder, String userMQPW, IMQManager imqManager, OnChatInputListener onChatInputListener) {
+    public MiChatHelper loginIM(Context context, MessageHolder messageHolder, String userMQPW, IMQManager imqManager, OnChatInputListener onChatInputListener, OnChatManagerListener onChatManagerListener) {
         mOption = new MiChatHelper.Option();
         mOption.setFileDirName(context.getPackageName())
                 .setNetTimeUrl("http://www.baidu.com")
                 .setOpenNetTime(true)
                 .setMessageHolder(messageHolder)
-                .setOnChatInputListener(onChatInputListener);
+                .setOnChatInputListener(onChatInputListener)
+                .setOnChatManagerListener(onChatManagerListener);
 
         Intent intent = new Intent(context, ChatService.class);
         intent.putExtra(ChatService.LOGIN_MEMBER, messageHolder);
@@ -84,12 +87,17 @@ public class MiChatHelper {
 
     //设置推送
     public void addMQMessage(ChatMessage chatMessage) {
-        EventBus.getDefault().post(chatMessage);
+        EventBus.getDefault().post(new EBChatMessage(EBChatMessage.MQ_NOTIFY_SEND, chatMessage));
     }
 
     //群聊初始化
     public void initChatGroupList(List<ChatMessage> chatMessages, String initChatMessageID, String errorLabel) {
-        EventBus.getDefault().post(new EBInitChatGroup(chatMessages, initChatMessageID, errorLabel));
+        EventBus.getDefault().post(new EBChatInit(chatMessages, initChatMessageID, errorLabel));
+    }
+
+    //好友列表初始化
+    public void initFriendList(List<MessageHolder> messageHolders, String errorLabel) {
+        EventBus.getDefault().post(new EBFriendInit(messageHolders, errorLabel));
     }
 
     //群聊成员初始化
@@ -98,14 +106,25 @@ public class MiChatHelper {
     }
 
     //更新群聊显示名称
-    public void updateChatGroupShowName(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
-        EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.UPDATE_MQ, mChatGroupId, messageHolder, newChatGroupName));
+    public void notifyChatGroupShowName(ChatMessage chatMessage) {
+        EventBus.getDefault().post(new EBChatManager(EBChatManager.MQ_UPDATE_CHAT_DISPLAY_NAME, chatMessage, null));
     }
 
     //更新群聊名称
-    public void updateChatGroupName(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
-        EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.UPDATE_GROUP_NAME_MQ, mChatGroupId, messageHolder, newChatGroupName));
+    public void notifyChatGroupName(ChatMessage chatMessage) {
+        EventBus.getDefault().post(new EBChatManager(EBChatManager.MQ_UPDATE_GROUP_NAME, chatMessage, null));
     }
+
+    //通知新增成员
+    public void notifyAddMember(ChatMessage chatMessage) {
+        EventBus.getDefault().post(new EBChatManager(EBChatManager.MQ_ADD_MEMBER, chatMessage, null));
+    }
+
+    //通知成员退出
+    public void notifyExistMember(ChatMessage chatMessage) {
+        EventBus.getDefault().post(new EBChatManager(EBChatManager.MQ_EXIST_MEMBER, chatMessage, null));
+    }
+
 
     //进入聊天界面一
     public ChatMessageControl gotoChat(Context context, ChatGroupDetail chatGroupDetail) {
@@ -130,47 +149,67 @@ public class MiChatHelper {
 
         @Override
         public void onSendFail(ChatMessage chatMessage, String msg) {
-            EventBus.getDefault().post(new EBChatMessageControl(EBChatMessageControl.TYPE_ERROR, chatMessage));
+            EventBus.getDefault().post(new EBChatMessage(EBChatMessage.TYPE_SEND_ERROR, chatMessage));
         }
 
         @Override
         public void onSendSuccess(ChatMessage chatMessage) {
-            EventBus.getDefault().post(new EBChatMessageControl(EBChatMessageControl.TYPE_SUCCESS, chatMessage));
+            EventBus.getDefault().post(new EBChatMessage(EBChatMessage.TYPE_SEND_SUCCESS, chatMessage));
         }
 
         @Override
         public void onRemoveSuccess(ChatMessage chatMessage) {
-            EventBus.getDefault().post(new EBChatMessageControl(EBChatMessageControl.TYPE_REMOVE_SUCCESS, chatMessage));
+            EventBus.getDefault().post(new EBChatMessage(EBChatMessage.TYPE_REMOVE_SUCCESS, chatMessage));
         }
 
         @Override
         public void onRemoveFail(ChatMessage chatMessage, String msg) {
-            EventBus.getDefault().post(new EBChatMessageControl(EBChatMessageControl.TYPE_REMOVE_ERROR, chatMessage));
+            EventBus.getDefault().post(new EBChatMessage(EBChatMessage.TYPE_REMOVE_ERROR, chatMessage));
         }
 
         @Override
-        public void onUpdateChatDisplayNameFail(String mChatGroupId, MessageHolder messageHolder, String msg) {
-            EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.TYPE_ERROR, mChatGroupId, messageHolder, null, msg));
+        public void onUpdateChatDisplayNameFail(String mChatGroupId, ChatMessage chatMessage, String msg) {
+            EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_CHAT_DISPLAY_ERROR, chatMessage, msg));
         }
 
         @Override
-        public void onUpdateChatDisplayNameSuccess(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
-            EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.TYPE_SUCCESS, mChatGroupId, messageHolder, newChatGroupName, null));
+        public void onUpdateChatDisplayNameSuccess(String mChatGroupId, ChatMessage chatMessage) {
+            EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_CHAT_DISPLAY_SUCCESS, chatMessage, null));
         }
 
         @Override
-        public void onUpdateGroupNameFail(String mChatGroupId, MessageHolder messageHolder, String msg) {
-            EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.TYPE_UPDATE_GROUP_NAME_FAIL, mChatGroupId, messageHolder, null, null));
+        public void onUpdateGroupNameFail(String mChatGroupId, ChatMessage chatMessage, String msg) {
+            EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_GROUP_NAME_FAIL, chatMessage, null));
         }
 
         @Override
-        public void onUpdateGroupNameSuccess(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName) {
-            EventBus.getDefault().post(new EBUpdateChat(EBUpdateChat.TYPE_UPDATE_GROUP_NAME_SUCCESS, mChatGroupId, messageHolder, newChatGroupName, null));
+        public void onUpdateGroupNameSuccess(String mChatGroupId, ChatMessage chatMessage) {
+            EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_GROUP_NAME_SUCCESS, chatMessage, null));
+        }
+
+        @Override
+        public void onExistMemberSuccess(String mChatGroupId, ChatMessage chatMessage) {
+            EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_EXIST_SUCCESS, chatMessage, null));
+        }
+
+        @Override
+        public void onExistMemberFail(String mChatGroupId, ChatMessage chatMessage, String error) {
+            EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_EXIST_FAIL, chatMessage, error));
+        }
+
+        @Override
+        public void addMemberSuccess(String mChatGroupId, ChatMessage chatMessage) {
+            EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_ADD_MEMBER_SUCCESS, chatMessage, null));
+        }
+
+        @Override
+        public void addMemberFail(String mChatGroupId, ChatMessage chatMessage, String errorLabel) {
+            EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_ADD_MEMBER_FAIL, chatMessage, errorLabel));
         }
 
         @Override
         public void notifyRemove(ChatMessage message) {
-            EventBus.getDefault().post(new EBChatMessageControl(EBChatMessageControl.TYPE_NOTIFY_REMOVE, message));
+            EventBus.getDefault().post(new EBChatMessage(EBChatMessage.MQ_NOTIFY_REMOVE, message));
         }
     }
 
@@ -228,6 +267,10 @@ public class MiChatHelper {
         return mOption.onChatInputListener;
     }
 
+    public OnChatManagerListener getOnChatManagerListener() {
+        return mOption.onChatManagerListener;
+    }
+
     public static class Option {
         private boolean isOpenEmotion = true;//是否开启表情
         private boolean isOpenRadio = true;//是否开启录音功能
@@ -241,12 +284,14 @@ public class MiChatHelper {
         private MessageHolder messageHolder;
         //        private ArrayList<MessageHolder> groupMembers;//群成员列表
         private BaseChatAdapter adapter;
-        OnChatInputListener onChatInputListener;
+        private OnChatInputListener onChatInputListener;
+        private OnChatManagerListener onChatManagerListener;
 
 //        public Option setGroupMembers(ArrayList<MessageHolder> groupMembers) {
 //            this.groupMembers = groupMembers;
 //            return this;
 //        }
+
 
         public Option setMessageHolder(MessageHolder messageHolder) {
             this.messageHolder = messageHolder;
@@ -299,9 +344,14 @@ public class MiChatHelper {
             return this;
         }
 
-        public void setOnChatInputListener(OnChatInputListener onChatInputListener) {
+        public Option setOnChatInputListener(OnChatInputListener onChatInputListener) {
             this.onChatInputListener = onChatInputListener;
+            return this;
         }
 
+        public Option setOnChatManagerListener(OnChatManagerListener onChatManagerListener) {
+            this.onChatManagerListener = onChatManagerListener;
+            return this;
+        }
     }
 }

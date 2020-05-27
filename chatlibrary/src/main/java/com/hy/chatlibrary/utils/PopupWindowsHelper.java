@@ -1,15 +1,19 @@
 package com.hy.chatlibrary.utils;
 
+import android.app.Activity;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 
 import com.hrw.chatlibrary.R;
 import com.hy.chatlibrary.adapter.ItemControlAdapter;
@@ -52,11 +56,46 @@ public class PopupWindowsHelper {
         window.setBackgroundDrawable(new DrawerArrowDrawable(view.getContext()));
         window.setOutsideTouchable(true);
         window.setFocusable(true);
-        int offsetHeight =( -view.getMeasuredHeight() - 146);
+        int offsetHeight = (-view.getMeasuredHeight() - 146);
         if (chatMessage.getMessageOwner() == 0) {
             window.showAsDropDown(view, -3 * 160, offsetHeight, Gravity.RIGHT);
         } else {
             window.showAsDropDown(view, 0, offsetHeight, Gravity.LEFT);
         }
     }
+
+    //弹出编辑框
+    public static void showEditWindows(Activity context, String titleLabel, String contentLabel, String descLabel, OnPopupWindowsEditListener onPopupWindowsEditListener) {
+        View view = LayoutInflater.from(context).inflate(R.layout.popup_edit_show, null);
+        TextView title = view.findViewById(R.id.popup_title);
+        EditText content = view.findViewById(R.id.popup_content);
+        TextView desc = view.findViewById(R.id.popup_desc);
+        TextView cancel = view.findViewById(R.id.popup_cancel);
+        TextView submit = view.findViewById(R.id.popup_submit);
+        title.setText(titleLabel);
+        content.setText(contentLabel);
+        desc.setText(descLabel);
+
+        PopupWindow window = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        window.setFocusable(true);
+        window.setOutsideTouchable(false);
+        StatusBarUtil.setBackgroundAlpha(context, 0.5f);
+        window.showAtLocation(context.findViewById(android.R.id.content), Gravity.CENTER, 0, 0);
+        window.setOnDismissListener(() -> {
+            StatusBarUtil.setBackgroundAlpha(context, 1f);
+        });
+        cancel.setOnClickListener(v -> window.dismiss());
+        submit.setOnClickListener(v -> {
+            window.dismiss();
+            if (onPopupWindowsEditListener != null) {
+                onPopupWindowsEditListener.onEditResult(content.getText().toString());
+            }
+        });
+    }
+
+    public interface OnPopupWindowsEditListener {
+        void onEditResult(String label);
+    }
+
+
 }

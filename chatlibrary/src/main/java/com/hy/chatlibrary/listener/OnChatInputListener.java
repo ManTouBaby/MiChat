@@ -1,6 +1,5 @@
 package com.hy.chatlibrary.listener;
 
-import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.db.entity.ChatMessage;
 
 /**
@@ -18,9 +17,6 @@ public interface OnChatInputListener {
     //初始化列表
     void onInitChatList(ChatMessage chatMessage, String mChatGroupId);
 
-    //修改群聊显示名称
-    void changeChatDisplayName(String mChatGroupId, MessageHolder messageHolder, String newChatGroupName);
-
-    //修改群聊显示名称
-    void changeChatGroupName(String mChatGroupId,MessageHolder messageHolder, String newChatGroupName);
+    //初始化好友列表
+    void onInitFriendList();
 }

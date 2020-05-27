@@ -10,30 +10,31 @@ import java.lang.annotation.RetentionPolicy;
 /**
  * @author:MtBaby
  * @date:2020/04/22 18:11
- * @desc:
+ * @desc://消息发送、撤回等消息处理
  */
-public class EBChatMessageControl {
+public class EBChatMessage {
     private ChatMessage chatMessage;
     private String errorLabel;
     private int mType;
 
-    @IntDef({TYPE_ERROR, TYPE_SUCCESS, TYPE_REMOVE_ERROR, TYPE_REMOVE_SUCCESS,TYPE_NOTIFY_REMOVE})
+    @IntDef({TYPE_SEND_ERROR, TYPE_SEND_SUCCESS, TYPE_REMOVE_ERROR, TYPE_REMOVE_SUCCESS,MQ_NOTIFY_REMOVE,MQ_NOTIFY_SEND})
     @Retention(RetentionPolicy.SOURCE)
     @interface ChatMessageType {
     }
 
-    public final static int TYPE_ERROR = 1;
-    public final static int TYPE_SUCCESS = 2;
+    public final static int TYPE_SEND_ERROR = 1;
+    public final static int TYPE_SEND_SUCCESS = 2;
     public final static int TYPE_REMOVE_ERROR = 3;
     public final static int TYPE_REMOVE_SUCCESS = 4;
-    public final static int TYPE_NOTIFY_REMOVE = 5;
+    public final static int MQ_NOTIFY_REMOVE = 5;
+    public final static int MQ_NOTIFY_SEND= 6;
 
 
-    public EBChatMessageControl(@ChatMessageType int mType, ChatMessage chatMessage) {
+    public EBChatMessage(@ChatMessageType int mType, ChatMessage chatMessage) {
         this(mType, chatMessage, null);
     }
 
-    public EBChatMessageControl(@ChatMessageType int mType, ChatMessage chatMessage, String errorLabel) {
+    public EBChatMessage(@ChatMessageType int mType, ChatMessage chatMessage, String errorLabel) {
         this.mType = mType;
         this.errorLabel = errorLabel;
         this.chatMessage = chatMessage;

@@ -27,8 +27,8 @@ import java.util.List;
 @TypeConverters({ConverterMessageHolder.class, ConverterInstruct.class, ConverterChatMessage.class, ConverterMessageHolders.class})
 public class ChatMessage extends BaseSmartBO {
 
-    //itemType: 自己的类型 0:文字 1:语音 2:视屏 3:图片 4:地图 5:文件 6：指令 7:引用 8:回复指令 9:@消息  10：撤回消息提示、修改群名称提示、修改群显示名称提示
-    //itemType：别人的类型 100:文字 101:语音 102:视屏 103:图片 104:地图 105:文件 106：指令 107:引用 108:回复指令  9:@消息 110:撤回消息提示、修改群名称提示、修改群显示名称提示
+    //itemType: 自己的类型 0:文字 1:语音 2:视屏 3:图片 4:地图 5:文件 6：指令 7:引用 8:回复指令 9:@消息  10：撤回消息提示 11、修改群名称提示 12、修改群显示名称提示 13、添加成员 14、退出群聊
+    //itemType：别人的类型 100:文字 101:语音 102:视屏 103:图片 104:地图 105:文件 106：指令 107:引用 108:回复指令  9:@消息 110:撤回消息提示、
     private String messageGroupId;//消息聊天组ID
     private String messageGroupName;//消息聊天组名称
     private String messageChatGroupDetail;//消息聊天描述
@@ -61,9 +61,12 @@ public class ChatMessage extends BaseSmartBO {
     private String messageHolderName;
     private String messageHolderShowName;
     private MessageHolder messageHolder;
-    private InstructBean instructBean;
+
+    private InstructBean instructBean;//指令发送
     private ChatMessage chatMessage;//回复和引用对象
     private List<MessageHolder> messageHolders;//@消息接收人员
+    private String label;//文字修改
+    private List<MessageHolder> newHolders;//新增群成员
 
     //地图位置
     private String locationAddress;//位置名称
@@ -89,6 +92,22 @@ public class ChatMessage extends BaseSmartBO {
 //    private String messageTo;//消息发送到
 //    private String messageFrom;//消息来自
 
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public List<MessageHolder> getNewHolders() {
+        return newHolders;
+    }
+
+    public void setNewHolders(List<MessageHolder> newHolders) {
+        this.newHolders = newHolders;
+    }
 
     public List<MessageHolder> getMessageHolders() {
         return messageHolders;
