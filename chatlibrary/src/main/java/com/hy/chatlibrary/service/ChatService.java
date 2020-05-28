@@ -181,7 +181,7 @@ public class ChatService extends Service {
         MessageHolder controlHolder = chatChatMessage.getMessageHolder();
         List<ChatMessage> chatMessages;
         ChatMessage messageByTop = mChatMessageDAO.queryMMessageByTop(chatGroupId, controlHolder.getId());
-        mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
+       if (messageByTop!=null)mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
         switch (ebUpdateChat.getType()) {
 //            case EBChatManager.TYPE_UPDATE_CHAT_DISPLAY_ERROR:
 //                ebChat = new EBChat(EBChat.MQ_UPDATE_CHAT_DISPLAY_NAME, ebUpdateChat, ebUpdateChat.getErrorLabel());

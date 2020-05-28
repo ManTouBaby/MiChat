@@ -6,7 +6,6 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,7 +41,7 @@ public class PopupWindowsHelper {
         controlTypeBeans.add(new ControlTypeBean(1, "引用", true));
         controlTypeBeans.add(new ControlTypeBean(2, "回复", openInstruct));//用于指令
         controlTypeBeans.add(new ControlTypeBean(3, "撤回", isCallBack));//用于撤回，一定时间内发出的消息可以进行撤回
-        controlTypeBeans.add(new ControlTypeBean(4, "翻译", openTranslate));//用于语音,对语音进行翻译
+//        controlTypeBeans.add(new ControlTypeBean(4, "翻译", openTranslate));//用于语音,对语音进行翻译
         View itemMenu = LayoutInflater.from(view.getContext()).inflate(R.layout.popup_item_control_menu, null);
         PopupWindow window = new PopupWindow(itemMenu, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         RecyclerView recyclerView = itemMenu.findViewById(R.id.show_item_control_menu);

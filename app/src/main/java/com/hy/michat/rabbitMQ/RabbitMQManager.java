@@ -60,7 +60,6 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
 
     @Override
     public void myTask(JSONObject jsonObject) {
-//        RabbitMQMessageBean baseRabbitBean = JSON.parseObject(jsonObject.toJSONString(), RabbitMQMessageBean.class);
         JSONObject msgSendJsonObject = jsonObject.getJSONObject("msgSend");
         String msgId = jsonObject.getString("msgId");
         String msgFrom = msgSendJsonObject.getString("msgFrom");

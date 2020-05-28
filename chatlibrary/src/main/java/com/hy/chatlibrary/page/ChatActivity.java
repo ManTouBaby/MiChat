@@ -144,8 +144,8 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             if (messageByTop != null) {
                 mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
                 mChatGroupName = messageByTop.getMessageGroupName();
-                runOnUiThread(() -> mGroupName.setText(mChatGroupName));
             }
+            runOnUiThread(() -> mGroupName.setText(mChatGroupName));
         }).start();
 
         String memberChatGroup = SPHelper.getInstance(this).getString(mMessageHolder.getId() + "-" + mChatGroupId);
@@ -346,9 +346,13 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                             }
                         }
                     }
-                    mChatMessageCreator.createChatMessage(mAMapLocation, messageHolders, textLabel, chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
+                    mChatMessageCreator.createChatMessage(mAMapLocation, messageHolders, textLabel, chatMessage -> {
+                        mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
+                    });
                 } else {
-                    mChatMessageCreator.createChatMessage(0, mAMapLocation, textLabel, chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
+                    mChatMessageCreator.createChatMessage(0, mAMapLocation, textLabel, chatMessage -> {
+                        mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
+                    });
                 }
             }
         });
@@ -483,11 +487,11 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                         addMQMessage(chatManagerChatMessage);
                         break;
                     case EBChatManager.TYPE_ADD_MEMBER_SUCCESS:
+                        addMQMessage(chatManagerChatMessage);
                         new Thread(() -> {
                             ChatMessage mChatMessage = mChatMessageDAO.queryMessageByTopAndSynchronization(mChatGroupId);
                             mOnChatInputListener.onInitChatList(mChatMessage, mChatGroupId);
                         }).start();
-                        addMQMessage(chatManagerChatMessage);
                         break;
                     case EBChatManager.TYPE_EXIST_SUCCESS:
                         addMQMessage(chatManagerChatMessage);

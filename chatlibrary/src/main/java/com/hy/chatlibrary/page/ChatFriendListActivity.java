@@ -53,6 +53,7 @@ public class ChatFriendListActivity extends AppCompatActivity {
             protected void onBindView(SmartVH holder, MessageHolder data, int position) {
                 CornerTextView cornerTextView = holder.getViewById(R.id.mi_holder_pro);
                 holder.getText(R.id.mi_holder_name).setText(data.getName());
+                holder.getText(R.id.mi_holder_id).setText(data.getId());
                 cornerTextView.setText(data.getName());
             }
         });

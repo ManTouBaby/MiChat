@@ -197,7 +197,6 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
         List<MessageHolder> groupMembers = new ArrayList<>();
         for (int i = 0; i < 15; i++) {
             MessageHolder messageHolder = new MessageHolder();
-//            messageHolder.setPortrait(DateModel.images[i]);
             messageHolder.setMobile("1111111111" + i);
             messageHolder.setGender(i % 2);
             messageHolder.setDepartName("政治处");

@@ -26,7 +26,7 @@ public class LoadingHelper {
     //弹出加载框
     public static void showLoading(Activity context, String label) {
         View view;
-        if (popupWindow != null) {
+        if (popupWindow != null && popupWindow.isShowing()) {
             view = popupWindow.getContentView();
         } else {
             view = LayoutInflater.from(context).inflate(R.layout.popup_dialog_loading, null);
@@ -35,7 +35,7 @@ public class LoadingHelper {
             TextView loadLabel = view.findViewById(R.id.mi_load_label);
             loadLabel.setText(label);
         }
-        if (popupWindow != null) return;
+        if (popupWindow != null && popupWindow.isShowing()) return;
         popupWindow = new PopupWindow(view, ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         popupWindow.setOutsideTouchable(false);
         popupWindow.setFocusable(true);

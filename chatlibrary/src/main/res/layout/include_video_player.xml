@@ -9,7 +9,7 @@
         android:id="@+id/mi_item_video_bg"
         android:layout_width="@dimen/image_default_width"
         android:layout_height="@dimen/image_default_height"
-        android:src="@mipmap/bms"
+        android:src="@mipmap/icon_image_error"
         app:smart_radius="4dp"/>
 
     <ImageView
