@@ -68,7 +68,7 @@ public class ChatService extends Service {
         mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (mImqManager != null) {
             Log.d(TAG, "initMQ");
-            mImqManager.initMQ();
+            mImqManager.initMQ(this);
         }
     }
 

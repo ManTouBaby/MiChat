@@ -1,5 +1,7 @@
 package com.hy.chatlibrary.service;
 
+import android.content.Context;
+
 import com.hy.chatlibrary.bean.MessageHolder;
 
 /**
@@ -8,6 +10,6 @@ import com.hy.chatlibrary.bean.MessageHolder;
  * @desc:
  */
 public interface IMQManager {
-    void initMQ();
+    void initMQ(Context context);
     void loginMQ(MessageHolder messageHolder,String loginMQPW);
 }

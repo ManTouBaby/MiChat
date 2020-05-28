@@ -1,5 +1,6 @@
 package com.hy.michat.rabbitMQ;
 
+import android.content.Context;
 import android.support.annotation.StringDef;
 
 import com.alibaba.fastjson.JSON;
@@ -191,7 +192,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
     }
 
     @Override
-    public void initMQ() {
+    public void initMQ(Context context) {
         mConn = new Conn();
         mMessageCenter = new MessageCenter();
         mMessageCenter.setConfigServerUrl(mOption.configServerUrl);
