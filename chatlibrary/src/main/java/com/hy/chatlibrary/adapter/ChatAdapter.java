@@ -3,6 +3,7 @@ package com.hy.chatlibrary.adapter;
 import android.annotation.SuppressLint;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.AnimationDrawable;
+import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.SparseIntArray;
 import android.view.View;
@@ -18,6 +19,10 @@ import com.amap.api.maps.UiSettings;
 import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.MarkerOptions;
+import com.google.android.flexbox.FlexDirection;
+import com.google.android.flexbox.FlexWrap;
+import com.google.android.flexbox.FlexboxLayoutManager;
+import com.google.android.flexbox.JustifyContent;
 import com.hrw.chatlibrary.R;
 import com.hy.chatlibrary.base.SmartVH;
 import com.hy.chatlibrary.bean.MessageHolder;
@@ -65,6 +70,7 @@ public class ChatAdapter extends BaseChatAdapter {
         sparseIntArray.put(12, R.layout.mimo_item_common_notify);
         sparseIntArray.put(13, R.layout.mimo_item_common_notify);
         sparseIntArray.put(14, R.layout.mimo_item_common_notify);
+        sparseIntArray.put(15, R.layout.mimo_item_common_notify);
 
         sparseIntArray.put(100, R.layout.mio_item_type_txt);
         sparseIntArray.put(101, R.layout.mio_item_type_voice);
@@ -81,6 +87,7 @@ public class ChatAdapter extends BaseChatAdapter {
         sparseIntArray.put(112, R.layout.mimo_item_common_notify);
         sparseIntArray.put(113, R.layout.mimo_item_common_notify);
         sparseIntArray.put(114, R.layout.mimo_item_common_notify);
+        sparseIntArray.put(115, R.layout.mimo_item_common_notify);
         return sparseIntArray;
     }
 
@@ -88,13 +95,13 @@ public class ChatAdapter extends BaseChatAdapter {
     @Override
     public void onBindView(final SmartVH holder, final int position) {
         final ChatMessage chatMessage = mChatMessages.get(position);
+        MessageHolder messageHolder = chatMessage.getMessageHolder();
+        String messageHolderShowName = chatMessage.getMessageHolderShowName();
+        String messageHolderName = chatMessage.getMessageHolderName();
         TextView msgTime = holder.getText(R.id.mi_message_time);
         View view = holder.getViewById(R.id.mi_content_container);   //item单击监听
         CornerTextView holderPro = holder.getViewById(R.id.mi_holder_pro);
         ImageView leaderTag = holder.getViewById(R.id.iv_leader_tag);
-        MessageHolder messageHolder = chatMessage.getMessageHolder();
-        String messageHolderShowName = chatMessage.getMessageHolderShowName();
-        String messageHolderName = chatMessage.getMessageHolderName();
 
 
         if (holderPro != null) {
@@ -133,6 +140,7 @@ public class ChatAdapter extends BaseChatAdapter {
             case 11:
             case 12:
             case 14:
+            case 15:
                 if (msgTime != null) msgTime.setVisibility(View.GONE);
                 String tagLabel = TextUtils.isEmpty(messageHolderShowName) ? messageHolderName : messageHolderShowName;
                 holder.getText(R.id.mt_notify_content).setText(tagLabel + chatMessage.getMessageContent());
@@ -220,6 +228,18 @@ public class ChatAdapter extends BaseChatAdapter {
                 ImageView instructPic = holder.getImage(R.id.mi_instruct_pic);
                 ImageView instructVideoBG = holder.getImage(R.id.mi_instruct_video_bg);
                 RelativeLayout instructVideoContainer = holder.getViewById(R.id.mi_instruct_video_container);
+                RecyclerView mAcceptorShow = holder.getViewById(R.id.mi_acceptor_show);
+                FlexboxLayoutManager manager = new FlexboxLayoutManager(mContext, FlexDirection.ROW, FlexWrap.WRAP);
+                manager.setJustifyContent(JustifyContent.SPACE_BETWEEN);//交叉轴的起点对齐。
+                mAcceptorShow.setLayoutManager(manager);
+                mAcceptorShow.setHasFixedSize(true);
+                mAcceptorShow.setAdapter(new BaseAdapter<MessageHolder>(instructBean.getAcceptors(), R.layout.item_acceptor_tag) {
+                    @Override
+                    protected void onBindView(SmartVH holder, MessageHolder data, int position) {
+                        TextView miTagName = holder.getViewById(R.id.mi_tag_name);
+                        miTagName.setText(TextUtils.isEmpty(data.getGroupName()) ? data.getName() : data.getGroupName());
+                    }
+                });
                 instructTitle.setText(StringUtil.isEmpty(instructBean.getTitle()));
                 instructContent.setText(StringUtil.isEmpty(instructBean.getContent()));
                 instructHolder.setText(StringUtil.isEmpty(messageHolderShowName));
@@ -260,7 +280,9 @@ public class ChatAdapter extends BaseChatAdapter {
                 chatMessage.getItemType() != 11 &&
                 chatMessage.getItemType() != 12 &&
                 chatMessage.getItemType() != 13 &&
-                chatMessage.getItemType() != 14) {
+                chatMessage.getItemType() != 14 &&
+                chatMessage.getItemType() != 15
+        ) {
             if (chatMessage.getMessageOwner() == 1) {
                 TextView groupShowName = holder.getText(R.id.mi_group_show_name);
                 boolean isOpenGroupName = SPHelper.getInstance(holder.getItemView().getContext()).getBoolean(SPHelper.IS_OPEN_GROUP_NAME);

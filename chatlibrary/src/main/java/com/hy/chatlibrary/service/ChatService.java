@@ -211,6 +211,16 @@ public class ChatService extends Service {
                 mChatMessageDAO.updateChatMessage(chatMessages);
                 mChatMessageDAO.insertChatMessage(ebUpdateChat.getChatMessage());
                 break;
+            case EBChatManager.TYPE_UPDATE_GROUP_DESC_SUCCESS:
+            case EBChatManager.MQ_UPDATE_GROUP_DESC:
+                ebChat = new EBChat(EBChat.MQ_UPDATE_CHAT_DISPLAY_NAME, ebUpdateChat, ebUpdateChat.getErrorLabel());
+                chatMessages = mChatMessageDAO.queryByGroupId(chatGroupId);
+                for (ChatMessage chatMessage : chatMessages) {
+                    chatMessage.setMessageChatGroupDetail(chatChatMessage.getLabel());
+                }
+                mChatMessageDAO.updateChatMessage(chatMessages);
+                mChatMessageDAO.insertChatMessage(ebUpdateChat.getChatMessage());
+                break;
 //            case EBChatManager.TYPE_ADD_MEMBER_FAIL:
 //                break;
 //            case EBChatManager.TYPE_EXIST_FAIL:

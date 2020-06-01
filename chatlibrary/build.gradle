@@ -54,6 +54,7 @@ dependencies {
     api 'pub.devrel:easypermissions:1.0.1'
     api 'com.alibaba:fastjson:1.1.55.android'
     implementation 'cn.jzvd:jiaozivideoplayer:7.2.3'
+    implementation 'com.google.android:flexbox:1.0.0'
 
     api 'io.reactivex:rxjava:1.1.8'
     api 'io.reactivex:rxandroid:1.2.1'

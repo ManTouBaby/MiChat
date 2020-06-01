@@ -48,16 +48,14 @@
                 android:layout_weight="1"
                 android:orientation="vertical">
 
-                <EditText
+                <com.hy.chatlibrary.widget.KeyDelEditText
                     android:id="@+id/edit_text"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:minHeight="36dp"
                     android:layout_marginBottom="6dp"
                     android:background="@drawable/icon_edit_text_bg"
-                    android:clickable="true"
-                    android:focusableInTouchMode="true"
                     android:maxLines="2"
+                    android:minHeight="36dp"
                     android:paddingLeft="8dp"
                     android:paddingRight="8dp"
                     android:textSize="16sp" />
@@ -152,7 +150,16 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/mi_other_send_content"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" />
+                android:layout_height="match_parent"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/mi_smile_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="表情"
+                android:visibility="gone" />
         </RelativeLayout>
 
     </LinearLayout>

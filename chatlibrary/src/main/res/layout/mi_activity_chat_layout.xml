@@ -37,11 +37,30 @@
             android:src="@mipmap/icon_chat_menu" />
     </LinearLayout>
 
+
+
     <com.hy.chatlibrary.widget.chatinput.MiChatInputGroup
         android:id="@+id/mi_cig_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/mi_toolbar_container" />
+
+    <TextView
+        android:id="@+id/open_instruct_manager"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:layout_below="@+id/mi_toolbar_container"
+        android:text="指令管理"
+        android:paddingTop="6dp"
+        android:layout_marginTop="16dp"
+        android:paddingBottom="6dp"
+        android:textSize="10sp"
+        android:paddingLeft="10dp"
+        android:layout_alignParentRight="true"
+        android:paddingRight="6dp"
+        android:background="@drawable/icon_right_corner"
+        android:textColor="@color/mi_text_white" />
 
     <RelativeLayout
         android:id="@+id/mi_show_photo_video_container"

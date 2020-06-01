@@ -80,7 +80,7 @@ public class LoginActivity extends AppCompatActivity {
                     0,
                     "13829793053",
                     "http://i0.hdslb.com/bfs/article/8e87829cde9559c8407892aa6110f83a4631c6b3.jpg",
-                    new RabbitMQManager());
+                    RabbitMQManager.getInstance());
         });
 
     }

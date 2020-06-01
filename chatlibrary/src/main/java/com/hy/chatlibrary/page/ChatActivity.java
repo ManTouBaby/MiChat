@@ -143,7 +143,10 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             mOnChatInputListener.onInitChatList(mChatMessage, mChatGroupId);
             if (messageByTop != null) {
                 mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
-                mChatGroupName = messageByTop.getMessageGroupName();
+                String messageGroupName = messageByTop.getMessageGroupName();
+                String messageChatGroupDetail = messageByTop.getMessageChatGroupDetail();
+                mChatGroupDetail = TextUtils.isEmpty(messageChatGroupDetail) ? mChatGroupDetail : messageChatGroupDetail;
+                mChatGroupName = TextUtils.isEmpty(messageGroupName) ? mChatGroupName : messageGroupName;
             }
             runOnUiThread(() -> mGroupName.setText(mChatGroupName));
         }).start();
@@ -182,6 +185,12 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             } else {
                 finish();
             }
+        });
+
+        findViewById(R.id.open_instruct_manager).setOnClickListener(v -> {
+            Intent instructManager = new Intent(this, InstructManager.class);
+            instructManager.putExtra(MiChatHelper.CHAT_GROUP_ID, mChatGroupId);
+            startActivity(instructManager);
         });
 
     }
@@ -262,7 +271,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
 
         });
         mChatAdapter.setOnItemChildLongClickListener((OnItemChildLongClickListener<ChatMessage>) (view, chatMessage) -> {
-            if (view.getId() == R.id.mi_item_pro) {
+            if (view.getId() == R.id.mi_holder_pro) {
                 miChatInputGroup.addATQuote(chatMessage.getMessageHolder().getGroupName());
             }
             if (view.getId() == R.id.mi_content_container) {
@@ -486,6 +495,13 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                         updateChatGroupName(chatManagerChatMessage);
                         addMQMessage(chatManagerChatMessage);
                         break;
+                    case EBChatManager.TYPE_UPDATE_GROUP_DESC_SUCCESS:
+                    case EBChatManager.MQ_UPDATE_GROUP_DESC:////群成员更新群公告
+                        mChatGroupDetail = newChatGroupName;
+                        updateChatGroupName(chatManagerChatMessage);
+                        addMQMessage(chatManagerChatMessage);
+                        break;
+
                     case EBChatManager.TYPE_ADD_MEMBER_SUCCESS:
                         addMQMessage(chatManagerChatMessage);
                         new Thread(() -> {

@@ -124,7 +124,10 @@ public class MiChatHelper {
     public void notifyExistMember(ChatMessage chatMessage) {
         EventBus.getDefault().post(new EBChatManager(EBChatManager.MQ_EXIST_MEMBER, chatMessage, null));
     }
-
+    //通知成员退出
+    public void notifyChatGroupDesc(ChatMessage chatMessage) {
+        EventBus.getDefault().post(new EBChatManager(EBChatManager.MQ_UPDATE_GROUP_DESC, chatMessage, null));
+    }
 
     //进入聊天界面一
     public ChatMessageControl gotoChat(Context context, ChatGroupDetail chatGroupDetail) {
@@ -185,6 +188,16 @@ public class MiChatHelper {
         @Override
         public void onUpdateGroupNameSuccess(String mChatGroupId, ChatMessage chatMessage) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_GROUP_NAME_SUCCESS, chatMessage, null));
+        }
+
+        @Override
+        public void onUpdateGroupDescFail(String mChatGroupId, ChatMessage chatMessage, String msg) {
+            EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_GROUP_DESC_FAIL, chatMessage, null));
+        }
+
+        @Override
+        public void onUpdateGroupDescSuccess(String mChatGroupId, ChatMessage chatMessage) {
+            EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_GROUP_DESC_SUCCESS, chatMessage, null));
         }
 
         @Override

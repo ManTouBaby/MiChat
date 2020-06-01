@@ -1,5 +1,6 @@
 package com.hy.chatlibrary.adapter;
 
+import android.content.Context;
 import android.support.annotation.LayoutRes;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -22,6 +23,7 @@ import java.util.List;
  * @desc:
  */
 public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> implements OnDateChangeListener {
+    protected Context mContext;
     private SparseIntArray itemTypes;
     List<ChatMessage> mChatMessages = new ArrayList<>();
     private OnSendFailTagClickListener mOnSendFailTagClickListener;
@@ -47,7 +49,8 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
     @Override
     public SmartVH onCreateViewHolder(ViewGroup parent, int viewType) {
         int layoutId = itemTypes.get(viewType);
-        View view = LayoutInflater.from(parent.getContext()).inflate(layoutId, null);
+        mContext = parent.getContext();
+        View view = LayoutInflater.from(mContext).inflate(layoutId, null);
         return new SmartVH(view);
     }
 

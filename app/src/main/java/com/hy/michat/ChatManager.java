@@ -92,7 +92,7 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
 
     @Override
     public void onMessageSend(ChatMessage message, String chatMessageJson) {
-//        System.out.println("发送消息:" + chatMessageJson);
+        System.out.println("发送消息:" + chatMessageJson);
         if (message.getItemType() == 1 || message.getItemType() == 2 || message.getItemType() == 3 || message.getItemType() == 5 || message.getItemType() == 6 && !TextUtils.isEmpty(message.getInstructBean().getLocalFilePath())) {
             File file;
             final InstructBean instructBean = message.getInstructBean();
@@ -218,6 +218,11 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
     @Override
     public void changeChatGroupName(String mChatGroupId, ChatMessage chatMessage) {
         new Thread(() -> mRabbitMQManager.sendChatNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+    }
+
+    @Override
+    public void changeChatGroupDesc(String mChatGroupId, ChatMessage chatMessage) {
+        new Thread(() -> mRabbitMQManager.sendChatDescNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
     }
 
     @Override

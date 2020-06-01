@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.hy.chatlibrary.base.SmartVH;
+import com.hy.chatlibrary.db.entity.ChatMessage;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,8 +48,9 @@ public abstract class BaseAdapter<T> extends RecyclerView.Adapter<SmartVH> {
         notifyDataSetChanged();
     }
 
-    public void setOnItemClickListener(OnItemClickListener mOnItemClickListener) {
+    public BaseAdapter<ChatMessage> setOnItemClickListener(OnItemClickListener mOnItemClickListener) {
         this.mOnItemClickListener = mOnItemClickListener;
+        return null;
     }
 
     public void setOnItemLongClickListener(OnItemLongClickListener mOnItemLongClickListener) {

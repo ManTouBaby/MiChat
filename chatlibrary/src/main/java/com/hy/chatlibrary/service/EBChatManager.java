@@ -26,6 +26,9 @@ public class EBChatManager {
             TYPE_UPDATE_GROUP_NAME_SUCCESS,
             TYPE_UPDATE_GROUP_NAME_FAIL,
             MQ_UPDATE_CHAT_DISPLAY_NAME, MQ_UPDATE_GROUP_NAME,
+            TYPE_UPDATE_GROUP_DESC_SUCCESS,
+            TYPE_UPDATE_GROUP_DESC_FAIL,
+            MQ_UPDATE_GROUP_DESC,
             MQ_ADD_MEMBER, MQ_EXIST_MEMBER})
     @Retention(RetentionPolicy.SOURCE)
     @interface UpdateChatDisplayNameStatus {
@@ -35,6 +38,9 @@ public class EBChatManager {
     public final static int TYPE_UPDATE_CHAT_DISPLAY_SUCCESS = 2;
     public final static int TYPE_UPDATE_GROUP_NAME_SUCCESS = 3;
     public final static int TYPE_UPDATE_GROUP_NAME_FAIL = 4;
+    public final static int TYPE_UPDATE_GROUP_DESC_SUCCESS = 13;
+    public final static int TYPE_UPDATE_GROUP_DESC_FAIL = 14;
+    public final static int MQ_UPDATE_GROUP_DESC = 15;
     public final static int TYPE_ADD_MEMBER_FAIL = 5;
     public final static int TYPE_ADD_MEMBER_SUCCESS = 6;
     public final static int TYPE_EXIST_FAIL = 7;

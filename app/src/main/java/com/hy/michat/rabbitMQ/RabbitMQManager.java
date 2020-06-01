@@ -1,5 +1,6 @@
 package com.hy.michat.rabbitMQ;
 
+import android.app.NotificationManager;
 import android.content.Context;
 import android.support.annotation.StringDef;
 
@@ -51,16 +52,38 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
     public static String PUSH_CHAT_MESSAGE_CALL_BACK = "PUSH_CHAT_MESSAGE_CALL_BACK";
     public static String PUSH_UPDATE_CHAT_DISPLAY = "PUSH_UPDATE_CHAT_DISPLAY";
     public static String PUSH_UPDATE_CHAT_NAME = "PUSH_UPDATE_CHAT_NAME";
+    public static String PUSH_UPDATE_CHAT_DESC = "PUSH_UPDATE_CHAT_DESC";
     public static String PUSH_ADD_MEMBER = "PUSH_ADD_MEMBER";
     public static String PUSH_EXIST_MEMBER = "PUSH_EXIST_MEMBER";
+    public static String PUSH_CHAT_INVITE = "PUSH_CHAT_INVITE";
+    private Context mContent;
+    private NotificationManager mNotifyManager;
+    private Map<String, Integer> integerMap = new HashMap<>();
 
     @Override
     public void myListTask(List<JSONObject> list) {
 
     }
 
+    private static RabbitMQManager rabbitMQManager;
+
+    private RabbitMQManager() {
+    }
+
+    public static RabbitMQManager getInstance() {
+        if (rabbitMQManager == null) {
+            synchronized (RabbitMQManager.class) {
+                if (rabbitMQManager == null) {
+                    rabbitMQManager = new RabbitMQManager();
+                }
+            }
+        }
+        return rabbitMQManager;
+    }
+
     @Override
     public void myTask(JSONObject jsonObject) {
+//        RabbitMQMessageBean baseRabbitBean = JSON.parseObject(jsonObject.toJSONString(), RabbitMQMessageBean.class);
         JSONObject msgSendJsonObject = jsonObject.getJSONObject("msgSend");
         String msgId = jsonObject.getString("msgId");
         String msgFrom = msgSendJsonObject.getString("msgFrom");
@@ -157,7 +180,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
             }
         }
 
-        if (PUSH_EXIST_MEMBER.equals(exchangeType)) {//
+        if (PUSH_EXIST_MEMBER.equals(exchangeType)) {
             ChatMessage chatMessage = JSON.parseObject(data.toJSONString(), ChatMessage.class);
             if (msgFrom.equals(mUserName)) {
                 chatMessage.setMessageOwner(0);
@@ -175,7 +198,27 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
                 IMLog.d("退出群聊MQ：" + chatMessage.getMessageGroupId() + "---" + chatMessage.getMessageHolderName());
             }
         }
+
+        if (PUSH_UPDATE_CHAT_DESC.equals(exchangeType)) {
+            ChatMessage chatMessage = JSON.parseObject(data.toJSONString(), ChatMessage.class);
+            if (msgFrom.equals(mUserName)) {
+                chatMessage.setMessageOwner(0);
+            } else {
+                chatMessage.setMessageOwner(1);
+            }
+            if (isContainer(msgId)) {
+                ChatMessage message = (ChatMessage) mSendMsgs.get(msgId);
+                message.setMessageContent(chatMessage.getMessageContent());
+                MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
+                chatMessageControl.onUpdateGroupDescSuccess(chatMessage.getMessageGroupId(), chatMessage);
+                IMLog.d("修改群聊公告成功：" + chatMessage.getMessageGroupId() + "---" + chatMessage.getMessageHolderName());
+            } else {
+                MiChatHelper.getInstance().notifyChatGroupDesc(chatMessage);
+                IMLog.d("修改群聊公告失败：" + chatMessage.getMessageGroupId() + "---" + chatMessage.getMessageHolderName());
+            }
+        }
     }
+
 
     @Override
     public void ConnSuccess() {
@@ -193,6 +236,8 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
 
     @Override
     public void initMQ(Context context) {
+        this.mContent = context;
+        mNotifyManager = (NotificationManager) mContent.getSystemService(Context.NOTIFICATION_SERVICE);
         mConn = new Conn();
         mMessageCenter = new MessageCenter();
         mMessageCenter.setConfigServerUrl(mOption.configServerUrl);
@@ -202,15 +247,18 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
         mConn.setVirtualHost(mOption.virtualHost);
     }
 
+
+
     @Override
     public void loginMQ(MessageHolder messageHolder, String loginMQPW) {
         this.mMessageHolder = messageHolder;
-        this.mUserName = messageHolder.getName();
-        this.mExchangeId = messageHolder.getName();
+        this.mUserName = messageHolder.getId();
+        this.mExchangeId = messageHolder.getId();
         this.mUerPassWord = loginMQPW;
         if (mRabbitMQInit != null) {
             mRabbitMQInit.closeConnAndChannel();
             mRabbitMQInit.delShutdownListener();
+            mRabbitMQInit.consumerOffline();
             mRabbitMQInit = null;
         }
         try {
@@ -260,6 +308,8 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
         }
     }
 
+
+
     //发送消息撤回消息
     public void sendChatMsgCallBack(@MQType String mqType, String targetId, String holderId, ChatMessage chatMessage) {
         long currentTimeMillis = System.currentTimeMillis();
@@ -299,6 +349,22 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
         MQExchange<ChatMessage> mqExchange = new MQExchange<>();
         mqExchange.setData(chatMessage);
         mqExchange.setExchangeType(PUSH_UPDATE_CHAT_NAME);
+        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(), mqExchange);
+        try {
+            mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
+        } catch (Exception e) {
+            MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
+            chatMessageControl.onUpdateGroupNameFail(targetId, chatMessage, e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    //发送群公告修改通知
+    public void sendChatDescNotify(@MQType String mqType, String targetId, ChatMessage chatMessage) {
+        mSendMsgs.put(chatMessage.getMessageId(), chatMessage);
+        MQExchange<ChatMessage> mqExchange = new MQExchange<>();
+        mqExchange.setData(chatMessage);
+        mqExchange.setExchangeType(PUSH_UPDATE_CHAT_DESC);
         String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(), mqExchange);
         try {
             mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");

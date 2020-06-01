@@ -40,6 +40,7 @@ import org.greenrobot.eventbus.ThreadMode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.hy.chatlibrary.MiChatHelper.CHAT_GROUP_DETAIL;
 import static com.hy.chatlibrary.MiChatHelper.CHAT_GROUP_NAME;
 import static com.hy.chatlibrary.page.ChatActivity.CHAT_MEMBER;
 
@@ -66,6 +67,7 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
     //    private String mGroupName;
     private String mOriginalChatDisplayName;//群聊原始显示名称
     private String mOriginalGroupName;
+    private String mOriginalGroupDetail;
     private ChatGroupMemberAdapter groupMemberAdapter;
     private OnChatManagerListener mOnChatManagerListener;
     private MiChatHelper miChatHelper;
@@ -84,7 +86,7 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
         mGroupId = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_ID);
         mMemberId = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_MEMBER_ID);
         mOriginalGroupName = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_NAME);
-        String groupDetail = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_DETAIL);
+        mOriginalGroupDetail = getIntent().getStringExtra(CHAT_GROUP_DETAIL);
         mOriginalChatDisplayName = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_MEMBER_GROUP_NAME);
         ArrayList<MessageHolder> mGroupMembers = (ArrayList<MessageHolder>) getIntent().getSerializableExtra(MiChatHelper.CHAT_GROUP_MEMBER);
         EventBus.getDefault().register(this);
@@ -129,7 +131,7 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
         }).start();
 
         mChatGroupName.setText(mOriginalGroupName);
-        mGroupDesc.setText(groupDetail);
+        mGroupDesc.setText(mOriginalGroupDetail);
         mChatDisplayName.setText(mOriginalChatDisplayName);
         mGroupMemberCount.setText("(" + mGroupMembers.size() + ")");
 
@@ -183,6 +185,16 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
             if (mOnChatManagerListener != null) {
                 mChatMessageCreator.createChatMessage(12, mAMapLocation, "修改昵称", label, chatMessage -> {
                     mOnChatManagerListener.changeChatDisplayName(mGroupId, chatMessage);
+                    LoadingHelper.showLoading(this);
+                });
+            }
+
+        }));
+
+        mGroupDesc.setOnClickListener(v -> PopupWindowsHelper.showEditWindows(this, "群公告", mOriginalGroupDetail, "修改本群公告，该公告只在本群内显示", label -> {
+            if (mOnChatManagerListener != null) {
+                mChatMessageCreator.createChatMessage(15, mAMapLocation, "修改群公告", label, chatMessage -> {
+                    mOnChatManagerListener.changeChatGroupDesc(mGroupId, chatMessage);
                     LoadingHelper.showLoading(this);
                 });
             }
@@ -249,6 +261,16 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
                     mChatGroupName.setText(mOriginalGroupName);
                     SPHelper.getInstance(this).putString(CHAT_GROUP_NAME, mOriginalGroupName);
                     Toast.makeText(this, "群名称修改失败", Toast.LENGTH_SHORT).show();
+                    break;
+                case EBChatManager.TYPE_UPDATE_GROUP_DESC_SUCCESS://自己更新群公告成功
+                    mGroupDesc.setText(ebChatManager.getChatMessage().getLabel());
+                    mOriginalGroupDetail = ebChatManager.getChatMessage().getLabel();
+                    Toast.makeText(this, "群公告修改成功", Toast.LENGTH_SHORT).show();
+                    break;
+                case EBChatManager.TYPE_UPDATE_GROUP_DESC_FAIL://自己更新群公告失败
+                    mGroupDesc.setText(mOriginalGroupDetail);
+                    SPHelper.getInstance(this).putString(CHAT_GROUP_DETAIL, mOriginalGroupDetail);
+                    Toast.makeText(this, "群公告修改失败", Toast.LENGTH_SHORT).show();
                     break;
             }
         }

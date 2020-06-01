@@ -24,27 +24,58 @@
             android:id="@+id/mi_content_container"
             android:layout_width="238dp"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
             android:background="@drawable/icon_item_type_instruct_bg"
+            android:orientation="vertical"
             android:padding="8dp">
 
             <TextView
                 android:id="@+id/mi_instruct_title"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="标题"
                 android:textColor="@color/mi_text_white"
                 android:textSize="16sp"
                 android:textStyle="bold" />
 
-            <TextView
-                android:id="@+id/mi_instruct_holder"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/mi_instruct_title"
-                android:text="指令发布者"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="发布人："
+                    android:textColor="@color/mi_text_white"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/mi_instruct_holder"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="指令发布者"
+                    android:textColor="@color/mi_text_white"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="wrap_content"
+                android:layout_height="1dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="4dp"
+                android:background="@color/mi_white_bg" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="接收人"
                 android:textColor="@color/mi_text_white"
-                android:textSize="14sp" />
+                android:textSize="12sp" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/mi_acceptor_show"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -68,7 +99,9 @@
                     android:layout_width="222dp"
                     android:layout_height="168dp"
                     android:layout_marginTop="8dp"
+                    android:src="@mipmap/icon_image_error"
                     app:smart_radius="4dp" />
+
                 <RelativeLayout
                     android:id="@+id/mi_instruct_video_container"
                     android:layout_width="222dp"
@@ -83,6 +116,7 @@
                             android:id="@+id/mi_instruct_video_bg"
                             android:layout_width="222dp"
                             android:layout_height="168dp"
+                            android:src="@mipmap/icon_image_error"
                             app:smart_radius="4dp" />
                     </LinearLayout>
 

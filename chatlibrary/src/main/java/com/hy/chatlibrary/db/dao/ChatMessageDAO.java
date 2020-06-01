@@ -51,6 +51,14 @@ public interface ChatMessageDAO {
     @Query("Select * from chatmessage where messageGroupId=:messageGroup and messageHolderId = :holderId")
     List<ChatMessage> queryByGroupIdAndHolderId(String messageGroup, String holderId);
 
+    @Query("Select * from chatmessage where itemType=6 and messageGroupId=:messageGroup and messageHolderId = :holderId")
+    List<ChatMessage> queryInstructByGroupIdAndHolderId(String messageGroup, String holderId);
+
+    @Query("Select * from chatmessage where itemType=:itemType and messageGroupId=:messageGroup or itemType=:itemType2 and messageGroupId=:messageGroup")
+    List<ChatMessage> queryHistoryByGroupId(int itemType, int itemType2, String messageGroup);
+
+    @Query("Select * from chatmessage where itemType=:itemType  and messageGroupId=:messageGroup")
+    List<ChatMessage> queryHistoryByGroupId(int itemType, String messageGroup);
 
     @Query("Select * from chatmessage where messageGroupId=:messageGroup and messageId = :messageId")
     ChatMessage queryByGroupIdAndMessageId(String messageGroup, String messageId);
@@ -60,7 +68,7 @@ public interface ChatMessageDAO {
 
     //查询指定群聊指定时间之前的前queryCount个消息
     @Query("Select * from chatmessage  where messageGroupId=:mChatGroupId and messageSTMillis < :lastNewMilli order by messageSTMillis  desc limit :queryCount")
-    List<ChatMessage> queryMessageByMilli(String mChatGroupId,  long lastNewMilli, int queryCount);
+    List<ChatMessage> queryMessageByMilli(String mChatGroupId, long lastNewMilli, int queryCount);
 
     //查询指定群聊指定时间之前的前queryCount个消息
     @Query("Select * from chatmessage  where messageGroupId=:mChatGroupId and messageSTMillis >= :beforeMilli and messageSTMillis < :afterMilli order by messageSTMillis  desc ")

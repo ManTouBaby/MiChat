@@ -5,33 +5,49 @@
     android:background="@color/mi_chat_main_bg"
     android:orientation="vertical">
 
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/mi_toolbar_container"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:background="@color/mi_chat_main_bg"
-        android:gravity="center_vertical">
-
-        <EditText
-            android:id="@+id/mi_history_search_input"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginRight="58dp"
-            android:layout_marginBottom="8dp"
-            android:background="@drawable/icon_edit_text_bg"
-            android:gravity="center_vertical"
-            android:hint="搜索"
-            android:paddingLeft="36dp"
-            android:textSize="14sp" />
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
 
         <ImageView
-            android:layout_width="wrap_content"
+            android:id="@+id/mi_iv_back"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="center"
+            android:src="@mipmap/ic_back" />
+
+        <RelativeLayout
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_marginLeft="24dp"
-            android:src="@mipmap/icon_search" />
+            android:layout_weight="1">
+
+            <EditText
+                android:id="@+id/mi_history_search_input"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/icon_edit_text_bg"
+                android:gravity="center_vertical"
+                android:hint="搜索"
+                android:paddingLeft="12dp"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_alignParentRight="true"
+                android:layout_marginRight="16dp"
+                android:layout_marginLeft="24dp"
+                android:src="@mipmap/icon_search" />
+
+        </RelativeLayout>
 
         <TextView
             android:id="@+id/mi_cancel_search_history"
@@ -44,15 +60,15 @@
             android:text="取消"
             android:textColor="@color/mi_text_gray"
             android:textSize="14sp" />
-    </RelativeLayout>
+    </LinearLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/mi_show_history"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
-        android:visibility="gone"
-        android:focusable="true" />
+        android:focusable="true"
+        android:visibility="gone" />
 
 
     <LinearLayout
@@ -60,7 +76,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="68dp"
-        android:visibility="gone"
         android:orientation="vertical">
 
         <TextView

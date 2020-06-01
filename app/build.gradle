@@ -59,6 +59,7 @@ dependencies {
     implementation 'com.android.support:multidex:1.0.3'
     debugImplementation 'com.idescout.sql:sqlscout-server:4.1'
     releaseImplementation 'com.idescout.sql:sqlscout-server-noop:4.1'
+//    implementation 'com.google.android:flexbox:1.0.0'
     //    implementation 'com.hy:message-center:2.1.2-RELEASE'
     //com/hy/message-center/2.1.2-RELEASE/message-center-2.1.2-RELEASE.jar
     //com/hy/message-center/2.1.0-RELEASE/message-center-2.1.0-RELEASE.jar

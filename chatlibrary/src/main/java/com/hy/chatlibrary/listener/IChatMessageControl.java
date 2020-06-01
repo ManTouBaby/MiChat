@@ -32,6 +32,12 @@ public interface IChatMessageControl {
     //更新群名称成功
     void onUpdateGroupNameSuccess(String mChatGroupId,  ChatMessage chatMessage);
 
+    //更新群公告失败
+    void onUpdateGroupDescFail(String mChatGroupId, ChatMessage chatMessage, String msg);
+
+    //更新群公告成功
+    void onUpdateGroupDescSuccess(String mChatGroupId,  ChatMessage chatMessage);
+
     //退群成功
     void onExistMemberSuccess(String mChatGroupId, ChatMessage chatMessage);
 

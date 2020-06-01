@@ -35,6 +35,10 @@
         <activity
             android:name="com.hy.chatlibrary.page.ChatFriendListActivity"
             android:launchMode="singleTask" />
+        <activity android:name="com.hy.chatlibrary.page.InstructManager"
+            android:theme="@style/Anim_slide"
+            android:screenOrientation="portrait"
+            android:launchMode="singleTask" />
         <!--        android:windowSoftInputMode="stateHidden|adjustResize"-->
 
         <provider

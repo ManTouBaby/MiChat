@@ -55,7 +55,6 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
     private final float density;
     private String filePathDir;
 
-
     ImageView ivVoice;//语音输入切换
     ImageView ivSmile;//表情
     ImageView ivAdd;//打开菜单可选项
@@ -63,13 +62,13 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
     EditText editText;//文字编辑控件
     TextView tvVoiceClick;//长按录音控件
     RecyclerView rvSendContent;//发送内容类型列表
+    TextView rvSmileContent;//发送表情
     RecyclerView rvChatList;//聊天列表
     RelativeLayout emotionContainer;//其他
     RelativeLayout mQuoteContainer;
     TextView mQuoteLabel;
     ImageView mCloseQuote;
     LinearLayout mLabelMsgContainer;
-//    ProgressBar mPullDownLoadMore;
 
     BaseChatAdapter mBaseChatAdapter;
     ChatContentTypeAdapter typeAdapter;
@@ -79,7 +78,6 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
     boolean isShowTakeVoiceBtn = false;//语音录制按钮是否显示
     boolean isShowContent = false;//菜单内容框是否开启
     boolean isOpenSoftKeyBoard = false;//输入键盘是否开启
-//    boolean onPullDowning = false;
 
 
     public RecyclerView getRvChatList() {
@@ -150,8 +148,9 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
     //添加@引用
     public void addATQuote(String label) {
         if (editText != null && editText.getText() != null) {
+            editText.requestFocus();
             SpannableStringBuilder spannableString = new SpannableStringBuilder(editText.getText());
-            label =  "@" +label+" ";
+            label = "@" + label + " ";
             spannableString.append(label);
             ForegroundColorSpan colorSpan = new ForegroundColorSpan(Color.parseColor("#6f6f6f"));
             spannableString.setSpan(colorSpan, spannableString.length() - label.length(), spannableString.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -159,8 +158,6 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
             editText.setSelection(spannableString.length());
         }
     }
-
-
 
 
     public void setFilePathDir(String filePathDir) {
@@ -264,18 +261,15 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
                 String string = editText.getText().toString();
                 String[] split = string.split(" @");
 
-
                 final ForegroundColorSpan spans[] = editText.getText().getSpans(selectionStart, selectionEnd, ForegroundColorSpan.class);
                 for (ForegroundColorSpan span : spans) {
-                    if (span == null) {
-                        continue;
-                    }
+                    if (span == null) continue;
                     if (editText.getText().getSpanEnd(span) == selectionStart) {
                         final int spanStart = editText.getText().getSpanStart(span);
                         final int spanEnd = editText.getText().getSpanEnd(span);
-//                        System.out.println("要删除的对象:"+editText.getText().subSequence(spanStart, spanEnd));
+                        System.out.println("要删除的对象:" + editText.getText().subSequence(spanStart, spanEnd));
                         Selection.setSelection(editText.getText(), spanStart, spanEnd);//选中要删除的字段
-                        return false;
+                        return true;
                     }
                 }
             }
@@ -299,8 +293,8 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
         contentTypes.add(new ChatContentType(ContentType.INSTRUCT, "指令", R.mipmap.icon_type_command));
 
         rvSendContent = findViewById(R.id.mi_other_send_content);
+        rvSmileContent = findViewById(R.id.mi_smile_container);
         rvSendContent.setLayoutManager(new GridLayoutManager(getContext(), 4));
-        rvSendContent.setHasFixedSize(true);
         rvSendContent.setAdapter(typeAdapter = new ChatContentTypeAdapter(contentTypes));
     }
 
@@ -366,17 +360,44 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
         }
         //打开表情列表按钮
         if (id == R.id.emotion_smile) {
-
+            if (isShowContent){
+                if (rvSmileContent.getVisibility()==VISIBLE){
+                    openSoftInput();
+                    hideContent();
+                }else {
+                    rvSmileContent.setVisibility(VISIBLE);
+                    rvSendContent.setVisibility(GONE);
+                }
+            }else {
+                isShowTakeVoiceBtn = false;
+                ivVoice.setImageResource(R.mipmap.icon_chat_voice);
+                tvVoiceClick.setVisibility(GONE);
+                mLabelMsgContainer.setVisibility(VISIBLE);
+                showContent();
+                rvSmileContent.setVisibility(VISIBLE);
+                rvSendContent.setVisibility(GONE);
+                closeSoftInput();
+            }
         }
         //打开其他可发送内容按钮
         if (id == R.id.emotion_add) {
             if (isShowContent) {
-                openSoftInput();
-                hideContent();
+                if (rvSendContent.getVisibility()==VISIBLE){
+                    openSoftInput();
+                    hideContent();
+                }else {
+                    rvSmileContent.setVisibility(GONE);
+                    rvSendContent.setVisibility(VISIBLE);
+                }
             } else {
-                showEditText();
+//                showEditText();
+                isShowTakeVoiceBtn = false;
+                ivVoice.setImageResource(R.mipmap.icon_chat_voice);
+                tvVoiceClick.setVisibility(GONE);
+                mLabelMsgContainer.setVisibility(VISIBLE);
                 showContent();
-//                if (!isOpenSoftKeyBoard) emotionContainer.requestLayout();
+                rvSmileContent.setVisibility(GONE);
+                rvSendContent.setVisibility(VISIBLE);
                 closeSoftInput();
             }
         }
@@ -407,6 +428,7 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
         ivVoice.setImageResource(R.mipmap.icon_chat_voice);
         tvVoiceClick.setVisibility(GONE);
         mLabelMsgContainer.setVisibility(VISIBLE);
+        scrollToBottom();
         openSoftInput();
         if (editText.getText().length() > 0) {
             showSendBtn();

@@ -34,7 +34,18 @@
     </declare-styleable>
 
     <declare-styleable name="CornerTextView">
-        <attr name="auto_background" format="boolean"/>
-        <attr name="radius"  format="dimension" />
+        <attr name="auto_background" format="boolean" />
+        <attr name="radius" format="dimension" />
     </declare-styleable>
+
+    <style name="slide" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityOpenExitAnimation">@anim/slide_out_right</item>
+        <item name="android:activityCloseEnterAnimation">@anim/slide_in_right</item>
+        <item name="android:activityCloseExitAnimation">@anim/slide_out_right</item>
+    </style>
+
+    <style name="Anim_slide" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:windowAnimationStyle">@style/slide</item>
+    </style>
 </resources>
