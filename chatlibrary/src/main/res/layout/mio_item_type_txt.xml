@@ -25,7 +25,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/mi_group_show_name"
             android:background="@mipmap/icon_o_txt_bg"
-            android:gravity="start"
+            android:gravity="start|center_vertical"
             android:paddingLeft="14dp"
             android:maxWidth="238dp"
             android:paddingTop="10dp"

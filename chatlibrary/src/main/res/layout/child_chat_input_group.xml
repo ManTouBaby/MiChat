@@ -153,11 +153,12 @@
                 android:layout_height="match_parent"
                 android:visibility="gone" />
 
-            <TextView
+            <android.support.v7.widget.RecyclerView
                 android:id="@+id/mi_smile_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
+                android:padding="8dp"
                 android:text="表情"
                 android:visibility="gone" />
         </RelativeLayout>

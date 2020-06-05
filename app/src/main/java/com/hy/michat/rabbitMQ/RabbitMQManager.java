@@ -248,7 +248,6 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
     }
 
 
-
     @Override
     public void loginMQ(MessageHolder messageHolder, String loginMQPW) {
         this.mMessageHolder = messageHolder;
@@ -307,7 +306,6 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
             e.printStackTrace();
         }
     }
-
 
 
     //发送消息撤回消息

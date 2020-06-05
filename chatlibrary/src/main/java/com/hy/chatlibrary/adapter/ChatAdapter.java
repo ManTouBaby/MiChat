@@ -29,6 +29,7 @@ import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.db.entity.ChatMessage;
 import com.hy.chatlibrary.db.entity.InstructBean;
 import com.hy.chatlibrary.utils.DateUtil;
+import com.hy.chatlibrary.utils.IMLog;
 import com.hy.chatlibrary.utils.MediaPlayerUtil;
 import com.hy.chatlibrary.utils.SPHelper;
 import com.hy.chatlibrary.utils.StringUtil;
@@ -106,13 +107,12 @@ public class ChatAdapter extends BaseChatAdapter {
 
         if (holderPro != null) {
             addChildViewClick(holderPro, chatMessage);
+            addChildViewLongClick(holderPro, chatMessage);
             if (messageHolder != null) {
                 holderPro.setText(messageHolderName);
                 leaderTag.setVisibility(messageHolder.getRole() == 1 ? View.VISIBLE : View.GONE);
             }
         }
-        if (chatMessage.getMessageOwner() == 1 && holderPro != null)
-            addChildViewLongClick(holderPro, chatMessage);
         if (view != null) addChildViewLongClick(view, chatMessage);
         if (msgTime != null) {
             if (position > 0) {
@@ -154,7 +154,7 @@ public class ChatAdapter extends BaseChatAdapter {
             case 0:
             case 9:
                 String content = chatMessage.getMessageContent();
-                holder.getText(R.id.mi_chat_item_text).setText(StringUtil.isEmpty(content));
+                StringUtil.matchExpression( holder.getText(R.id.mi_chat_item_text), content);
                 break;
             case 1:
                 holder.getText(R.id.mi_voice_time).setText(chatMessage.getDuration() / 1000 + "``");
@@ -194,7 +194,10 @@ public class ChatAdapter extends BaseChatAdapter {
                 if (view != null) addChildViewClick(view, chatMessage);
                 TextureMapView textureMapView = holder.getViewById(R.id.tmv_show);
                 textureMapViews.add(textureMapView);
-                if (textureMapView != null && view != null) {
+                textureMapView.setOnClickListener(v -> {
+                    IMLog.d("地图单击");
+                });
+                if (view != null) {
                     TextView localName = view.findViewById(R.id.mi_local_name);
                     TextView localRoad = view.findViewById(R.id.mi_local_road);
                     localName.setText(chatMessage.getLocationAddress());
@@ -208,7 +211,7 @@ public class ChatAdapter extends BaseChatAdapter {
                     uiSettings.setAllGesturesEnabled(false);//禁止手势
                     MarkerOptions markerOption = new MarkerOptions();
                     markerOption.position(latLng);
-                    markerOption.draggable(true);//设置Marker可拖动
+//                    markerOption.draggable(true);//设置Marker可拖动
                     markerOption.icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(view.getResources(), R.mipmap.icon_location)));
                     // 将Marker设置为贴地显示，可以双指下拉地图查看效果
                     markerOption.setFlat(true);//设置marker平贴地图效果
