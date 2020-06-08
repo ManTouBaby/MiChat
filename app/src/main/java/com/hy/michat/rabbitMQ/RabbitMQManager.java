@@ -292,12 +292,11 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
         if (mRabbitMQInit == null) {
             loginMQ(mMessageHolder, mUerPassWord);
         }
-
         mSendMsgs.put(chatMessage.getMessageId(), chatMessage);
         MQExchange<ChatMessage> mqExchange = new MQExchange<>();
         mqExchange.setData(chatMessage);
         mqExchange.setExchangeType(PUSH_CHAT_MESSAGE);
-        String sendMsg = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(), mqExchange);
+        String sendMsg = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(),chatMessage.getItemType(), mqExchange);
         try {
             mRabbitMQInit.sendMessageCenter("msg-send-process", sendMsg, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(chatMessage.getMessageCTMillis()), "0");
         } catch (Exception e) {
@@ -315,7 +314,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
         MQExchange<ChatMessage> mqExchange = new MQExchange<>();
         mqExchange.setData(chatMessage);
         mqExchange.setExchangeType(PUSH_CHAT_MESSAGE_CALL_BACK);
-        String sendMsg = getDateJson(mqType, targetId, holderId, mqExchange);
+        String sendMsg = getDateJson(mqType, targetId, holderId,chatMessage.getItemType(), mqExchange);
         try {
             mRabbitMQInit.sendMessageCenter("msg-send-process", sendMsg, holderId + "-" + currentTimeMillis, "", DateUtil.getDateByMilli(chatMessage.getMessageCTMillis()), "0");
         } catch (Exception e) {
@@ -331,7 +330,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
         MQExchange<ChatMessage> mqExchange = new MQExchange<>();
         mqExchange.setData(chatMessage);
         mqExchange.setExchangeType(PUSH_UPDATE_CHAT_DISPLAY);
-        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(), mqExchange);
+        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(),chatMessage.getItemType(), mqExchange);
         try {
             mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
         } catch (Exception e) {
@@ -347,7 +346,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
         MQExchange<ChatMessage> mqExchange = new MQExchange<>();
         mqExchange.setData(chatMessage);
         mqExchange.setExchangeType(PUSH_UPDATE_CHAT_NAME);
-        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(), mqExchange);
+        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(),chatMessage.getItemType(), mqExchange);
         try {
             mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
         } catch (Exception e) {
@@ -363,7 +362,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
         MQExchange<ChatMessage> mqExchange = new MQExchange<>();
         mqExchange.setData(chatMessage);
         mqExchange.setExchangeType(PUSH_UPDATE_CHAT_DESC);
-        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(), mqExchange);
+        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(),chatMessage.getItemType(), mqExchange);
         try {
             mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
         } catch (Exception e) {
@@ -378,7 +377,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
         MQExchange<ChatMessage> mqExchange = new MQExchange<>();
         mqExchange.setData(chatMessage);
         mqExchange.setExchangeType(PUSH_ADD_MEMBER);
-        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(), mqExchange);
+        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(), chatMessage.getItemType(),mqExchange);
         try {
             mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
         } catch (Exception e) {
@@ -393,7 +392,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
         MQExchange<ChatMessage> mqExchange = new MQExchange<>();
         mqExchange.setData(chatMessage);
         mqExchange.setExchangeType(PUSH_EXIST_MEMBER);
-        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(), mqExchange);
+        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(),chatMessage.getItemType(), mqExchange);
         try {
             mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
         } catch (Exception e) {
@@ -404,13 +403,14 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
     }
 
 
-    private String getDateJson(@MQType String mqType, String targetId, String holderId, Object object) {
+    private String getDateJson(@MQType String mqType, String targetId, String holderId,int msgType, Object object) {
         String dataJson = JSON.toJSONString(object, SerializerFeature.WriteMapNullValue);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\"msgSend\":{\"");
         stringBuilder.append(mqType).append("\":\"");
         stringBuilder.append(targetId).append("\",\"msgFrom\":\"");
-        stringBuilder.append(holderId).append("\",\"type\":\"0\",\"dataType\":\"jstx\",\"ifRead\":\"1\",\"data\":");
+        stringBuilder.append(holderId).append("\",\"msgType\":\"");
+        stringBuilder.append(msgType).append("\",\"type\":\"jstx\",\"dataType\":\"jq\",\"ifRead\":\"1\",\"data\":");
         stringBuilder.append(dataJson).append("}}");
         IMLog.d("发送消息:" + stringBuilder.toString());
         return stringBuilder.toString();

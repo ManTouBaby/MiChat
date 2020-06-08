@@ -123,8 +123,10 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
                                 BaseResult baseResult = JSON.parseObject(json, BaseResult.class);
                                 if (message.getItemType() == 6) {
                                     instructBean.setNetFilePath(AppConfig.FILE_SERVER + baseResult.getData().getId());
+                                    instructBean.setNetThumbFilePath(AppConfig.FILE_SERVER + baseResult.getData().getAfterFileId());
                                 } else {
                                     message.setMessageNetPath(AppConfig.FILE_SERVER + baseResult.getData().getId());
+                                    message.setMessageThumbFilePath(AppConfig.FILE_SERVER + baseResult.getData().getAfterFileId());
                                 }
                                 mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, message.getMessageGroupId(), message);
                             } catch (IOException e) {

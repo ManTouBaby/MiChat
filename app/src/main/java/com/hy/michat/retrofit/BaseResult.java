@@ -71,5 +71,4 @@ public class BaseResult {
         this.allSuccess = allSuccess;
     }
 
-
 }

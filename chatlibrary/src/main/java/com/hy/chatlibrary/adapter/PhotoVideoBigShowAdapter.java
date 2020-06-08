@@ -75,45 +75,39 @@ public class PhotoVideoBigShowAdapter extends RecyclerView.Adapter<SmartVH> {
         RecyclerView.LayoutParams layoutParams = new RecyclerView.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         holder.itemView.setLayoutParams(layoutParams);
 
-        if (chatMessage.getItemType() == 2) {//视屏
-            String filePath = chatMessage.getMessageLocalPath();
-            File file = new File(StringUtil.isEmpty(filePath));
-            if (!file.exists()) {
-                filePath = chatMessage.getMessageNetPath();
-            }
-            System.out.println("文件路径:" + filePath);
-            showVideo(holder, filePath);
-        }
-
-        if (chatMessage.getItemType() == 3) {//图片0
-            String filePath = chatMessage.getMessageLocalPath();
-            File file = new File(StringUtil.isEmpty(filePath));
-            if (!file.exists()) {
-                filePath = chatMessage.getMessageNetPath();
-            }
-            showImage(holder,filePath);
-        }
         if (chatMessage.getItemType() == 6) {
             InstructBean instructBean = chatMessage.getInstructBean();
             String filePath = instructBean.getLocalFilePath();
             File file = new File(StringUtil.isEmpty(filePath));
             if (!file.exists()) {
-                filePath = instructBean.getNetFilePath();
+                filePath = TextUtils.isEmpty(instructBean.getNetThumbFilePath()) ? instructBean.getNetFilePath() : instructBean.getNetThumbFilePath();
             }
             if (instructBean.getDuration() > 0) {
-                showVideo(holder, filePath);
+                showVideo(holder, filePath, instructBean.getNetFilePath());
             } else {
-                showImage(holder,filePath);
+                showImage(holder, filePath);
+            }
+        } else {
+            String filePath = chatMessage.getMessageLocalPath();
+            File file = new File(StringUtil.isEmpty(filePath));
+            if (!file.exists()) {
+                filePath = TextUtils.isEmpty(chatMessage.getMessageThumbFilePath()) ? chatMessage.getMessageNetPath() : chatMessage.getMessageThumbFilePath();
+            }
+            if (chatMessage.getItemType() == 2) {//视屏
+                showVideo(holder, filePath, chatMessage.getMessageNetPath());
+            }
+            if (chatMessage.getItemType() == 3) {//图片0
+                showImage(holder, filePath);
             }
         }
     }
 
-    private void showVideo(SmartVH holder, String videoUrl) {
+    private void showVideo(SmartVH holder, String firstPage, String videoUrl) {
         JzvdStd jzvdStd = holder.getViewById(R.id.mi_video_play);
         jzvdStd.fullscreenButton.setVisibility(View.GONE);
         jzvdStd.setUp(videoUrl, "", Jzvd.SCREEN_NORMAL);
         jzvdStd.posterImageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        GlideHelper.loadIntoUseNoCorner(holder.itemView.getContext(), videoUrl, jzvdStd.posterImageView);
+        GlideHelper.loadIntoUseNoCorner(holder.itemView.getContext(), firstPage, jzvdStd.posterImageView);
         if (!stringJzvdMap.containsKey(jzvdStd.hashCode()))
             stringJzvdMap.put(jzvdStd.hashCode(), jzvdStd);
     }
@@ -140,7 +134,7 @@ public class PhotoVideoBigShowAdapter extends RecyclerView.Adapter<SmartVH> {
         }
 
         LinearLayoutManager layoutManager = (LinearLayoutManager) mRecyclerView.getLayoutManager();
-        if (clickPosition != -1)  layoutManager.scrollToPosition(clickPosition);
+        if (clickPosition != -1) layoutManager.scrollToPosition(clickPosition);
     }
 
 
@@ -190,7 +184,7 @@ public class PhotoVideoBigShowAdapter extends RecyclerView.Adapter<SmartVH> {
                 if (!TextUtils.isEmpty(instructBean.getLocalFilePath()) || !TextUtils.isEmpty(instructBean.getNetFilePath())) {
                     messages.add(chatMessage);
                 }
-            }else if (chatMessage.getItemType()==2||chatMessage.getItemType()==3){
+            } else if (chatMessage.getItemType() == 2 || chatMessage.getItemType() == 3) {
                 messages.add(chatMessage);
             }
         }

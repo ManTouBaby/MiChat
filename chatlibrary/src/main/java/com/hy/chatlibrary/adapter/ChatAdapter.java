@@ -132,7 +132,7 @@ public class ChatAdapter extends BaseChatAdapter {
         String filePath = chatMessage.getMessageLocalPath();
         File file = new File(StringUtil.isEmpty(filePath));
         if (!file.exists()) {
-            filePath = chatMessage.getMessageNetPath();
+            filePath = TextUtils.isEmpty(chatMessage.getMessageThumbFilePath()) ? chatMessage.getMessageNetPath() : chatMessage.getMessageThumbFilePath();
         }
 
         switch (chatMessage.getItemType()) {
@@ -154,7 +154,7 @@ public class ChatAdapter extends BaseChatAdapter {
             case 0:
             case 9:
                 String content = chatMessage.getMessageContent();
-                StringUtil.matchExpression( holder.getText(R.id.mi_chat_item_text), content);
+                StringUtil.matchExpression(holder.getText(R.id.mi_chat_item_text), content);
                 break;
             case 1:
                 holder.getText(R.id.mi_voice_time).setText(chatMessage.getDuration() / 1000 + "``");
@@ -166,20 +166,27 @@ public class ChatAdapter extends BaseChatAdapter {
                     drawable.stop();
                 }
                 //处理语音
-                String finalFilePath = filePath;
-                if (view != null) view.setOnClickListener(v -> {
-                    //单击语音时不管所单击的Item是不是正在播放的语音，都进行停止
-                    if (chatMessage.isPlayer()) {
-                        stopVoicePlay();
-                    } else {
-                        stopVoicePlay();
-                        mDrawable = (AnimationDrawable) holder.getImage(R.id.mi_voice_animate_holder).getDrawable();
-                        if (mDrawable != null) mDrawable.start();
-                        mPlayingItem = chatMessage;
-                        chatMessage.setPlayer(true);
-                        mediaPlayerUtil.playerMedia(finalFilePath, mp -> stopVoicePlay());
-                    }
-                });
+                String finalFilePath = chatMessage.getMessageLocalPath();
+                File audioFile = new File(StringUtil.isEmpty(finalFilePath));
+                if (!audioFile.exists()) {
+                    finalFilePath = chatMessage.getMessageNetPath();
+                }
+                if (view != null) {
+                    String finalFilePath1 = finalFilePath;
+                    view.setOnClickListener(v -> {
+                        //单击语音时不管所单击的Item是不是正在播放的语音，都进行停止
+                        if (chatMessage.isPlayer()) {
+                            stopVoicePlay();
+                        } else {
+                            stopVoicePlay();
+                            mDrawable = (AnimationDrawable) holder.getImage(R.id.mi_voice_animate_holder).getDrawable();
+                            if (mDrawable != null) mDrawable.start();
+                            mPlayingItem = chatMessage;
+                            chatMessage.setPlayer(true);
+                            mediaPlayerUtil.playerMedia(finalFilePath1, mp -> stopVoicePlay());
+                        }
+                    });
+                }
                 break;
             case 2:
                 if (view != null) addChildViewClick(view, chatMessage);

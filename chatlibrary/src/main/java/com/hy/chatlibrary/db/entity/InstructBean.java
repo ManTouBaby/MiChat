@@ -26,6 +26,7 @@ public class InstructBean implements Serializable {
     private String              content;     //指令内容
     private List<MessageHolder> acceptors;  //接收人员信息
     private String              netFilePath;//网络地址
+    private String              netThumbFilePath;//网络缩率图地址
     private long                duration;   //视频时长
     private float               fileSize;   //文件大小
     private String              fileName;   //文件名称
@@ -44,6 +45,14 @@ public class InstructBean implements Serializable {
     @Ignore
     @JSONField(serialize = false)
     private boolean isOpenControl;//是否打开操作
+
+    public String getNetThumbFilePath() {
+        return netThumbFilePath;
+    }
+
+    public void setNetThumbFilePath(String netThumbFilePath) {
+        this.netThumbFilePath = netThumbFilePath;
+    }
 
     public int getReplyStatus() {
         return replyStatus;

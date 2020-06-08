@@ -41,6 +41,7 @@ public class ChatMessage extends BaseSmartBO {
     private String messageST;//消息发送成功时间
     private String messageContent;//消息内容
     private String messageNetPath;//文件消息地址
+    private String messageThumbFilePath;//网络缩率图地址
     private long messageCTMillis;//消息生成时间戳
     private long messageSTMillis;//消息发送成功时间戳
 
@@ -139,6 +140,14 @@ public class ChatMessage extends BaseSmartBO {
 
     public void setMessageHolderId(String messageHolderId) {
         this.messageHolderId = messageHolderId;
+    }
+
+    public String getMessageThumbFilePath() {
+        return messageThumbFilePath;
+    }
+
+    public void setMessageThumbFilePath(String messageThumbFilePath) {
+        this.messageThumbFilePath = messageThumbFilePath;
     }
 
     public String getMessageNetPath() {

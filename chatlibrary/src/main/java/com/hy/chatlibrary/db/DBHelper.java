@@ -44,14 +44,15 @@ public class DBHelper {
             public void migrate(@NonNull SupportSQLiteDatabase database) {
 //                database.execSQL("alter table ChatMessage add isSynchronization integer NOT NULL DEFAULT 0");
 
-                database.execSQL("create table NoDisturbing(chatGroupHolderID text ,chatGroupId text ,isOpen integer NOT NUll default 0,primary key(chatGroupHolderID,chatGroupId) )");
-//                database.execSQL("alter table ChatMessage add locationRoad text");
+//                database.execSQL("create table NoDisturbing(chatGroupHolderID text ,chatGroupId text ,isOpen integer NOT NUll default 0,primary key(chatGroupHolderID,chatGroupId) )");
+                database.execSQL("alter table ChatMessage add messageThumbFilePath text");
+                database.execSQL("alter table instructModel add netThumbFilePath text");
 //                database.execSQL("alter table ChatMessage add latitude real");
 //                database.execSQL("alter table ChatMessage add longitude real");
             }
         };
         mDataBase = Room.databaseBuilder(context, AppDataBase.class, "chatMessage.db")
-                .addMigrations(migration1_2)
+                .addMigrations(migration1_2,migration2_3)
                 .allowMainThreadQueries()
                 .build();
     }

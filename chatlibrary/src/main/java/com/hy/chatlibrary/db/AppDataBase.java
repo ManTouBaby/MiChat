@@ -15,7 +15,7 @@ import com.hy.chatlibrary.db.entity.NoDisturbing;
  * @date:2020/04/08 12:02
  * @desc:
  */
-@Database(entities = {ChatMessage.class, InstructBean.class, NoDisturbing.class}, version = 2, exportSchema = false)
+@Database(entities = {ChatMessage.class, InstructBean.class, NoDisturbing.class}, version = 3, exportSchema = false)
 public abstract class AppDataBase extends RoomDatabase {
     public abstract ChatMessageDAO chatMessageDAO();
 
