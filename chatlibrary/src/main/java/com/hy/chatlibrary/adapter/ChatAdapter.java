@@ -281,7 +281,8 @@ public class ChatAdapter extends BaseChatAdapter {
                 ChatMessage quoteMessage = chatMessage.getChatMessage();
                 holder.getText(R.id.mi_chat_item_text).setText(StringUtil.isEmpty(chatMessage.getMessageContent()));
                 TextView quoteShow = holder.getText(R.id.mi_quote_reply_notify);
-                quoteShow.setText(quoteMessage.getMessageHolderShowName() + "：" + quoteMessage.getMessageContent());
+                String quoteName = TextUtils.isEmpty(quoteMessage.getMessageHolderShowName()) ? quoteMessage.getMessageHolderName() : quoteMessage.getMessageHolderShowName();
+                quoteShow.setText(quoteName + "：" + quoteMessage.getMessageContent());
                 addChildViewClick(quoteShow, chatMessage);
                 break;
         }
