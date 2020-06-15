@@ -211,6 +211,8 @@ public abstract class BaseChatAdapter extends RecyclerView.Adapter<SmartVH> impl
        }
     }
 
+
+
     @Override
     public void updateMessage(ChatMessage message) {
         int position = -1;

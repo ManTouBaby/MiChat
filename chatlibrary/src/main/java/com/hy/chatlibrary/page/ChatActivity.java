@@ -451,8 +451,8 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                 onRemoveFail(groupControl.getChatMessage(), groupControl.getErrorLabel());
                 break;
             case EBChat.TYPE_REMOVE_SUCCESS://消息撤回
-                onRemoveSuccess(groupControl.getChatMessage());
-                mChatMessageCreator.createChatMessage(10, mAMapLocation, "撤回消息", chatMessage -> mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage)));
+            case EBChat.MQ_MSG_CALL_BACK:
+                updateMessage(groupControl.getChatMessage());
                 break;
             case EBChat.TYPE_GROUP_INIT://群聊信息初始化
                 setNetMessages(groupControl.getChatMessages());
@@ -515,9 +515,6 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                         break;
                 }
                 break;
-            case EBChat.MQ_MSG_CALL_BACK:
-                onRemoveSuccess(groupControl.getChatMessage());
-                break;
 
         }
     }
@@ -564,14 +561,13 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
     }
 
     //消息撤销成功
-    public void onRemoveSuccess(ChatMessage message) {
-        runOnUiThread(() -> {
-            mChatAdapter.removeMessage(message);
-        });
+    public void updateMessage(ChatMessage message) {
+        runOnUiThread(() -> mChatAdapter.updateMessage(message));
     }
 
     //消息撤销失败
     public void onRemoveFail(ChatMessage message, String label) {
+        Toast.makeText(this, "消息撤回失败-" + label, Toast.LENGTH_SHORT).show();
     }
 
     //新消息

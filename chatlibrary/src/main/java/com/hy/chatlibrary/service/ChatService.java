@@ -105,8 +105,10 @@ public class ChatService extends Service {
                 ebChat = new EBChat(EBChat.TYPE_REMOVE_ERROR, chatMessage, message.getErrorLabel());
                 break;
             case EBChatMessage.TYPE_REMOVE_SUCCESS://消息撤回成功
-                ebChat = new EBChat(EBChat.TYPE_REMOVE_SUCCESS, chatMessage);
-                mChatMessageDAO.deleteChatMessage(queryMessage);//删除本地聊天消息
+                ebChat = new EBChat(EBChat.TYPE_REMOVE_SUCCESS, queryMessage);
+                queryMessage.setItemType(10);
+                queryMessage.setMessageContent("撤回消息");
+                mChatMessageDAO.updateChatMessage(queryMessage);//更新本地聊天消息
                 break;
             case EBChatMessage.MQ_NOTIFY_REMOVE:
                 ebChat = new EBChat(EBChat.MQ_MSG_CALL_BACK, chatMessage);
@@ -181,7 +183,8 @@ public class ChatService extends Service {
         MessageHolder controlHolder = chatChatMessage.getMessageHolder();
         List<ChatMessage> chatMessages;
         ChatMessage messageByTop = mChatMessageDAO.queryMMessageByTop(chatGroupId, controlHolder.getId());
-       if (messageByTop!=null)mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
+        if (messageByTop != null)
+            mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());
         switch (ebUpdateChat.getType()) {
 //            case EBChatManager.TYPE_UPDATE_CHAT_DISPLAY_ERROR:
 //                ebChat = new EBChat(EBChat.MQ_UPDATE_CHAT_DISPLAY_NAME, ebUpdateChat, ebUpdateChat.getErrorLabel());
