@@ -1,6 +1,5 @@
 package com.hy.michat.rabbitMQ;
 
-import android.app.NotificationManager;
 import android.content.Context;
 import android.support.annotation.StringDef;
 
@@ -48,17 +47,14 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
     private String mUerPassWord;
     private String mExchangeId;
 
-    public static String PUSH_CHAT_MESSAGE = "PUSH_CHAT_MESSAGE";
-    public static String PUSH_CHAT_MESSAGE_CALL_BACK = "PUSH_CHAT_MESSAGE_CALL_BACK";
-    public static String PUSH_UPDATE_CHAT_DISPLAY = "PUSH_UPDATE_CHAT_DISPLAY";
-    public static String PUSH_UPDATE_CHAT_NAME = "PUSH_UPDATE_CHAT_NAME";
-    public static String PUSH_UPDATE_CHAT_DESC = "PUSH_UPDATE_CHAT_DESC";
-    public static String PUSH_ADD_MEMBER = "PUSH_ADD_MEMBER";
-    public static String PUSH_EXIST_MEMBER = "PUSH_EXIST_MEMBER";
-    public static String PUSH_CHAT_INVITE = "PUSH_CHAT_INVITE";
+    public static final String PUSH_CHAT_MESSAGE = "PUSH_CHAT_MESSAGE";
+    public static final String PUSH_CHAT_MESSAGE_CALL_BACK = "PUSH_CHAT_MESSAGE_CALL_BACK";    //发送消息撤回消息
+    public static final String PUSH_UPDATE_CHAT_DISPLAY = "PUSH_UPDATE_CHAT_DISPLAY";    //发送群聊显示名称通知
+    public static final String PUSH_UPDATE_CHAT_NAME = "PUSH_UPDATE_CHAT_NAME";    //发送群聊名称通知
+    public static final String PUSH_UPDATE_CHAT_DESC = "PUSH_UPDATE_CHAT_DESC";    //发送群公告修改通知
+    public static final String PUSH_ADD_MEMBER = "PUSH_ADD_MEMBER";                //添加群成员通知
+    public static final String PUSH_EXIST_MEMBER = "PUSH_EXIST_MEMBER";            //退出群聊通知
     private Context mContent;
-    private NotificationManager mNotifyManager;
-    private Map<String, Integer> integerMap = new HashMap<>();
 
     @Override
     public void myListTask(List<JSONObject> list) {
@@ -83,7 +79,6 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
 
     @Override
     public void myTask(JSONObject jsonObject) {
-//        RabbitMQMessageBean baseRabbitBean = JSON.parseObject(jsonObject.toJSONString(), RabbitMQMessageBean.class);
         JSONObject msgSendJsonObject = jsonObject.getJSONObject("msgSend");
         String msgId = jsonObject.getString("msgId");
         String msgFrom = msgSendJsonObject.getString("msgFrom");
@@ -120,7 +115,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
                 ChatMessage message = (ChatMessage) mSendMsgs.get(msgId);
                 message.setMessageContent(chatMessage.getMessageContent());
                 MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-                chatMessageControl.onUpdateChatDisplayNameSuccess(message.getMessageGroupId(), message);
+                chatMessageControl.onUpdateChatDisplayNameSuccess(message);
                 removeSendMSG(msgId);
                 IMLog.d("群聊显示名称成功：" + chatMessage.getMessageHolderName() + "---" + chatMessage.getLabel());
             } else {
@@ -139,7 +134,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
                 ChatMessage message = (ChatMessage) mSendMsgs.get(msgId);
                 message.setMessageContent(chatMessage.getMessageContent());
                 MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-                chatMessageControl.onUpdateGroupNameSuccess(chatMessage.getMessageGroupId(), chatMessage);
+                chatMessageControl.onUpdateGroupNameSuccess(chatMessage);
                 removeSendMSG(msgId);
                 IMLog.d("群聊名称修改成功：" + chatMessage.getMessageHolderName() + "---" + chatMessage.getLabel());
             } else {
@@ -172,7 +167,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
                 ChatMessage message = (ChatMessage) mSendMsgs.get(msgId);
                 message.setMessageContent(chatMessage.getMessageContent());
                 MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-                chatMessageControl.addMemberSuccess(chatMessage.getMessageGroupId(), message);
+                chatMessageControl.addMemberSuccess(message);
                 IMLog.d("新成员加入群成功：" + chatMessage.getMessageGroupId() + "---" + chatMessage.getNewHolders().get(0).getName());
             } else {
                 MiChatHelper.getInstance().notifyAddMember(chatMessage);
@@ -191,7 +186,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
                 ChatMessage message = (ChatMessage) mSendMsgs.get(msgId);
                 message.setMessageContent(chatMessage.getMessageContent());
                 MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-                chatMessageControl.onExistMemberSuccess(chatMessage.getMessageGroupId(), chatMessage);
+                chatMessageControl.onExistMemberSuccess(chatMessage);
                 IMLog.d("退出群聊成功：" + chatMessage.getMessageGroupId() + "---" + chatMessage.getMessageHolderName());
             } else {
                 MiChatHelper.getInstance().notifyExistMember(chatMessage);
@@ -210,7 +205,7 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
                 ChatMessage message = (ChatMessage) mSendMsgs.get(msgId);
                 message.setMessageContent(chatMessage.getMessageContent());
                 MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-                chatMessageControl.onUpdateGroupDescSuccess(chatMessage.getMessageGroupId(), chatMessage);
+                chatMessageControl.onUpdateGroupDescSuccess(chatMessage);
                 IMLog.d("修改群聊公告成功：" + chatMessage.getMessageGroupId() + "---" + chatMessage.getMessageHolderName());
             } else {
                 MiChatHelper.getInstance().notifyChatGroupDesc(chatMessage);
@@ -230,14 +225,13 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
     @Override
     public void reConnError(String s) {
         isLoginSuccess = false;
-        IMLog.d("失败");
+        IMLog.d("失败:" + s);
         EventBus.getDefault().post(new MQLoginResult(false));
     }
 
     @Override
     public void initMQ(Context context) {
         this.mContent = context;
-        mNotifyManager = (NotificationManager) mContent.getSystemService(Context.NOTIFICATION_SERVICE);
         mConn = new Conn();
         mMessageCenter = new MessageCenter();
         mMessageCenter.setConfigServerUrl(mOption.configServerUrl);
@@ -284,126 +278,62 @@ public class RabbitMQManager implements IMQManager, TaskListener, ConnSuccessLis
     @interface MQType {
     }
 
+    @StringDef({PUSH_CHAT_MESSAGE,
+            PUSH_CHAT_MESSAGE_CALL_BACK,
+            PUSH_UPDATE_CHAT_DISPLAY,
+            PUSH_UPDATE_CHAT_NAME,
+            PUSH_UPDATE_CHAT_DESC,
+            PUSH_ADD_MEMBER,
+            PUSH_EXIST_MEMBER})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface DATAType {
+    }
+
+
     public static final String MSG_TO = "msgTo";//私聊
     public static final String GROUP_ID = "groupId";//群聊
 
     //群聊消息
-    public void sendChatMsg(@MQType String mqType, String targetId, ChatMessage chatMessage) {
+    public void sendChatMsg(@MQType String mqType, @DATAType String dataType, ChatMessage chatMessage) {
         if (mRabbitMQInit == null) {
             loginMQ(mMessageHolder, mUerPassWord);
         }
         mSendMsgs.put(chatMessage.getMessageId(), chatMessage);
         MQExchange<ChatMessage> mqExchange = new MQExchange<>();
         mqExchange.setData(chatMessage);
-        mqExchange.setExchangeType(PUSH_CHAT_MESSAGE);
-        String sendMsg = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(),chatMessage.getItemType(), mqExchange);
+        mqExchange.setExchangeType(dataType);
+        String sendMsg = getDateJson(mqType, chatMessage.getMessageGroupId(), chatMessage.getMessageHolderId(), chatMessage.getItemType(), mqExchange);
         try {
             mRabbitMQInit.sendMessageCenter("msg-send-process", sendMsg, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(chatMessage.getMessageCTMillis()), "0");
         } catch (Exception e) {
-            MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-            chatMessageControl.onSendFail(chatMessage, e.getMessage());
             e.printStackTrace();
+            if (dataType.equals(PUSH_CHAT_MESSAGE)) {
+                MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
+                chatMessageControl.onSendFail(chatMessage, e.getMessage());
+            } else if (dataType.equals(PUSH_CHAT_MESSAGE_CALL_BACK)) {
+                MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
+                chatMessageControl.onRemoveFail(chatMessage, e.getMessage());
+            } else if (dataType.equals(PUSH_UPDATE_CHAT_DISPLAY)) {
+                MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
+                chatMessageControl.onUpdateChatDisplayNameFail(chatMessage, e.toString());
+            } else if (dataType.equals(PUSH_UPDATE_CHAT_NAME)) {
+                MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
+                chatMessageControl.onUpdateGroupNameFail(chatMessage, e.toString());
+            } else if (dataType.equals(PUSH_UPDATE_CHAT_DESC)) {
+                MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
+                chatMessageControl.onUpdateGroupNameFail(chatMessage, e.toString());
+            } else if (dataType.equals(PUSH_ADD_MEMBER)) {
+                MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
+                chatMessageControl.addMemberFail(chatMessage, e.toString());
+            } else if (dataType.equals(PUSH_EXIST_MEMBER)) {
+                MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
+                chatMessageControl.onExistMemberFail(chatMessage, e.toString());
+            }
         }
     }
 
 
-    //发送消息撤回消息
-    public void sendChatMsgCallBack(@MQType String mqType, String targetId, String holderId, ChatMessage chatMessage) {
-        long currentTimeMillis = System.currentTimeMillis();
-        mSendMsgs.put(holderId + "-" + currentTimeMillis, chatMessage);
-        MQExchange<ChatMessage> mqExchange = new MQExchange<>();
-        mqExchange.setData(chatMessage);
-        mqExchange.setExchangeType(PUSH_CHAT_MESSAGE_CALL_BACK);
-        String sendMsg = getDateJson(mqType, targetId, holderId,chatMessage.getItemType(), mqExchange);
-        try {
-            mRabbitMQInit.sendMessageCenter("msg-send-process", sendMsg, holderId + "-" + currentTimeMillis, "", DateUtil.getDateByMilli(chatMessage.getMessageCTMillis()), "0");
-        } catch (Exception e) {
-            MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-            chatMessageControl.onRemoveFail(chatMessage, e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    //发送群聊显示名称通知
-    public void sendChatDisPlayNameNotify(@MQType String mqType, String targetId, ChatMessage chatMessage) {
-        mSendMsgs.put(chatMessage.getMessageId(), chatMessage);
-        MQExchange<ChatMessage> mqExchange = new MQExchange<>();
-        mqExchange.setData(chatMessage);
-        mqExchange.setExchangeType(PUSH_UPDATE_CHAT_DISPLAY);
-        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(),chatMessage.getItemType(), mqExchange);
-        try {
-            mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
-        } catch (Exception e) {
-            MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-            chatMessageControl.onUpdateChatDisplayNameFail(targetId, chatMessage, e.toString());
-            e.printStackTrace();
-        }
-    }
-
-    //发送群聊名称通知
-    public void sendChatNameNotify(@MQType String mqType, String targetId, ChatMessage chatMessage) {
-        mSendMsgs.put(chatMessage.getMessageId(), chatMessage);
-        MQExchange<ChatMessage> mqExchange = new MQExchange<>();
-        mqExchange.setData(chatMessage);
-        mqExchange.setExchangeType(PUSH_UPDATE_CHAT_NAME);
-        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(),chatMessage.getItemType(), mqExchange);
-        try {
-            mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
-        } catch (Exception e) {
-            MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-            chatMessageControl.onUpdateGroupNameFail(targetId, chatMessage, e.toString());
-            e.printStackTrace();
-        }
-    }
-
-    //发送群公告修改通知
-    public void sendChatDescNotify(@MQType String mqType, String targetId, ChatMessage chatMessage) {
-        mSendMsgs.put(chatMessage.getMessageId(), chatMessage);
-        MQExchange<ChatMessage> mqExchange = new MQExchange<>();
-        mqExchange.setData(chatMessage);
-        mqExchange.setExchangeType(PUSH_UPDATE_CHAT_DESC);
-        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(),chatMessage.getItemType(), mqExchange);
-        try {
-            mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
-        } catch (Exception e) {
-            MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-            chatMessageControl.onUpdateGroupNameFail(targetId, chatMessage, e.toString());
-            e.printStackTrace();
-        }
-    }
-
-    public void addChatMemberNotify(@MQType String mqType, String targetId, ChatMessage chatMessage) {
-        mSendMsgs.put(chatMessage.getMessageId(), chatMessage);
-        MQExchange<ChatMessage> mqExchange = new MQExchange<>();
-        mqExchange.setData(chatMessage);
-        mqExchange.setExchangeType(PUSH_ADD_MEMBER);
-        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(), chatMessage.getItemType(),mqExchange);
-        try {
-            mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
-        } catch (Exception e) {
-            MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-            chatMessageControl.addMemberFail(targetId, chatMessage, e.toString());
-            e.printStackTrace();
-        }
-    }
-
-    public void existChatGroupNotify(@MQType String mqType, String targetId, ChatMessage chatMessage) {
-        mSendMsgs.put(chatMessage.getMessageId(), chatMessage);
-        MQExchange<ChatMessage> mqExchange = new MQExchange<>();
-        mqExchange.setData(chatMessage);
-        mqExchange.setExchangeType(PUSH_EXIST_MEMBER);
-        String dateJson = getDateJson(mqType, targetId, chatMessage.getMessageHolderId(),chatMessage.getItemType(), mqExchange);
-        try {
-            mRabbitMQInit.sendMessageCenter("msg-send-process", dateJson, chatMessage.getMessageId(), "", DateUtil.getDateByMilli(System.currentTimeMillis()), "0");
-        } catch (Exception e) {
-            MiChatHelper.ChatMessageControl chatMessageControl = MiChatHelper.getInstance().getChatMessageControl();
-            chatMessageControl.onExistMemberFail(targetId, chatMessage, e.toString());
-            e.printStackTrace();
-        }
-    }
-
-
-    private String getDateJson(@MQType String mqType, String targetId, String holderId,int msgType, Object object) {
+    private String getDateJson(@MQType String mqType, String targetId, String holderId, int msgType, Object object) {
         String dataJson = JSON.toJSONString(object, SerializerFeature.WriteMapNullValue);
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("{\"msgSend\":{\"");

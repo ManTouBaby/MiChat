@@ -128,7 +128,7 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
                                     message.setMessageNetPath(AppConfig.FILE_SERVER + baseResult.getData().getId());
                                     message.setMessageThumbFilePath(AppConfig.FILE_SERVER + baseResult.getData().getAfterFileId());
                                 }
-                                mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, message.getMessageGroupId(), message);
+                                mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, RabbitMQManager.PUSH_CHAT_MESSAGE, message);
                             } catch (IOException e) {
                                 e.printStackTrace();
                                 onError(e);
@@ -137,7 +137,7 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
                     });
         } else {
             if (mRabbitMQManager.isLoginSuccess()) {
-                new Thread(() -> mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, message.getMessageGroupId(), message)).start();
+                new Thread(() -> mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, RabbitMQManager.PUSH_CHAT_MESSAGE, message)).start();
             }
         }
 
@@ -145,7 +145,7 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
 
     @Override
     public void onChatMessageCallBack(ChatMessage message) {
-        new Thread(() -> mRabbitMQManager.sendChatMsgCallBack(RabbitMQManager.GROUP_ID, message.getMessageGroupId(), message.getMessageHolder().getId(), message)).start();
+        new Thread(() -> mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, RabbitMQManager.PUSH_CHAT_MESSAGE_CALL_BACK, message)).start();
     }
 
     @Override
@@ -214,17 +214,19 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
 
     @Override
     public void changeChatDisplayName(String mChatGroupId, ChatMessage chatMessage) {
-        new Thread(() -> mRabbitMQManager.sendChatDisPlayNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+//        new Thread(() -> mRabbitMQManager.sendChatDisPlayNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+        new Thread(() -> mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, RabbitMQManager.PUSH_UPDATE_CHAT_DISPLAY, chatMessage)).start();
     }
 
     @Override
     public void changeChatGroupName(String mChatGroupId, ChatMessage chatMessage) {
-        new Thread(() -> mRabbitMQManager.sendChatNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+//        new Thread(() -> mRabbitMQManager.sendChatNameNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+        new Thread(() -> mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, RabbitMQManager.PUSH_UPDATE_CHAT_NAME, chatMessage)).start();
     }
 
     @Override
     public void changeChatGroupDesc(String mChatGroupId, ChatMessage chatMessage) {
-        new Thread(() -> mRabbitMQManager.sendChatDescNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+        new Thread(() -> mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, RabbitMQManager.PUSH_UPDATE_CHAT_DESC, chatMessage)).start();
     }
 
     @Override
@@ -242,13 +244,13 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
 
                     @Override
                     public void onError(Throwable e) {
-                        mChatGroupControl.addMemberFail(chatMessage.getMessageGroupId(), chatMessage, e.getMessage());
+                        mChatGroupControl.addMemberFail(chatMessage, e.getMessage());
                     }
 
                     @Override
                     public void onNext(BaseChatBO<String> stringBaseChatBO) {
                         if (stringBaseChatBO.isSuccess()) {
-                            new Thread(() -> mRabbitMQManager.addChatMemberNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
+                            new Thread(() -> mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, RabbitMQManager.PUSH_ADD_MEMBER, chatMessage)).start();
                         }
                     }
                 });
@@ -267,14 +269,14 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
 
                     @Override
                     public void onError(Throwable e) {
-                        mChatGroupControl.onExistMemberFail(chatMessage.getMessageGroupId(), chatMessage, e.getMessage());
+                        mChatGroupControl.onExistMemberFail(chatMessage, e.getMessage());
                     }
 
                     @Override
                     public void onNext(BaseChatBO<String> stringBaseChatBO) {
                         if (stringBaseChatBO.isSuccess()) {
-                            new Thread(() -> mRabbitMQManager.existChatGroupNotify(RabbitMQManager.GROUP_ID, mChatGroupId, chatMessage)).start();
-                            mChatGroupControl.onExistMemberSuccess(mChatGroupId, chatMessage);
+                            new Thread(() -> mRabbitMQManager.sendChatMsg(RabbitMQManager.GROUP_ID, RabbitMQManager.PUSH_EXIST_MEMBER, chatMessage)).start();
+                            mChatGroupControl.onExistMemberSuccess(chatMessage);
                         }
                     }
                 });

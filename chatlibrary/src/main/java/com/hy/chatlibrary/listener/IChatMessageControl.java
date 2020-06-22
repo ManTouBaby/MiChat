@@ -21,34 +21,34 @@ public interface IChatMessageControl {
     void onRemoveFail(ChatMessage chatMessage, String msg);
 
     //更新群聊显示名称失败
-    void onUpdateChatDisplayNameFail(String mChatGroupId, ChatMessage chatMessage, String msg);
+    void onUpdateChatDisplayNameFail( ChatMessage chatMessage, String msg);
 
     //更新群聊显示名称成功
-    void onUpdateChatDisplayNameSuccess(String mChatGroupId,  ChatMessage chatMessage);
+    void onUpdateChatDisplayNameSuccess(  ChatMessage chatMessage);
 
     //更新群名称失败
-    void onUpdateGroupNameFail(String mChatGroupId, ChatMessage chatMessage, String msg);
+    void onUpdateGroupNameFail( ChatMessage chatMessage, String msg);
 
     //更新群名称成功
-    void onUpdateGroupNameSuccess(String mChatGroupId,  ChatMessage chatMessage);
+    void onUpdateGroupNameSuccess(  ChatMessage chatMessage);
 
     //更新群公告失败
-    void onUpdateGroupDescFail(String mChatGroupId, ChatMessage chatMessage, String msg);
+    void onUpdateGroupDescFail( ChatMessage chatMessage, String msg);
 
     //更新群公告成功
-    void onUpdateGroupDescSuccess(String mChatGroupId,  ChatMessage chatMessage);
+    void onUpdateGroupDescSuccess(  ChatMessage chatMessage);
 
     //退群成功
-    void onExistMemberSuccess(String mChatGroupId, ChatMessage chatMessage);
+    void onExistMemberSuccess( ChatMessage chatMessage);
 
     //退群失败
-    void onExistMemberFail(String mChatGroupId, ChatMessage chatMessage, String error);
+    void onExistMemberFail( ChatMessage chatMessage, String error);
 
     //加群成功
-    void addMemberSuccess(String mChatGroupId,  ChatMessage chatMessage);
+    void addMemberSuccess(  ChatMessage chatMessage);
 
     //加群失败
-    void addMemberFail(String mChatGroupId, ChatMessage chatMessage, String error);
+    void addMemberFail( ChatMessage chatMessage, String error);
 
     void notifyRemove(ChatMessage message);
 }

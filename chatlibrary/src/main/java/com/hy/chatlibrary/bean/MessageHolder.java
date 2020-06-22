@@ -22,8 +22,8 @@ public class MessageHolder implements Serializable {
     private String duty;//消息发送人职务
     private String portrait;//消息发送人头像
     private String mobile;//移动电话
-    private int gender;//性别 男:0  女:1
-    private int role;//角色  1:领导  2:其他普通成员
+    private int    gender;//性别 男:0  女:1
+    private int    role;//角色  1:领导  2:其他普通成员
 
     @Ignore
     @JSONField(serialize = false)

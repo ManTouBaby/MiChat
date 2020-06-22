@@ -131,9 +131,9 @@ public class ChatGroupHistoryActivity extends AppCompatActivity {
                                 messageHolderShowName.setSpan(new ForegroundColorSpan(Color.RED), holderShowNameIndex, (holderShowNameIndex + searchLabel.length()), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                             if (messageContentIndex != -1)
                                 messageContent.setSpan(new ForegroundColorSpan(Color.RED), messageContentIndex, (messageContentIndex + searchLabel.length()), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                            holder.getText(R.id.mi_message_date).setText(DateUtil.getStringTimeByMilli(data.getMessageSTMillis(), "MM月dd日"));
                             holder.getText(R.id.mi_holder_name).setText(messageHolderShowName);
                             holder.getText(R.id.mi_message_content).setText(messageContent);
+                            holder.getText(R.id.mi_message_date).setText(DateUtil.getStringTimeByMilli(data.getMessageSTMillis(), "MM月dd日"));
                             CornerTextView cornerTextView = holder.getViewById(R.id.mi_holder_pro);
                             cornerTextView.setText(messageHolderShowName);
                         }

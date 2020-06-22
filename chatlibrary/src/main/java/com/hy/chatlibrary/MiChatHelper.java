@@ -124,6 +124,7 @@ public class MiChatHelper {
     public void notifyExistMember(ChatMessage chatMessage) {
         EventBus.getDefault().post(new EBChatManager(EBChatManager.MQ_EXIST_MEMBER, chatMessage, null));
     }
+
     //通知成员退出
     public void notifyChatGroupDesc(ChatMessage chatMessage) {
         EventBus.getDefault().post(new EBChatManager(EBChatManager.MQ_UPDATE_GROUP_DESC, chatMessage, null));
@@ -171,52 +172,52 @@ public class MiChatHelper {
         }
 
         @Override
-        public void onUpdateChatDisplayNameFail(String mChatGroupId, ChatMessage chatMessage, String msg) {
+        public void onUpdateChatDisplayNameFail(ChatMessage chatMessage, String msg) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_CHAT_DISPLAY_ERROR, chatMessage, msg));
         }
 
         @Override
-        public void onUpdateChatDisplayNameSuccess(String mChatGroupId, ChatMessage chatMessage) {
+        public void onUpdateChatDisplayNameSuccess(ChatMessage chatMessage) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_CHAT_DISPLAY_SUCCESS, chatMessage, null));
         }
 
         @Override
-        public void onUpdateGroupNameFail(String mChatGroupId, ChatMessage chatMessage, String msg) {
+        public void onUpdateGroupNameFail(ChatMessage chatMessage, String msg) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_GROUP_NAME_FAIL, chatMessage, null));
         }
 
         @Override
-        public void onUpdateGroupNameSuccess(String mChatGroupId, ChatMessage chatMessage) {
+        public void onUpdateGroupNameSuccess(ChatMessage chatMessage) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_GROUP_NAME_SUCCESS, chatMessage, null));
         }
 
         @Override
-        public void onUpdateGroupDescFail(String mChatGroupId, ChatMessage chatMessage, String msg) {
+        public void onUpdateGroupDescFail(ChatMessage chatMessage, String msg) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_GROUP_DESC_FAIL, chatMessage, null));
         }
 
         @Override
-        public void onUpdateGroupDescSuccess(String mChatGroupId, ChatMessage chatMessage) {
+        public void onUpdateGroupDescSuccess(ChatMessage chatMessage) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_UPDATE_GROUP_DESC_SUCCESS, chatMessage, null));
         }
 
         @Override
-        public void onExistMemberSuccess(String mChatGroupId, ChatMessage chatMessage) {
+        public void onExistMemberSuccess(ChatMessage chatMessage) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_EXIST_SUCCESS, chatMessage, null));
         }
 
         @Override
-        public void onExistMemberFail(String mChatGroupId, ChatMessage chatMessage, String error) {
+        public void onExistMemberFail(ChatMessage chatMessage, String error) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_EXIST_FAIL, chatMessage, error));
         }
 
         @Override
-        public void addMemberSuccess(String mChatGroupId, ChatMessage chatMessage) {
+        public void addMemberSuccess(ChatMessage chatMessage) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_ADD_MEMBER_SUCCESS, chatMessage, null));
         }
 
         @Override
-        public void addMemberFail(String mChatGroupId, ChatMessage chatMessage, String errorLabel) {
+        public void addMemberFail(ChatMessage chatMessage, String errorLabel) {
             EventBus.getDefault().post(new EBChatManager(EBChatManager.TYPE_ADD_MEMBER_FAIL, chatMessage, errorLabel));
         }
 

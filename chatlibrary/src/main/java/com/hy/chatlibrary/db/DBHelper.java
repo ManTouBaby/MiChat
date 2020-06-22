@@ -60,7 +60,6 @@ public class DBHelper {
     public ChatMessageDAO getChatMessageDAO() {
         return mDataBase.chatMessageDAO();
     }
-
     public InstructDAO getInstructDAO() {
         return mDataBase.instructDAO();
     }
