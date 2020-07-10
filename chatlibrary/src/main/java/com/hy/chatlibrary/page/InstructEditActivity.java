@@ -14,16 +14,19 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.db.entity.InstructBean;
 import com.hy.chatlibrary.utils.StatusBarUtil;
-import com.hy.chatlibrary.utils.glide.GlideLoader;
-import com.mt.filepicker.ImagePicker;
-import com.mt.filepicker.data.MediaFile;
+import com.hy.filelibrary.FileMode;
+import com.hy.filelibrary.FilePicker;
+import com.hy.filelibrary.SelectMode;
+import com.hy.filelibrary.base.FileBean;
+import com.hy.filelibrary.base.OnSelectFinishListener;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_INSTRUCT_MEMBERS;
 import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_INSTRUCT_MODEL;
@@ -34,7 +37,7 @@ import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_PHOTO_VIDEO;
  * @date:2020/04/29 9:46
  * @desc:
  */
-public class InstructEditActivity extends AppCompatActivity {
+public class InstructEditActivity extends AppCompatActivity implements OnSelectFinishListener {
     private ImageView mShow;
     private ImageView mSelectImage;
     private TextView mAcceptorCount;
@@ -42,9 +45,9 @@ public class InstructEditActivity extends AppCompatActivity {
     private EditText mInstructContent;
     private RelativeLayout mShowContainer;
 
-    private ArrayList<MediaFile> mMediaFiles;
     private InstructBean mInstructBean;
     private ArrayList<MessageHolder> mSelectAcceptor = new ArrayList<>();
+    private List<FileBean> mFileBeans;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -69,7 +72,7 @@ public class InstructEditActivity extends AppCompatActivity {
         findViewById(R.id.mi_delete_select).setOnClickListener(v -> {
             mShowContainer.setVisibility(View.GONE);
             mSelectImage.setVisibility(View.VISIBLE);
-            mMediaFiles.clear();
+            mFileBeans.clear();
         });
         findViewById(R.id.mi_tv_go_model).setOnClickListener(v -> {
             Intent intent = new Intent(this, InstructModelActivity.class);
@@ -86,13 +89,13 @@ public class InstructEditActivity extends AppCompatActivity {
 
             if (mInstructBean == null) mInstructBean = new InstructBean();
 
-            if (mMediaFiles != null && mMediaFiles.size() > 0) {
-                MediaFile mediaFile = mMediaFiles.get(0);
-                mInstructBean.setLocalFilePath(mediaFile.getPath());
-                mInstructBean.setNetFilePath(mediaFile.getPath());
-                mInstructBean.setDuration(mediaFile.getDuration());
-                mInstructBean.setFileName(mediaFile.getFolderName());
-                mInstructBean.setFileSize(new File(mediaFile.getPath()).length());
+            if (mFileBeans != null && mFileBeans.size() > 0) {
+                FileBean mFileBean = mFileBeans.get(0);
+                mInstructBean.setLocalFilePath(mFileBean.getPath());
+                mInstructBean.setNetFilePath(mFileBean.getPath());
+                mInstructBean.setDuration(mFileBean.getDuration());
+                mInstructBean.setFileName(mFileBean.getFileName());
+                mInstructBean.setFileSize(new File(mFileBean.getPath()).length());
             }
             mInstructBean.setTitle(instructTitle);
             mInstructBean.setContent(instructContent);
@@ -105,16 +108,14 @@ public class InstructEditActivity extends AppCompatActivity {
         });
 
         mSelectImage.setOnClickListener(v -> {
-            ImagePicker.getInstance()
-                    .setTitle("图片视屏")//设置标题
-                    .showCamera(true)//设置是否显示拍照按钮
-                    .showImage(true)//设置是否展示图片
-                    .showVideo(true)//设置是否展示视频
-                    .setSingleType(false)//设置图片视频不能同时选择
-                    .setMaxCount(1)//设置最大选择图片数目(默认为1，单选)
-                    .setImagePaths(mMediaFiles)//保存上一次选择图片的状态，如果不需要可以忽略
-                    .setImageLoader(new GlideLoader())//设置自定义图片加载器
-                    .start(this, REQUEST_TAKE_PHOTO_VIDEO);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
+            new FilePicker.Builder()
+                    .setMaxCount(9)
+                    .setSelectionMode(SelectMode.SELECT_MODE_MULTI)
+                    .setTitle("图片/视频")
+                    .setFileMode(FileMode.IMAGE_VIDEO)
+                    .builder()
+                    .setOnSelectFinishListener(this)
+                    .openFilePicker(this);
         });
     }
 
@@ -140,19 +141,6 @@ public class InstructEditActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_TAKE_PHOTO_VIDEO) {
-                mMediaFiles = data.getParcelableArrayListExtra(ImagePicker.EXTRA_SELECT_IMAGES);
-                if (mMediaFiles.size() < 1) {
-                    mShowContainer.setVisibility(View.GONE);
-                    mSelectImage.setVisibility(View.VISIBLE);
-                } else {
-                    MediaFile mMediaFile = mMediaFiles.get(0);
-                    String path = mMediaFile.getPath();
-                    mShowContainer.setVisibility(View.VISIBLE);
-                    mSelectImage.setVisibility(View.GONE);
-                    Glide.with(this).load(path).into(mShow);
-                }
-            }
             if (requestCode == REQUEST_TAKE_INSTRUCT_MODEL) {
                 mInstructBean = (InstructBean) data.getSerializableExtra("InstructItem");
                 mInstructTitle.setText(mInstructBean.getTitle());
@@ -162,6 +150,21 @@ public class InstructEditActivity extends AppCompatActivity {
                 mSelectAcceptor = (ArrayList<MessageHolder>) data.getSerializableExtra("AcceptorListSelect");
                 mAcceptorCount.setText(mSelectAcceptor.size() + "人");
             }
+        }
+    }
+
+    @Override
+    public void onSelectFinish(FileMode fileMode, List<FileBean> fileBeans) {
+        this.mFileBeans = fileBeans;
+        if (fileBeans.size() < 1) {
+            mShowContainer.setVisibility(View.GONE);
+            mSelectImage.setVisibility(View.VISIBLE);
+        } else {
+            FileBean mMediaFile = fileBeans.get(0);
+            String path = mMediaFile.getPath();
+            mShowContainer.setVisibility(View.VISIBLE);
+            mSelectImage.setVisibility(View.GONE);
+            Glide.with(this).load(path).into(mShow);
         }
     }
 }

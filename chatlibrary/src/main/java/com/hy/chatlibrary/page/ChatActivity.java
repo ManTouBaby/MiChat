@@ -26,10 +26,10 @@ import com.amap.api.location.AMapLocationListener;
 import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.services.core.PoiItem;
-import com.hrw.chatlibrary.R;
 import com.hrw.gdlibrary.CodeManager;
 import com.hrw.gdlibrary.GDHelper;
 import com.hy.chatlibrary.MiChatHelper;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.adapter.BaseChatAdapter;
 import com.hy.chatlibrary.adapter.ChatAdapter;
 import com.hy.chatlibrary.adapter.OnItemChildClickListener;
@@ -51,12 +51,14 @@ import com.hy.chatlibrary.utils.SPHelper;
 import com.hy.chatlibrary.utils.StatusBarUtil;
 import com.hy.chatlibrary.utils.StringUtil;
 import com.hy.chatlibrary.utils.animation.RevealAnimation;
-import com.hy.chatlibrary.utils.glide.GlideLoader;
 import com.hy.chatlibrary.widget.chatinput.MiChatInputGroup;
 import com.hy.chatlibrary.widget.chatinput.OnAudioRecordListener;
-import com.mt.camera.CameraHelper;
-import com.mt.filepicker.ImagePicker;
-import com.mt.filepicker.data.MediaFile;
+
+import com.hy.filelibrary.FileMode;
+import com.hy.filelibrary.FilePicker;
+import com.hy.filelibrary.SelectMode;
+import com.hy.filelibrary.base.FileBean;
+import com.hy.filelibrary.base.OnSelectFinishListener;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -80,7 +82,7 @@ import static com.hy.chatlibrary.base.ResultCode.REQUEST_TAKE_VIDEO_CODE;
  * @date:2020/03/30 15:16
  * @desc:
  */
-public class ChatActivity extends AppCompatActivity implements OnLocalMessageControl {
+public class ChatActivity extends AppCompatActivity implements OnLocalMessageControl, OnSelectFinishListener {
     private BaseChatAdapter mChatAdapter;
     private PhotoVideoBigShowAdapter mShowAdapter;
     private MiChatHelper miChatHelper;
@@ -268,7 +270,6 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             if (viewId == R.id.mi_quote_reply_notify) {
                 miChatInputGroup.scrollToPosition(chatMessage.getChatMessage());
             }
-
         });
         mChatAdapter.setOnItemChildLongClickListener((OnItemChildLongClickListener<ChatMessage>) (view, chatMessage) -> {
             if (view.getId() == R.id.mi_holder_pro) {
@@ -308,29 +309,40 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
         miChatInputGroup.setOnContentTypeClickListener(contentType -> {
             switch (contentType) {
                 case PIC:
-                    ImagePicker.getInstance()
-                            .setTitle("图片视屏")//设置标题
-                            .showCamera(false)//设置是否显示拍照按钮
-                            .showImage(true)//设置是否展示图片
-                            .showVideo(true)//设置是否展示视频
-//                            .filterGif(false)//设置是否过滤gif图片
-                            .setSingleType(false)//设置图片视频不能同时选择
-                            .setMaxCount(9)//设置最大选择图片数目(默认为1，单选)
-//                        .setImagePaths(mImageList)//保存上一次选择图片的状态，如果不需要可以忽略
-                            .setImageLoader(new GlideLoader())//设置自定义图片加载器
-                            .start(ChatActivity.this, REQUEST_SELECT_IMAGES_CODE);//REQEST_SELECT_IMAGES_CODE为Intent调用的requestCode
+                    new FilePicker.Builder()
+                            .setMaxCount(9)
+                            .setSelectionMode(SelectMode.SELECT_MODE_MULTI)
+                            .setTitle("图片/视频")
+                            .setFileMode(FileMode.IMAGE_VIDEO)
+                            .builder()
+                            .setOnSelectFinishListener(this)
+                            .openFilePicker(this);
                     break;
                 case TAKE_PHOTO:
-                    CameraHelper.getInstance(getPackageName()).capturePhoto(ChatActivity.this, REQUEST_TAKE_PHOTO_CODE);
+                    new FilePicker.Builder()
+                            .setFileMode(FileMode.TAKE_PHOTO)
+                            .setSavePath(getPackageName())
+                            .builder()
+                            .setOnSelectFinishListener(this)
+                            .openFilePicker(this);
                     break;
                 case TAKE_VIDEO:
-                    CameraHelper.getInstance(getPackageName()).captureRecord(ChatActivity.this, REQUEST_TAKE_VIDEO_CODE, 15000);
+                    new FilePicker.Builder()
+                            .setFileMode(FileMode.TAKE_VIDEO)
+                            .setSavePath(getPackageName())
+                            .builder()
+                            .setOnSelectFinishListener(this)
+                            .openFilePicker(this);
                     break;
                 case LOCAL:
                     mGdHelper.openNearby(this, REQUEST_TAKE_LOCAL_CODE);
                     break;
                 case FILE:
-                    System.out.println("单击文件");
+                    new FilePicker.Builder()
+                            .setFileMode(FileMode.FILE)
+                            .builder()
+                            .setOnSelectFinishListener(this)
+                            .openFilePicker(this);
                     break;
                 case INSTRUCT:
                     Intent intent = new Intent(this, InstructEditActivity.class);
@@ -398,6 +410,55 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
         miChatInputGroup.setOnCloseQuoteListener(() -> mQuoteChatMessage = null);
     }
 
+
+    @Override
+    public void onSelectFinish(FileMode fileMode, List<FileBean> fileBeans) {
+        switch (fileMode) {
+            case IMAGE_VIDEO:
+                for (int i = 0; i < fileBeans.size(); i++) {
+                    FileBean mediaFile = fileBeans.get(i);
+                    if (mediaFile.getDuration() > 0) {
+                        mChatMessageCreator.createChatMessage(2, mAMapLocation, "[视屏消息]", mediaFile.getPath(), mediaFile.getDuration(), chatMessage -> {
+                            mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
+                        });
+
+                    } else {
+                        mChatMessageCreator.createChatMessage(3, mAMapLocation, "[图片消息]", mediaFile.getPath(), 0, chatMessage -> {
+                            mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
+                        });
+                    }
+                }
+                break;
+            case TAKE_PHOTO:
+                if (fileBeans != null && fileBeans.size() > 0) {
+                    FileBean data = fileBeans.get(0);
+                    mChatMessageCreator.createChatMessage(3, mAMapLocation, "[图片消息]", data.getPath(), 0, chatMessage -> {
+                        mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
+                    });
+                }
+                break;
+            case TAKE_VIDEO:
+                if (fileBeans != null && fileBeans.size() > 0) {
+                    FileBean data = fileBeans.get(0);
+//                    String path = data.getStringExtra(CameraHelper.DATA);
+//                    String pathOrigin = data.getStringExtra(CameraHelper.DATA_ORIGIN);
+//                    long realDuration = data.getLongExtra(CameraHelper.DATA_REAL_DURATION, (long) 0F);
+                    mChatMessageCreator.createChatMessage(2, mAMapLocation, "[视屏消息]", data.getPath(), data.getDuration(), chatMessage -> {
+                        mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
+                    });
+                }
+                break;
+            case FILE:
+                for (int i = 0; i < fileBeans.size(); i++) {
+                    FileBean mediaFile = fileBeans.get(i);
+                    mChatMessageCreator.createChatMessage(5, mAMapLocation, "[文件消息]", mediaFile.getPath(), 0, chatMessage -> {
+                        mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
+                    });
+                }
+                break;
+        }
+
+    }
 
     private void initShowView() {
         PagerSnapHelper pagerSnapHelper = new PagerSnapHelper();
@@ -590,7 +651,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                 List<ChatMessage> localChats = mChatMessageDAO.queryAllMessageByUnchronization(mChatGroupId);
                 for (ChatMessage message : chatMessages) {
                     boolean isExist = false;
-                    if (miChatHelper.getMessageHolder().getId().equals(message.getMessageHolder().getId())) {
+                    if (mMessageHolder.getId().equals(message.getMessageHolder().getId())) {
                         message.setMessageOwner(0);
                     } else {
                         message.setMessageOwner(1);
@@ -642,38 +703,6 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK) {
-            if (requestCode == REQUEST_SELECT_IMAGES_CODE) {
-                List<MediaFile> imagePaths = data.getParcelableArrayListExtra(ImagePicker.EXTRA_SELECT_IMAGES);
-                for (int i = 0; i < imagePaths.size(); i++) {
-                    MediaFile mediaFile = imagePaths.get(i);
-                    if (mediaFile.getDuration() > 0) {
-                        mChatMessageCreator.createChatMessage(2, mAMapLocation, "[视屏消息]", mediaFile.getPath(), mediaFile.getDuration(), chatMessage -> {
-                            mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
-                        });
-
-                    } else {
-                        mChatMessageCreator.createChatMessage(3, mAMapLocation, "[图片消息]", mediaFile.getPath(), 0, chatMessage -> {
-                            mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
-                        });
-                    }
-                }
-            }
-            if (requestCode == REQUEST_TAKE_PHOTO_CODE) {
-                String path = data.getStringExtra(CameraHelper.DATA);
-                String pathOrigin = data.getStringExtra(CameraHelper.DATA_ORIGIN);
-                mChatMessageCreator.createChatMessage(3, mAMapLocation, "[图片消息]", path, 0, chatMessage -> {
-                    mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
-                });
-            }
-            if (requestCode == REQUEST_TAKE_VIDEO_CODE) {
-                String path = data.getStringExtra(CameraHelper.DATA);
-                String pathOrigin = data.getStringExtra(CameraHelper.DATA_ORIGIN);
-                long realDuration = data.getLongExtra(CameraHelper.DATA_REAL_DURATION, (long) 0F);
-                mChatMessageCreator.createChatMessage(2, mAMapLocation, "[视屏消息]", path, realDuration, chatMessage -> {
-                    mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
-                });
-            }
-
             if (requestCode == REQUEST_TAKE_LOCAL_CODE) {
                 PoiItem poiItem = data.getParcelableExtra(CodeManager.PoiItem);
                 mChatMessageCreator.createChatMessage(mAMapLocation, poiItem.getTitle(), poiItem.getSnippet(), poiItem.getLatLonPoint().getLatitude(), poiItem.getLatLonPoint().getLongitude(), chatMessage -> {
@@ -703,7 +732,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        System.out.println("ChatActivity销毁");
+//        System.out.println("ChatActivity销毁");
         mChatAdapter.onDestroy();
         mGdHelper.closeLocationListener(aMapLocationListener);
         EventBus.getDefault().unregister(this);

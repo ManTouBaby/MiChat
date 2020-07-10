@@ -15,9 +15,10 @@ import android.widget.Toast;
 
 import com.amap.api.location.AMapLocation;
 import com.amap.api.navi.enums.NaviType;
-import com.hrw.chatlibrary.R;
+
 import com.hrw.gdlibrary.GDHelper;
 import com.hy.chatlibrary.MiChatHelper;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.adapter.ChatGroupMemberAdapter;
 import com.hy.chatlibrary.bean.ChatGroupMembers;
 import com.hy.chatlibrary.bean.MessageHolder;

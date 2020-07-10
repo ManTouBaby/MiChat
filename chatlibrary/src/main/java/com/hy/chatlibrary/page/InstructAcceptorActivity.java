@@ -9,7 +9,7 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.adapter.BaseAdapter;
 import com.hy.chatlibrary.adapter.OnItemClickListener;
 import com.hy.chatlibrary.base.SmartVH;

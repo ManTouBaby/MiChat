@@ -6,7 +6,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.base.SmartVH;
 import com.hy.chatlibrary.bean.ChatGroupMembers;
 import com.hy.chatlibrary.bean.MessageHolder;

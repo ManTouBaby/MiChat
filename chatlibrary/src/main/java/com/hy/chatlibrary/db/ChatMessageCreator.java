@@ -12,6 +12,7 @@ import com.hy.chatlibrary.db.entity.ChatMessage;
 import com.hy.chatlibrary.db.entity.InstructBean;
 import com.hy.chatlibrary.listener.OnLocalMessageControl;
 import com.hy.chatlibrary.utils.DateUtil;
+import com.hy.chatlibrary.utils.StringUtil;
 import com.hy.chatlibrary.utils.UUIDUtil;
 
 import java.io.File;
@@ -105,7 +106,7 @@ public class ChatMessageCreator {
             chatMessage.setMessageHolderName(mMessageHolder.getName());
             chatMessage.setMessageHolderShowName(mMessageHolder.getGroupName());
             chatMessage.setMessageHolders(messageHolders);
-            File file = new File(content);
+            File file = new File(StringUtil.isEmpty(filePath));
             if (file.exists()) {
                 chatMessage.setFileName(file.getName());
                 chatMessage.setFileSize(file.length());

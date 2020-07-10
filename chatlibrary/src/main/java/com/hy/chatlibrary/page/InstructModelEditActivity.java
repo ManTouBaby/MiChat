@@ -9,7 +9,7 @@ import android.text.TextUtils;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.utils.StatusBarUtil;
 import com.hy.chatlibrary.utils.UUIDUtil;
 

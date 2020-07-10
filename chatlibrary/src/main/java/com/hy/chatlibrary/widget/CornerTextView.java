@@ -9,7 +9,8 @@ import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
+
 
 /**
  * @author:MtBaby

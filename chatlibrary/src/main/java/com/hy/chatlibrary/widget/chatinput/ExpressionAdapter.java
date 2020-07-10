@@ -5,7 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.adapter.OnItemClickListener;
 import com.hy.chatlibrary.base.SmartVH;
 import com.hy.chatlibrary.widget.chatinput.expression.ExpressionBO;

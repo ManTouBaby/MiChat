@@ -8,6 +8,7 @@ import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.TypeConverters;
 import android.support.annotation.NonNull;
 
+
 import com.alibaba.fastjson.annotation.JSONField;
 import com.hy.chatlibrary.base.BaseSmartBO;
 import com.hy.chatlibrary.bean.MessageHolder;

@@ -25,6 +25,20 @@ allprojects {
             url 'http://www.idescout.com/maven/repo/'
             name 'IDEScout, Inc.'
         }
+        maven {
+            credentials {
+                username 'android'
+                password 'hy123456'
+            }
+            url 'http://112.94.13.13:17081/repository/android-public/'
+        }
+        maven {
+            credentials {
+                username 'android'
+                password 'hy123456'
+            }
+            url 'http://10.44.51.23:17081/repository/android-public/'
+        }
     }
 }
 

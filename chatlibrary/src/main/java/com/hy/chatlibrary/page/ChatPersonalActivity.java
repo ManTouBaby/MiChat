@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.utils.StatusBarUtil;
 import com.hy.chatlibrary.widget.CornerTextView;

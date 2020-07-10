@@ -14,7 +14,8 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
+
 
 /**
  * @author:MtBaby

@@ -33,7 +33,6 @@ public class StatusBarUtil {
                 }
                 decorView.setSystemUiVisibility(vis);
             }
-
         }
     }
 
@@ -84,7 +83,6 @@ public class StatusBarUtil {
             // 设置透明状态栏,这样才能让 ContentView 向上
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
             activity.getWindow().addFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
-            activity.getWindow().setNavigationBarColor(activity.getResources().getColor(color));
         }
     }
 

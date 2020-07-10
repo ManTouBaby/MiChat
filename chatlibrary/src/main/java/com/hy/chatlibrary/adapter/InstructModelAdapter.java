@@ -11,7 +11,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.base.SmartVH;
 import com.hy.chatlibrary.db.entity.InstructBean;
 

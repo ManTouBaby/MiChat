@@ -13,7 +13,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.adapter.InstructModelAdapter;
 import com.hy.chatlibrary.db.DBHelper;
 import com.hy.chatlibrary.db.entity.InstructBean;

@@ -8,7 +8,8 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.request.RequestOptions;
 import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
+
 
 /**
  * @author:MtBaby

@@ -33,7 +33,7 @@ import android.widget.PopupWindow;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.adapter.BaseChatAdapter;
 import com.hy.chatlibrary.adapter.OnPullDownLoadMoreListener;
 import com.hy.chatlibrary.bean.ChatContentType;
@@ -292,7 +292,7 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
         contentTypes.add(new ChatContentType(ContentType.TAKE_PHOTO, "拍照", R.mipmap.icon_type_takephoto));
         contentTypes.add(new ChatContentType(ContentType.TAKE_VIDEO, "录像", R.mipmap.icon_type_takevideo));
         contentTypes.add(new ChatContentType(ContentType.LOCAL, "位置", R.mipmap.icon_type_local));
-//        contentTypes.add(new ChatContentType(ContentType.FILE, "文件", R.mipmap.icon_type_file));
+        contentTypes.add(new ChatContentType(ContentType.FILE, "文件", R.mipmap.icon_type_file));
         contentTypes.add(new ChatContentType(ContentType.INSTRUCT, "指令", R.mipmap.icon_type_command));
 
         rvSendContent = findViewById(R.id.mi_other_send_content);

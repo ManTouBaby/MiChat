@@ -1,6 +1,7 @@
 package com.hy.chatlibrary.widget.chatinput.expression;
 
-import com.hrw.chatlibrary.R;
+
+import com.hy.chatlibrary.R;
 
 import java.util.ArrayList;
 import java.util.List;

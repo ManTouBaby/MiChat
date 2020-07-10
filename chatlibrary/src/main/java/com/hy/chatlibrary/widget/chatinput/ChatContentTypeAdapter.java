@@ -7,7 +7,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.base.SmartVH;
 import com.hy.chatlibrary.bean.ChatContentType;
 
@@ -39,12 +39,9 @@ public class ChatContentTypeAdapter extends RecyclerView.Adapter<SmartVH> {
         TextView text = holder.getText(R.id.mi_content_type_name);
         image.setImageResource(chatContentType.getTypeIcon());
         text.setText(chatContentType.getTypeName());
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mOnContentTypeClickListener != null) {
-                    mOnContentTypeClickListener.onContentTypeClick(chatContentType.getTypeId());
-                }
+        holder.itemView.setOnClickListener(v -> {
+            if (mOnContentTypeClickListener != null) {
+                mOnContentTypeClickListener.onContentTypeClick(chatContentType.getTypeId());
             }
         });
     }

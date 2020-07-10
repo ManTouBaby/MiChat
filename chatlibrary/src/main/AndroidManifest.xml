@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.hrw.chatlibrary">
+    package="com.hy.chatlibrary">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -13,37 +13,38 @@
 
     <application>
         <activity
-            android:name="com.hy.chatlibrary.page.ChatActivity"
+            android:name=".page.ChatActivity"
             android:launchMode="singleTask"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="stateHidden|adjustResize" />
-        <activity android:name="com.hy.chatlibrary.page.InstructEditActivity" />
-        <activity android:name="com.hy.chatlibrary.page.InstructModelActivity" />
-        <activity android:name="com.hy.chatlibrary.page.InstructModelEditActivity" />
-        <activity android:name="com.hy.chatlibrary.page.InstructAcceptorActivity" />
+        <activity android:name=".page.InstructEditActivity" />
+        <activity android:name=".page.InstructModelActivity" />
+        <activity android:name=".page.InstructModelEditActivity" />
+        <activity android:name=".page.InstructAcceptorActivity" />
         <activity
-            android:name="com.hy.chatlibrary.page.ChatGroupDetailActivity"
+            android:name=".page.ChatGroupDetailActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name="com.hy.chatlibrary.page.ChatPersonalActivity"
+            android:name=".page.ChatPersonalActivity"
             android:launchMode="singleTask" />
         <activity
-            android:name="com.hy.chatlibrary.page.ChatGroupHistoryActivity"
+            android:name=".page.ChatGroupHistoryActivity"
             android:launchMode="singleTask"
             android:windowSoftInputMode="stateHidden" />
         <activity
-            android:name="com.hy.chatlibrary.page.ChatFriendListActivity"
+            android:name=".page.ChatFriendListActivity"
             android:launchMode="singleTask" />
-        <activity android:name="com.hy.chatlibrary.page.InstructManager"
-            android:theme="@style/Anim_slide"
+        <activity
+            android:name="page.InstructManager"
+            android:launchMode="singleTask"
             android:screenOrientation="portrait"
-            android:launchMode="singleTask" />
+            android:theme="@style/Anim_slide" />
         <!--        android:windowSoftInputMode="stateHidden|adjustResize"-->
 
         <provider
-            android:name="android.support.v4.content.FileProvider"
-            android:authorities="${applicationId}.provider"
+            android:name=".widget.ChatProvider"
+            android:authorities="${applicationId}.ChatProvider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data
@@ -52,8 +53,8 @@
         </provider>
 
         <!--        <meta-data-->
-        <!--            android:name="com.hy.chatlibrary.utils.MyGlideModule"-->
+        <!--            android:name="utils.MyGlideModule"-->
         <!--            android:value="GlideModule" />-->
-        <service android:name="com.hy.chatlibrary.service.ChatService" />
+        <service android:name=".service.ChatService" />
     </application>
 </manifest>

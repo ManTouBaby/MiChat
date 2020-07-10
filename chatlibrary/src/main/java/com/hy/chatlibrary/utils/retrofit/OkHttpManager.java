@@ -1,7 +1,8 @@
 package com.hy.chatlibrary.utils.retrofit;
 
 
-import com.hrw.chatlibrary.BuildConfig;
+
+import com.hy.chatlibrary.BuildConfig;
 
 import java.util.concurrent.TimeUnit;
 

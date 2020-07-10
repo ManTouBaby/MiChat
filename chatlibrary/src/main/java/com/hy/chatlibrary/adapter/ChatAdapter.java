@@ -23,7 +23,7 @@ import com.google.android.flexbox.FlexDirection;
 import com.google.android.flexbox.FlexWrap;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.base.SmartVH;
 import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.db.entity.ChatMessage;
@@ -35,6 +35,8 @@ import com.hy.chatlibrary.utils.SPHelper;
 import com.hy.chatlibrary.utils.StringUtil;
 import com.hy.chatlibrary.utils.glide.GlideHelper;
 import com.hy.chatlibrary.widget.CornerTextView;
+import com.hy.filelibrary.utils.FileUtil;
+import com.hy.filelibrary.utils.format.FormatUtils;
 
 import java.io.File;
 import java.util.LinkedList;
@@ -227,7 +229,9 @@ public class ChatAdapter extends BaseChatAdapter {
                 }
                 break;
             case 5://文件
-
+                holder.getText(R.id.mi_file_name).setText(chatMessage.getFileName());
+                holder.getText(R.id.mi_file_size).setText(FileUtil.getStringByLength((long) chatMessage.getFileSize()));
+                holder.getImage(R.id.mi_file_type_tag).setImageResource(FormatUtils.getFileIcon(StringUtil.isEmpty(chatMessage.getFileName())));
                 break;
             case 6://指令
                 InstructBean instructBean = chatMessage.getInstructBean();

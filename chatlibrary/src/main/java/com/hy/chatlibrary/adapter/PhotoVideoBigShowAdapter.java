@@ -15,7 +15,7 @@ import com.bumptech.glide.request.target.SimpleTarget;
 import com.bumptech.glide.request.transition.Transition;
 import com.davemorrissey.labs.subscaleview.ImageSource;
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView;
-import com.hrw.chatlibrary.R;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.base.SmartVH;
 import com.hy.chatlibrary.db.entity.ChatMessage;
 import com.hy.chatlibrary.db.entity.InstructBean;

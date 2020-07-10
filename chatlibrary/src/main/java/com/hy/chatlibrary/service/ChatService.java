@@ -16,8 +16,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.hrw.chatlibrary.R;
 import com.hy.chatlibrary.MiChatHelper;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.bean.MessageHolder;
 import com.hy.chatlibrary.db.DBHelper;
 import com.hy.chatlibrary.db.dao.ChatMessageDAO;
@@ -53,9 +53,6 @@ public class ChatService extends Service {
     private Map<String, Integer> integerMap = new HashMap<>();
     private MessageHolder mMessageHolder;
     Handler mHandler = new Handler();
-    private MiChatHelper miChatHelper;
-
-
     private EBChat ebChat = null;
 
     @Override
@@ -63,7 +60,6 @@ public class ChatService extends Service {
         super.onCreate();
         EventBus.getDefault().register(this);
         mChatMessageDAO = DBHelper.getInstance(this).getChatMessageDAO();
-        miChatHelper = MiChatHelper.getInstance();
         //获取NotificationManager实例
         mNotifyManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         if (mImqManager != null) {
@@ -75,7 +71,7 @@ public class ChatService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String ditTime = SPHelper.getInstance(this).getString("DitTime");
-        System.out.println("service销毁时间:" + ditTime);
+//        System.out.println("service销毁时间:" + ditTime);
         startForeground(1, new Notification());
         mMessageHolder = (MessageHolder) intent.getSerializableExtra(LOGIN_MEMBER);
         String memberMQPW = intent.getStringExtra(LOGIN_PW);
@@ -280,7 +276,6 @@ public class ChatService extends Service {
         //发送通知
         mNotifyManager.notify((int) System.currentTimeMillis(), builder.build());
     }
-
 
     public static void setImqManager(IMQManager imqManager) {
         if (mImqManager == null) mImqManager = imqManager;

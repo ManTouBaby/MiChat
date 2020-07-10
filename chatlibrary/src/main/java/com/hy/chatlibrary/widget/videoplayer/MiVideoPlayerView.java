@@ -13,7 +13,8 @@ import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.hrw.chatlibrary.R;
+
+import com.hy.chatlibrary.R;
 
 import java.io.IOException;
 

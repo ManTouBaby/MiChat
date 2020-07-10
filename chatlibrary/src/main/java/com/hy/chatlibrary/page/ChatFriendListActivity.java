@@ -9,8 +9,8 @@ import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.widget.Toast;
 
-import com.hrw.chatlibrary.R;
 import com.hy.chatlibrary.MiChatHelper;
+import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.adapter.BaseAdapter;
 import com.hy.chatlibrary.adapter.OnItemClickListener;
 import com.hy.chatlibrary.base.SmartVH;

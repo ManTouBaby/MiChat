@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+
 import com.alibaba.fastjson.JSON;
 import com.hy.chatlibrary.MiChatHelper;
 import com.hy.chatlibrary.bean.ChatGroupDetail;
@@ -78,7 +79,6 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
         mMessageHolder.setMobile(phone);
         mMessageHolder.setPortrait(portraitUrl);
         mMiChatHelper = MiChatHelper.getInstance().loginIM(context, mMessageHolder, userMQPW, imqManager, this, this);
-
     }
 
     public void gotoChatGroup(Context mContext, ChatGroupDetail chatGroupDetail) {

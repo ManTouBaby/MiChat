@@ -18,11 +18,16 @@
         <RelativeLayout
             android:id="@+id/mi_content_container"
             android:layout_width="0dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
+            android:layout_gravity="center_vertical"
             android:layout_height="wrap_content"
             android:layout_marginRight="8dp"
             android:layout_weight="1"
-            android:background="@mipmap/icon_m_white_bg"
-            android:padding="12dp">
+            android:background="@mipmap/icon_m_white_bg">
+
 
             <TextView
                 android:id="@+id/mi_file_name"
@@ -50,15 +55,13 @@
 
             <ImageView
                 android:id="@+id/mi_file_type_tag"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_width="32dp"
+                android:layout_height="32dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentRight="true"
-                android:layout_marginRight="8dp"
                 android:scaleType="centerInside"
                 android:src="@mipmap/icon_zip" />
         </RelativeLayout>
-
 
         <include layout="@layout/include_chat_m_item_pro" />
     </LinearLayout>
