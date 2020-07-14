@@ -262,9 +262,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                 if (messageHolder == null) {
                     Toast.makeText(this, "无法查看该成员详情", Toast.LENGTH_SHORT).show();
                 } else {
-                    Intent intent = new Intent(this, ChatPersonalActivity.class);
-                    intent.putExtra(CHAT_MEMBER, messageHolder);
-                    startActivity(intent);
+                    miChatHelper.gotoPersonal(this, messageHolder);
                 }
             }
             if (viewId == R.id.mi_quote_reply_notify) {

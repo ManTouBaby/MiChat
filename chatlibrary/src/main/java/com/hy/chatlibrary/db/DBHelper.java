@@ -51,6 +51,18 @@ public class DBHelper {
 //                database.execSQL("alter table ChatMessage add longitude real");
             }
         };
+        Migration migration3_4 = new Migration(3, 4) {
+            @Override
+            public void migrate(@NonNull SupportSQLiteDatabase database) {
+//                database.execSQL("alter table ChatMessage add isSynchronization integer NOT NULL DEFAULT 0");
+
+//                database.execSQL("create table NoDisturbing(chatGroupHolderID text ,chatGroupId text ,isOpen integer NOT NUll default 0,primary key(chatGroupHolderID,chatGroupId) )");
+                database.execSQL("alter table ChatMessage add messageAcceptId text");
+                database.execSQL("alter table ChatMessage add messageAcceptor text");
+//                database.execSQL("alter table ChatMessage add latitude real");
+//                database.execSQL("alter table ChatMessage add longitude real");
+            }
+        };
         mDataBase = Room.databaseBuilder(context, AppDataBase.class, "chatMessage.db")
                 .addMigrations(migration1_2,migration2_3)
                 .allowMainThreadQueries()

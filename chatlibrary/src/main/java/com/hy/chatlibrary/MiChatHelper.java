@@ -13,6 +13,7 @@ import com.hy.chatlibrary.listener.IChatMessageControl;
 import com.hy.chatlibrary.listener.OnChatInputListener;
 import com.hy.chatlibrary.listener.OnChatManagerListener;
 import com.hy.chatlibrary.page.ChatActivity;
+import com.hy.chatlibrary.page.ChatPersonalActivity;
 import com.hy.chatlibrary.service.ChatService;
 import com.hy.chatlibrary.service.EBChatMessage;
 import com.hy.chatlibrary.service.EBChatInit;
@@ -26,6 +27,8 @@ import org.greenrobot.eventbus.EventBus;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.List;
+
+import static com.hy.chatlibrary.page.ChatActivity.CHAT_MEMBER;
 
 /**
  * @author:MtBaby
@@ -84,6 +87,13 @@ public class MiChatHelper {
         ChatService.setImqManager(imqManager);
         return mMiChatHelper;
     }
+
+    public void gotoPersonal(Context context, MessageHolder messageHolder) {
+        Intent intent = new Intent(context, ChatPersonalActivity.class);
+        intent.putExtra(CHAT_MEMBER, messageHolder);
+        context.startActivity(intent);
+    }
+
 
     //设置推送
     public void addMQMessage(ChatMessage chatMessage) {

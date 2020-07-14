@@ -35,6 +35,9 @@ public class ChatMessage extends BaseSmartBO {
     private String messageChatGroupDetail;//消息聊天描述
     private String messageGroupMaker;//消息聊天者创建人员
 
+//    private String messageAcceptId;//私聊接受人员ID
+//    private String messageAcceptor;//私聊接受人员名称
+
     @NonNull
     @PrimaryKey
     private String messageId;//消息ID
