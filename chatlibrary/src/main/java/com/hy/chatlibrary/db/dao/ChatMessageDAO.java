@@ -44,6 +44,10 @@ public interface ChatMessageDAO {
     @Query("Select * from chatmessage where messageGroupId= :messageGroupId")
     List<ChatMessage> queryByGroupId(String messageGroupId);
 
+    //查询指定群聊的最新消息
+    @Query("Select * from chatmessage where messageGroupId= :messageGroupId order by messageSTMillis  asc limit 1")
+    ChatMessage queryTopByGroupId(String messageGroupId);
+
     //查询指定群聊中显示名称包含指定字段或者内容包含包含指定字段的消息
     @Query("select * from ChatMessage where messageGroupId = :chatGroupId and  messageHolderShowName like  '%' || :label || '%'  or messageGroupId = :chatGroupId and   messageContent like '%' || :label || '%' order by messageSTMillis")
     List<ChatMessage> queryLikeLabel(String chatGroupId, String label);
