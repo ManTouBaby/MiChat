@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.support.annotation.ColorInt;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -56,22 +57,25 @@ public class CornerTextView extends AppCompatTextView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        if (autoBackGround) {
-            // 设置画笔颜色
-            mPaint.setColor(mStrokeColor);
-            // 画空心圆角矩形
-            mRectF.left = mRectF.top = 0;
-            mRectF.right = getMeasuredWidth();
-            mRectF.bottom = getMeasuredHeight();
-            System.out.println("CornerTextView：" + mRectF);
-            canvas.drawRoundRect(mRectF, mRadius, mRadius, mPaint);
-        }
+        // 设置画笔颜色
+        mPaint.setColor(mStrokeColor);
+        // 画空心圆角矩形
+        mRectF.left = mRectF.top = 0;
+        mRectF.right = getMeasuredWidth();
+        mRectF.bottom = getMeasuredHeight();
+        System.out.println("CornerTextView：" + mRectF);
+        canvas.drawRoundRect(mRectF, mRadius, mRadius, mPaint);
         super.onDraw(canvas);
+    }
+
+    public void setStrokeColor(@ColorInt int strokeColor) {
+        mStrokeColor = strokeColor;
+        invalidate();
     }
 
     @Override
     public void setText(CharSequence text, BufferType type) {
-        mStrokeColor = ColorUtils.getColorBySeed(text);
+        if (autoBackGround) mStrokeColor = ColorUtils.getColorBySeed(text);
         String label = null;
         if (!TextUtils.isEmpty(text)) {
             label = text.toString();
