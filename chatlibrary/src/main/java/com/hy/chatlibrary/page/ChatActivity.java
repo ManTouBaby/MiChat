@@ -190,6 +190,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_MEMBER_ID, mMessageHolder.getId());
             gotoDetail.putExtra(CHAT_GROUP_MEMBER_GROUP_NAME, mMessageHolder.getGroupName());
             gotoDetail.putExtra(CHAT_GROUP_NAME, mChatGroupName);
+            gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_TYPE, mChatGroupType);
             gotoDetail.putExtra(MiChatHelper.CHAT_GROUP_DETAIL, mChatGroupDetail);
             startActivityForResult(gotoDetail, REQUEST_GROUP_DETAIL);
         });

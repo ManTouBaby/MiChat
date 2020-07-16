@@ -9,6 +9,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -53,6 +55,7 @@ import static com.hy.chatlibrary.page.ChatActivity.CHAT_MEMBER;
  */
 public class ChatGroupDetailActivity extends AppCompatActivity {
     RecyclerView mChatMemberShow;
+    LinearLayout mChatGroupContainer;
     TextView mExistGroup;
     TextView mGroupMemberCount;
     Switch mIsOpenNoDisturbing;
@@ -70,6 +73,7 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
     private String mOriginalChatDisplayName;//群聊原始显示名称
     private String mOriginalGroupName;
     private String mOriginalGroupDetail;
+    private int mChatGroupType;
     private ChatGroupMemberAdapter groupMemberAdapter;
     private OnChatManagerListener mOnChatManagerListener;
     private MiChatHelper miChatHelper;
@@ -88,7 +92,8 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
         mGroupId = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_ID);
         mMemberId = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_MEMBER_ID);
         mOriginalGroupName = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_NAME);
-        mOriginalGroupDetail = getIntent().getStringExtra(CHAT_GROUP_DETAIL);
+        mOriginalGroupDetail = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_DETAIL);
+        mChatGroupType = getIntent().getIntExtra(MiChatHelper.CHAT_GROUP_TYPE, MiChatHelper.CHAT_GROUP);
         mOriginalChatDisplayName = getIntent().getStringExtra(MiChatHelper.CHAT_GROUP_MEMBER_GROUP_NAME);
         ArrayList<MessageHolder> mGroupMembers = (ArrayList<MessageHolder>) getIntent().getSerializableExtra(MiChatHelper.CHAT_GROUP_MEMBER);
         EventBus.getDefault().register(this);
@@ -112,7 +117,8 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
         mGroupDesc = findViewById(R.id.mi_group_desc);
         mGroupMemberCount = findViewById(R.id.mi_member_count);
         mExistGroup = findViewById(R.id.mi_exist_group);
-
+        mChatGroupContainer = findViewById(R.id.chat_group_container);
+        mChatGroupContainer.setVisibility(mChatGroupType == MiChatHelper.CHAT_GROUP ? View.VISIBLE : View.GONE);
         new Thread(() -> {
             mNoDisturbingDAO = DBHelper.getInstance(this).getNoDisturbingDAO();
             mNoDisturbing = mNoDisturbingDAO.getNoDisturbing(mMemberId, mGroupId);
@@ -161,6 +167,14 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
         mChatMemberShow = findViewById(R.id.mi_member_show);
         mChatMemberShow.setLayoutManager(new GridLayoutManager(this, 5));
         mChatMemberShow.setHasFixedSize(true);
+
+        for (ChatGroupMembers groupMembers:members){
+            if (miChatHelper.getMessageHolder().getId().equals(groupMembers.getMessageHolder().getId())){
+                members.remove(groupMembers);
+                break;
+            }
+        }
+
         mChatMemberShow.setAdapter(groupMemberAdapter = new ChatGroupMemberAdapter(members));
         groupMemberAdapter.setOnItemChildClickListener((view, data) -> {
             if (view.getId() == R.id.mi_tag_por) {

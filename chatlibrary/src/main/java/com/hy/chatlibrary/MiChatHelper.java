@@ -155,15 +155,19 @@ public class MiChatHelper {
     }
 
     //进入聊天界面二
+    public ChatMessageControl gotoChat(Context context, String chatGroupId, String chatGroupName, String chatGroupDetail) {
+        return gotoChat(context, MiChatHelper.CHAT_GROUP, chatGroupId, chatGroupName, chatGroupDetail, null);
+    }
+
+    //进入聊天界面二
     public ChatMessageControl gotoChat(Context context, @ChatGroupType int chatGroupType, String chatGroupId, String chatGroupName, String chatGroupDetail) {
         return gotoChat(context, chatGroupType, chatGroupId, chatGroupName, chatGroupDetail, null);
     }
 
     //进入聊天界面二
     public ChatMessageControl gotoChat(Context context, @ChatGroupType int chatGroupType, String chatGroupId, String chatGroupName, String chatGroupDetail, ChatGroupOption chatGroupOption) {
-        if (mOption.messageHolder == null) {
-            throw new NullPointerException("The MessageHolder of Option con`t be null");
-        }
+        if (mOption.messageHolder == null) throw new NullPointerException("The MessageHolder of Option con`t be null");
+
         mChatGroupOption = chatGroupOption;
         if (mChatGroupOption == null) mChatGroupOption = new ChatGroupOption();
 
