@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.hrw.michat"
+        applicationId "com.hy.michat"
         minSdkVersion 16
         targetSdkVersion 26
         versionCode 1
@@ -12,21 +12,21 @@ android {
 
         multiDexEnabled true
     }
-//    signingConfigs {
-//        debug {
-//
-//            storeFile file('D:\\ccfcodekey\\hy.jks')//签名文件路径
-//            storePassword "hy123456"
-//            keyAlias "gzhy"
-//            keyPassword "hy123456"  //签名密码
-//        }
-//        release {
-//            storeFile file('D:\\ccfcodekey\\hy.jks')//签名文件路径
-//            storePassword "hy123456"
-//            keyAlias "gzhy"
-//            keyPassword "hy123456"  //签名密码
-//        }
-//    }
+    signingConfigs {
+        debug {
+
+            storeFile file('D:\\ccfcodekey\\hy.jks')//签名文件路径
+            storePassword "hy123456"
+            keyAlias "gzhy"
+            keyPassword "hy123456"  //签名密码
+        }
+        release {
+            storeFile file('D:\\ccfcodekey\\hy.jks')//签名文件路径
+            storePassword "hy123456"
+            keyAlias "gzhy"
+            keyPassword "hy123456"  //签名密码
+        }
+    }
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8

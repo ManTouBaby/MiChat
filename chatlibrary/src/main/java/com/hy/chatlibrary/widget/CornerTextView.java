@@ -2,9 +2,16 @@ package com.hy.chatlibrary.widget;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.ColorInt;
 import android.support.v7.widget.AppCompatTextView;
 import android.text.TextUtils;
@@ -19,7 +26,7 @@ import com.hy.chatlibrary.R;
  * @desc:
  */
 public class CornerTextView extends AppCompatTextView {
-    float mRadius;
+    private float mRadius;
     boolean autoBackGround;
     int mStrokeColor;
     private Paint mPaint = new Paint();
@@ -57,25 +64,59 @@ public class CornerTextView extends AppCompatTextView {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        // 设置画笔颜色
-        mPaint.setColor(mStrokeColor);
-        // 画空心圆角矩形
-        mRectF.left = mRectF.top = 0;
-        mRectF.right = getMeasuredWidth();
-        mRectF.bottom = getMeasuredHeight();
-        System.out.println("CornerTextView：" + mRectF);
-        canvas.drawRoundRect(mRectF, mRadius, mRadius, mPaint);
+        Drawable background = getBackground();
+        //background包括color和Drawable,这里分开取值
+        if (background!=null){
+            if (background instanceof BitmapDrawable) {
+                Bitmap bgBitmap = ((BitmapDrawable) background).getBitmap();
+                bgBitmap = getRoundBitmap(bgBitmap);
+//                canvas.drawBitmap(bgBitmap, 0, 0, mPaint);
+                setBackground(new BitmapDrawable(getResources(),bgBitmap));
+            } else {
+                ColorDrawable colordDrawable = (ColorDrawable) background;
+                mStrokeColor = colordDrawable.getColor();
+                // 设置画笔颜色
+                mPaint.setColor(mStrokeColor);
+                // 画空心圆角矩形
+                mRectF.left = mRectF.top = 0;
+                mRectF.right = getMeasuredWidth();
+                mRectF.bottom = getMeasuredHeight();
+                canvas.drawRoundRect(mRectF, mRadius, mRadius, mPaint);
+            }
+        }else {
+            // 设置画笔颜色
+            mPaint.setColor(mStrokeColor);
+            // 画空心圆角矩形
+            mRectF.left = mRectF.top = 0;
+            mRectF.right = getMeasuredWidth();
+            mRectF.bottom = getMeasuredHeight();
+            canvas.drawRoundRect(mRectF, mRadius, mRadius, mPaint);
+        }
         super.onDraw(canvas);
     }
 
-    public void setStrokeColor(@ColorInt int strokeColor) {
-        mStrokeColor = strokeColor;
-        invalidate();
+    private Bitmap getRoundBitmap(Bitmap bit) {
+        Bitmap bitmap = Bitmap.createBitmap(bit.getWidth(), bit.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Paint paint = new Paint();
+        paint.setAntiAlias(true);
+        paint.setColor(Color.YELLOW);
+
+        // 绘制作为基准的圆角矩形
+        RectF rect = new RectF(0, 0, bit.getWidth(), bit.getHeight());
+
+        canvas.drawRoundRect(rect, mRadius, mRadius, paint);// 画圆角矩形
+
+        // 设置相交保留
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+
+        canvas.drawBitmap(bit, 0, 0, paint);
+        return bitmap;
     }
 
     @Override
     public void setText(CharSequence text, BufferType type) {
-        if (autoBackGround) mStrokeColor = ColorUtils.getColorBySeed(text);
+       mStrokeColor = ColorUtils.getColorBySeed(text);
         String label = null;
         if (!TextUtils.isEmpty(text)) {
             label = text.toString();

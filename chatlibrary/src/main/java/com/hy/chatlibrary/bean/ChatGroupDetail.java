@@ -1,5 +1,7 @@
 package com.hy.chatlibrary.bean;
 
+import com.hy.chatlibrary.MiChatHelper;
+
 /**
  * @author:MtBaby
  * @date:2020/05/07 10:04
@@ -10,8 +12,18 @@ public class ChatGroupDetail {
     private String messageGroupName;//消息聊天组名称
     private String messageGroupDes;//消息聊天组描述
     private String messageGroupMaker;//消息聊天者创建人员
+    private int messageGroupType;//消息聊天类型
 
 //    private ArrayList<MessageHolder> groupMembers;//聊天组成员
+
+
+    public int getMessageGroupType() {
+        return messageGroupType;
+    }
+
+    public void setMessageGroupType(@MiChatHelper.ChatGroupType int messageGroupType) {
+        this.messageGroupType = messageGroupType;
+    }
 
     public String getMessageGroupId() {
         return messageGroupId;

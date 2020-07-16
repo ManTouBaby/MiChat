@@ -26,8 +26,6 @@ import com.amap.api.location.AMapLocationListener;
 import com.amap.api.navi.enums.NaviType;
 import com.amap.api.navi.model.NaviLatLng;
 import com.amap.api.services.core.PoiItem;
-import com.hrw.gdlibrary.CodeManager;
-import com.hrw.gdlibrary.GDHelper;
 import com.hy.chatlibrary.MiChatHelper;
 import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.adapter.BaseChatAdapter;
@@ -59,6 +57,8 @@ import com.hy.filelibrary.FilePicker;
 import com.hy.filelibrary.SelectMode;
 import com.hy.filelibrary.base.FileBean;
 import com.hy.filelibrary.base.OnSelectFinishListener;
+import com.hy.gdlibrary.CodeManager;
+import com.hy.gdlibrary.GDHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -102,6 +102,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
     private List<String> sendAgainId = new ArrayList<>();//发送消息列表
     private ChatMessage mQuoteChatMessage;
     private ArrayList<MessageHolder> mGroupMembers;
+    private int mChatGroupType;
     private String mChatGroupDetail;
     private String mChatGroupName;
     public static String mChatGroupId;
@@ -116,21 +117,32 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        System.out.println("ChatActivity---onCreate");
         EventBus.getDefault().register(this);
+        Intent intent = getIntent();
+        initData(intent);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        initData(intent);
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    private void initData(Intent intent) {
         mChatMessageDAO = DBHelper.getInstance(getApplicationContext()).getChatMessageDAO();
         mGdHelper = new GDHelper.Builder().setNaviType(NaviType.GPS).build(getApplicationContext());
-        Intent intent = getIntent();
         mChatGroupId = intent.getStringExtra(MiChatHelper.CHAT_GROUP_ID);
-        mChatGroupName = intent.getStringExtra(CHAT_GROUP_NAME);
+        mChatGroupName = intent.getStringExtra(MiChatHelper.CHAT_GROUP_NAME);
         mChatGroupDetail = intent.getStringExtra(MiChatHelper.CHAT_GROUP_DETAIL);
+        mChatGroupType = intent.getIntExtra(MiChatHelper.CHAT_GROUP_TYPE, MiChatHelper.CHAT_GROUP);
         miChatHelper = MiChatHelper.getInstance();
         mMessageHolder = miChatHelper.getMessageHolder();
         mRevealAnimation = new RevealAnimation();
         StatusBarUtil.setStatueColor(this, R.color.mi_chat_main_bg, true);
         setContentView(R.layout.mi_activity_chat_layout);
         mGroupName = findViewById(R.id.mt_chat_group_name);
-
 
         initShowView();
         initChatInputGroup();
@@ -194,7 +206,6 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             instructManager.putExtra(MiChatHelper.CHAT_GROUP_ID, mChatGroupId);
             startActivity(instructManager);
         });
-
     }
 
     @Override
@@ -229,6 +240,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
         miChatInputGroup = findViewById(R.id.mi_cig_view);
         miChatInputGroup.setFilePathDir(miChatHelper.getFileDirName());
         miChatInputGroup.setChatListAdapter(mChatAdapter = adapter);
+        miChatInputGroup.setBottomMenuVisibility(miChatHelper.isOpenFile(), miChatHelper.isOpenInstruct());
 
         mChatAdapter.setOnSendFailTagClickListener(message -> {
             sendAgainId.add(message.getMessageId());
@@ -438,9 +450,6 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
             case TAKE_VIDEO:
                 if (fileBeans != null && fileBeans.size() > 0) {
                     FileBean data = fileBeans.get(0);
-//                    String path = data.getStringExtra(CameraHelper.DATA);
-//                    String pathOrigin = data.getStringExtra(CameraHelper.DATA_ORIGIN);
-//                    long realDuration = data.getLongExtra(CameraHelper.DATA_REAL_DURATION, (long) 0F);
                     mChatMessageCreator.createChatMessage(2, mAMapLocation, "[视屏消息]", data.getPath(), data.getDuration(), chatMessage -> {
                         mOnChatInputListener.onMessageSend(chatMessage, mChatMessageCreator.getChatMessageJson(chatMessage));
                     });

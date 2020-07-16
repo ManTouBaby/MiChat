@@ -70,7 +70,6 @@ public class LoginActivity extends AppCompatActivity {
         Button button = findViewById(R.id.mi_login_submit);
         //登录按钮
         button.setOnClickListener(v -> {
-
             showLoginAnimate();
             String loginUser = this.loginUser.getText().toString();
             String loginPW = this.loginPW.getText().toString();

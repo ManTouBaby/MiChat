@@ -3,6 +3,8 @@ package com.hy.michat;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
+import android.util.Log;
+import android.widget.Toast;
 
 
 import com.alibaba.fastjson.JSON;
@@ -13,6 +15,7 @@ import com.hy.chatlibrary.db.entity.ChatMessage;
 import com.hy.chatlibrary.db.entity.InstructBean;
 import com.hy.chatlibrary.listener.OnChatInputListener;
 import com.hy.chatlibrary.listener.OnChatManagerListener;
+import com.hy.chatlibrary.listener.OnChatPrivateListener;
 import com.hy.chatlibrary.utils.StringUtil;
 import com.hy.chatlibrary.utils.retrofit.RetrofitHelper;
 import com.hy.michat.rabbitMQ.RabbitMQManager;
@@ -20,8 +23,10 @@ import com.hy.michat.retrofit.AppConfig;
 import com.hy.michat.retrofit.BaseChatBO;
 import com.hy.michat.retrofit.BaseResult;
 import com.hy.michat.retrofit.FileApi;
+import com.hy.michat.retrofit.GroupBo;
 import com.hy.michat.retrofit.GroupMemberBO;
 import com.hy.michat.retrofit.IChatControl;
+import com.hy.michat.retrofit.JoinChatResult;
 
 import java.io.File;
 import java.io.IOException;
@@ -44,7 +49,7 @@ import static com.hy.michat.retrofit.AppConfig.HTTP_SERVER;
  * @date:2020/05/06 17:53
  * @desc:
  */
-public class ChatManager implements OnChatInputListener, OnChatManagerListener {
+public class ChatManager implements OnChatInputListener, OnChatManagerListener, OnChatPrivateListener {
     private static ChatManager mChatManager;
     private RabbitMQManager mRabbitMQManager;
     private MiChatHelper mMiChatHelper;
@@ -78,17 +83,21 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
         mMessageHolder.setGender(gender);
         mMessageHolder.setMobile(phone);
         mMessageHolder.setPortrait(portraitUrl);
-        mMiChatHelper = MiChatHelper.getInstance().loginIM(context, mMessageHolder, userMQPW, imqManager, this, this);
+        mMiChatHelper = MiChatHelper.getInstance().loginIM(context, mMessageHolder, userMQPW, imqManager, this, this, this);
     }
 
     public void gotoChatGroup(Context mContext, ChatGroupDetail chatGroupDetail) {
-        gotoChatGroup(mContext, chatGroupDetail.getMessageGroupId(), chatGroupDetail.getMessageGroupName(), chatGroupDetail.getMessageGroupDes());
+        if (chatGroupDetail.getMessageGroupType() < 0) {
+            throw new NullPointerException("must set chatGroupType be jump to ChatPage");
+        }
+        gotoChatGroup(mContext, chatGroupDetail.getMessageGroupType(), chatGroupDetail.getMessageGroupId(), chatGroupDetail.getMessageGroupName(), chatGroupDetail.getMessageGroupDes());
     }
 
     //跳转到聊天界面
-    public void gotoChatGroup(Context mContext, @NonNull String groupId, String groupName, String groupDes) {
-        mChatGroupControl = mMiChatHelper.gotoChat(mContext, groupId, groupName, groupDes);
+    public void gotoChatGroup(Context mContext, @MiChatHelper.ChatGroupType int chatGroupType, @NonNull String groupId, String groupName, String groupDes) {
+        mChatGroupControl = mMiChatHelper.gotoChat(mContext, chatGroupType, groupId, groupName, groupDes);
     }
+
 
     @Override
     public void onMessageSend(ChatMessage message, String chatMessageJson) {
@@ -187,7 +196,6 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
                             }
                             mMiChatHelper.initChatGroupMember(groupMembers, mChatGroupId, "");
                         }
-
                     }
                 });
 
@@ -283,4 +291,69 @@ public class ChatManager implements OnChatInputListener, OnChatManagerListener {
     }
 
 
+    @Override
+    public void sendPrivate(Context context, MessageHolder messageHolder) {
+        String groupNameAB = mMessageHolder.getId() + "-" + messageHolder.getId();
+        String groupNameBA = messageHolder.getId() + "-" + mMessageHolder.getId();
+        RetrofitHelper.buildRetrofit().create(IChatControl.class).chatGroupList(HTTP_SERVER + "/info/list/all", mMessageHolder.getId())
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<BaseChatBO<List<GroupBo>>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(BaseChatBO<List<GroupBo>> listBaseChatBO) {
+                        if (listBaseChatBO.isSuccess()) {
+                            for (GroupBo groupBo : listBaseChatBO.getData()) {
+                                if (groupBo.getGroupId().contains(groupNameAB)) {
+                                    gotoChatGroup(context, MiChatHelper.CHAT_PERSON, groupNameAB, messageHolder.getName(), "我是私聊");
+                                    return;
+                                }
+                                if (groupBo.getGroupId().contains(groupNameBA)) {
+                                    gotoChatGroup(context, MiChatHelper.CHAT_PERSON, groupNameBA, messageHolder.getName(), "我是私聊");
+                                    return;
+                                }
+                            }
+                            joinChatGroup(context, groupNameAB, messageHolder.getName(), mMessageHolder.getId() + "," + messageHolder.getId());
+                        } else {
+                            Toast.makeText(context, "消息发送失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
+
+    private void joinChatGroup(Context context, String groupId, String groupName, String userIds) {
+        Log.i("privateChat create---", "创建的私聊:" + groupId);
+        RetrofitHelper.buildRetrofit().create(IChatControl.class).joinGroup(HTTP_SERVER + "/info/inserts", groupId, userIds)
+                .subscribeOn(Schedulers.io())
+                .observeOn(Schedulers.io())
+                .subscribe(new Subscriber<BaseChatBO<List<JoinChatResult>>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(context, "创建私聊失败:" + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(BaseChatBO<List<JoinChatResult>> listBaseChatBO) {
+                        if (listBaseChatBO.isSuccess()) {
+                            gotoChatGroup(context, MiChatHelper.CHAT_PERSON, groupId, groupName, "我是私聊");
+                        } else {
+                            Toast.makeText(context, "创建私聊失败", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+                });
+    }
 }

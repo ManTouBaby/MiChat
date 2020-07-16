@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.EditText;
 
 import com.alibaba.fastjson.JSON;
+import com.hy.chatlibrary.MiChatHelper;
 import com.hy.chatlibrary.bean.ChatGroupDetail;
 
 public class MainActivity extends AppCompatActivity {
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
             chatGroupDetail.setMessageGroupDes("群聊描述测试");
             chatGroupDetail.setMessageGroupId(mGroupId.getText().toString());
             chatGroupDetail.setMessageGroupName("测试聊天群");
-            String json = JSON.toJSONString(chatGroupDetail);
+            chatGroupDetail.setMessageGroupType(MiChatHelper.CHAT_GROUP);
             ChatManager.getInstance().gotoChatGroup(this, chatGroupDetail);
         });
     }

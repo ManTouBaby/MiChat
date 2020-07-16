@@ -81,6 +81,8 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
     boolean isShowTakeVoiceBtn = false;//语音录制按钮是否显示
     boolean isShowContent = false;//菜单内容框是否开启
     boolean isOpenSoftKeyBoard = false;//输入键盘是否开启
+    private boolean showFile = true;
+    private boolean showInstruct = true;
 
 
     public RecyclerView getRvChatList() {
@@ -287,21 +289,32 @@ public class MiChatInputGroup extends RelativeLayout implements View.OnClickList
 
     //初始化底部布局二
     private void initContentTypeList() {
+        rvSendContent = findViewById(R.id.mi_other_send_content);
+        rvSendContent.setLayoutManager(new GridLayoutManager(getContext(), 4));
+        rvSendContent.setAdapter(typeAdapter = new ChatContentTypeAdapter());
+        rvSmileContent = findViewById(R.id.mi_smile_container);
+        rvSmileContent.setLayoutManager(new GridLayoutManager(getContext(), 8));
+        rvSmileContent.setAdapter(mExpressionAdapter = new ExpressionAdapter());
+        mExpressionAdapter.setOnItemClickListener((view, data) -> StringUtil.insertExpression(editText, data));
+    }
+
+    public void setBottomMenuVisibility(boolean showFile, boolean showInstruct) {
+        this.showFile = showFile;
+        this.showInstruct = showInstruct;
+        initBottomDates();
+    }
+
+    private void initBottomDates() {
         List<ChatContentType> contentTypes = new ArrayList<>();
         contentTypes.add(new ChatContentType(ContentType.PIC, "相册", R.mipmap.icon_type_photo));
         contentTypes.add(new ChatContentType(ContentType.TAKE_PHOTO, "拍照", R.mipmap.icon_type_takephoto));
         contentTypes.add(new ChatContentType(ContentType.TAKE_VIDEO, "录像", R.mipmap.icon_type_takevideo));
         contentTypes.add(new ChatContentType(ContentType.LOCAL, "位置", R.mipmap.icon_type_local));
-        contentTypes.add(new ChatContentType(ContentType.FILE, "文件", R.mipmap.icon_type_file));
-        contentTypes.add(new ChatContentType(ContentType.INSTRUCT, "指令", R.mipmap.icon_type_command));
-
-        rvSendContent = findViewById(R.id.mi_other_send_content);
-        rvSendContent.setLayoutManager(new GridLayoutManager(getContext(), 4));
-        rvSendContent.setAdapter(typeAdapter = new ChatContentTypeAdapter(contentTypes));
-        rvSmileContent = findViewById(R.id.mi_smile_container);
-        rvSmileContent.setLayoutManager(new GridLayoutManager(getContext(), 8));
-        rvSmileContent.setAdapter(mExpressionAdapter = new ExpressionAdapter());
-        mExpressionAdapter.setOnItemClickListener((view, data) -> StringUtil.insertExpression(editText, data));
+        if (showFile)
+            contentTypes.add(new ChatContentType(ContentType.FILE, "文件", R.mipmap.icon_type_file));
+        if (showInstruct)
+            contentTypes.add(new ChatContentType(ContentType.INSTRUCT, "指令", R.mipmap.icon_type_command));
+        typeAdapter.setContentTypes(contentTypes);
     }
 
 

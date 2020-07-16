@@ -11,6 +11,7 @@ import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.base.SmartVH;
 import com.hy.chatlibrary.bean.ChatContentType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -19,11 +20,12 @@ import java.util.List;
  * @desc:
  */
 public class ChatContentTypeAdapter extends RecyclerView.Adapter<SmartVH> {
-    private List<ChatContentType> contentTypes;
+    private List<ChatContentType> contentTypes = new ArrayList<>();
     private OnContentTypeClickListener mOnContentTypeClickListener;
 
-    ChatContentTypeAdapter(List<ChatContentType> contentTypes) {
+    public void setContentTypes(List<ChatContentType> contentTypes) {
         this.contentTypes = contentTypes;
+        notifyDataSetChanged();
     }
 
     @Override

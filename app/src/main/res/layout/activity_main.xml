@@ -37,4 +37,12 @@
         android:text="退出登录" />
 
 
+    <com.hy.chatlibrary.widget.CornerTextView
+        android:layout_width="68dp"
+        android:layout_height="68dp"
+        app:radius="10dp"
+        tools:text="正好"
+        android:gravity="center"
+        android:background="#666"
+        app:auto_background="true"/>
 </LinearLayout>

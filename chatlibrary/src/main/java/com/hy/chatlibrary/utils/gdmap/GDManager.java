@@ -3,7 +3,8 @@ package com.hy.chatlibrary.utils.gdmap;
 import android.content.Context;
 
 import com.amap.api.navi.enums.NaviType;
-import com.hrw.gdlibrary.GDHelper;
+import com.hy.gdlibrary.GDHelper;
+
 
 /**
  * @version 1.0.0

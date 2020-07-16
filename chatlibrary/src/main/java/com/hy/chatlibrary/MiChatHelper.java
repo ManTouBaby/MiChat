@@ -12,6 +12,7 @@ import com.hy.chatlibrary.db.entity.ChatMessage;
 import com.hy.chatlibrary.listener.IChatMessageControl;
 import com.hy.chatlibrary.listener.OnChatInputListener;
 import com.hy.chatlibrary.listener.OnChatManagerListener;
+import com.hy.chatlibrary.listener.OnChatPrivateListener;
 import com.hy.chatlibrary.page.ChatActivity;
 import com.hy.chatlibrary.page.ChatPersonalActivity;
 import com.hy.chatlibrary.service.ChatService;
@@ -42,10 +43,12 @@ public class MiChatHelper {
     public final static String CHAT_GROUP_NAME = "chatGroupName";
     public final static String CHAT_GROUP_DETAIL = "chatGroupDetail";
     public final static String CHAT_GROUP_MEMBER = "chatGroupMember";
+    public final static String CHAT_GROUP_TYPE = "chatGroupType";
 
     private static ChatMessageControl chatMessageControl = new ChatMessageControl();
     private static MiChatHelper mMiChatHelper;
     private static Option mOption;
+    private static ChatGroupOption mChatGroupOption;
 
     @IntDef({CHAT_PERSON, CHAT_GROUP})
     @Retention(RetentionPolicy.SOURCE)
@@ -72,13 +75,19 @@ public class MiChatHelper {
 
     //登录聊天
     public MiChatHelper loginIM(Context context, MessageHolder messageHolder, String userMQPW, IMQManager imqManager, OnChatInputListener onChatInputListener, OnChatManagerListener onChatManagerListener) {
+        return loginIM(context, messageHolder, userMQPW, imqManager, onChatInputListener, onChatManagerListener, null);
+    }
+
+    //登录聊天
+    public MiChatHelper loginIM(Context context, MessageHolder messageHolder, String userMQPW, IMQManager imqManager, OnChatInputListener onChatInputListener, OnChatManagerListener onChatManagerListener, OnChatPrivateListener onChatPrivateListener) {
         mOption = new MiChatHelper.Option();
         mOption.setFileDirName(context.getPackageName())
                 .setNetTimeUrl("http://www.baidu.com")
                 .setOpenNetTime(true)
                 .setMessageHolder(messageHolder)
                 .setOnChatInputListener(onChatInputListener)
-                .setOnChatManagerListener(onChatManagerListener);
+                .setOnChatManagerListener(onChatManagerListener)
+                .setOnChatPrivateListener(onChatPrivateListener);
 
         Intent intent = new Intent(context, ChatService.class);
         intent.putExtra(ChatService.LOGIN_MEMBER, messageHolder);
@@ -142,22 +151,30 @@ public class MiChatHelper {
 
     //进入聊天界面一
     public ChatMessageControl gotoChat(Context context, ChatGroupDetail chatGroupDetail) {
-        return gotoChat(context, chatGroupDetail.getMessageGroupId(), chatGroupDetail.getMessageGroupName(), chatGroupDetail.getMessageGroupDes());
+        return gotoChat(context, chatGroupDetail.getMessageGroupType(), chatGroupDetail.getMessageGroupId(), chatGroupDetail.getMessageGroupName(), chatGroupDetail.getMessageGroupDes());
     }
 
     //进入聊天界面二
-    public ChatMessageControl gotoChat(Context context, String chatGroupId, String chatGroupName, String chatGroupDetail) {
+    public ChatMessageControl gotoChat(Context context, @ChatGroupType int chatGroupType, String chatGroupId, String chatGroupName, String chatGroupDetail) {
+        return gotoChat(context, chatGroupType, chatGroupId, chatGroupName, chatGroupDetail, null);
+    }
+
+    //进入聊天界面二
+    public ChatMessageControl gotoChat(Context context, @ChatGroupType int chatGroupType, String chatGroupId, String chatGroupName, String chatGroupDetail, ChatGroupOption chatGroupOption) {
         if (mOption.messageHolder == null) {
             throw new NullPointerException("The MessageHolder of Option con`t be null");
         }
+        mChatGroupOption = chatGroupOption;
+        if (mChatGroupOption == null) mChatGroupOption = new ChatGroupOption();
+
         Intent intent = new Intent(context, ChatActivity.class);
         intent.putExtra(CHAT_GROUP_ID, chatGroupId);
         intent.putExtra(CHAT_GROUP_NAME, chatGroupName);
         intent.putExtra(CHAT_GROUP_DETAIL, chatGroupDetail);
+        intent.putExtra(CHAT_GROUP_TYPE, chatGroupType);
         context.startActivity(intent);
         return chatMessageControl;
     }
-
 
     public static class ChatMessageControl implements IChatMessageControl {
 
@@ -245,24 +262,12 @@ public class MiChatHelper {
         return mOption.fileDirName;
     }
 
-    public boolean isOpenEmotion() {
-        return mOption.isOpenEmotion;
+    public boolean isOpenInstruct() {
+        return mChatGroupOption.isOpenInstruct;
     }
 
-    public boolean isOpenRadio() {
-        return mOption.isOpenRadio;
-    }
-
-    public boolean isOpenVideo() {
-        return mOption.isOpenVideo;
-    }
-
-    public boolean isOpenPhoto() {
-        return mOption.isOpenPhoto;
-    }
-
-    public boolean isOpenLocation() {
-        return mOption.isOpenLocation;
+    public boolean isOpenFile() {
+        return mChatGroupOption.isOpenFile;
     }
 
     public boolean isOpenNetTime() {
@@ -275,6 +280,10 @@ public class MiChatHelper {
 
     public Option getOption() {
         return mOption;
+    }
+
+    public ChatGroupOption getChatGroupOption() {
+        return mChatGroupOption;
     }
 
     public MessageHolder getMessageHolder() {
@@ -295,27 +304,19 @@ public class MiChatHelper {
         return mOption.onChatManagerListener;
     }
 
-    public static class Option {
-        private boolean isOpenEmotion = true;//是否开启表情
-        private boolean isOpenRadio = true;//是否开启录音功能
-        private boolean isOpenVideo = true;//是否开启视屏录制
-        private boolean isOpenPhoto = true;//是否开启相册
-        private boolean isOpenLocation = true;//是否开启定位发送
+    public OnChatPrivateListener getOnChatPrivateListener() {
+        return mOption.onChatPrivateListener;
+    }
 
+    public static class Option {
         private boolean isOpenNetTime = false;//是否开启网络时间作为消息时间
         private String fileDirName = Environment.getExternalStorageDirectory().getPath() + "/hy/";//视屏、图片、音频文件保存路径
         private String netTimeUrl = "http://www.baidu.com";//获取网络时间的地址
         private MessageHolder messageHolder;
-        //        private ArrayList<MessageHolder> groupMembers;//群成员列表
         private BaseChatAdapter adapter;
         private OnChatInputListener onChatInputListener;
         private OnChatManagerListener onChatManagerListener;
-
-//        public Option setGroupMembers(ArrayList<MessageHolder> groupMembers) {
-//            this.groupMembers = groupMembers;
-//            return this;
-//        }
-
+        private OnChatPrivateListener onChatPrivateListener;
 
         public Option setMessageHolder(MessageHolder messageHolder) {
             this.messageHolder = messageHolder;
@@ -327,34 +328,9 @@ public class MiChatHelper {
             return this;
         }
 
-        public Option setOpenEmotion(boolean openEmotion) {
-            isOpenEmotion = openEmotion;
-            return this;
-        }
-
-
-        public Option setOpenRadio(boolean openRadio) {
-            isOpenRadio = openRadio;
-            return this;
-        }
-
-        public Option setOpenVideo(boolean openVideo) {
-            isOpenVideo = openVideo;
-            return this;
-        }
 
         public Option setAdapter(BaseChatAdapter adapter) {
             this.adapter = adapter;
-            return this;
-        }
-
-        public Option setOpenPhoto(boolean openPhoto) {
-            isOpenPhoto = openPhoto;
-            return this;
-        }
-
-        public Option setOpenLocation(boolean openLocation) {
-            isOpenLocation = openLocation;
             return this;
         }
 
@@ -368,6 +344,11 @@ public class MiChatHelper {
             return this;
         }
 
+        public Option setOnChatPrivateListener(OnChatPrivateListener onChatPrivateListener) {
+            this.onChatPrivateListener = onChatPrivateListener;
+            return this;
+        }
+
         public Option setOnChatInputListener(OnChatInputListener onChatInputListener) {
             this.onChatInputListener = onChatInputListener;
             return this;
@@ -375,6 +356,22 @@ public class MiChatHelper {
 
         public Option setOnChatManagerListener(OnChatManagerListener onChatManagerListener) {
             this.onChatManagerListener = onChatManagerListener;
+            return this;
+        }
+    }
+
+    public static class ChatGroupOption {
+        private boolean isOpenFile = true;//是否开启文件发送
+        private boolean isOpenInstruct = true;//是否开启指令发送
+
+
+        public ChatGroupOption setOpenFile(boolean openFile) {
+            isOpenFile = openFile;
+            return this;
+        }
+
+        public ChatGroupOption setOpenInstruct(boolean openInstruct) {
+            isOpenInstruct = openInstruct;
             return this;
         }
     }

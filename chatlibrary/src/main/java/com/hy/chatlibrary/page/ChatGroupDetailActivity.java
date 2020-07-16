@@ -16,7 +16,7 @@ import android.widget.Toast;
 import com.amap.api.location.AMapLocation;
 import com.amap.api.navi.enums.NaviType;
 
-import com.hrw.gdlibrary.GDHelper;
+
 import com.hy.chatlibrary.MiChatHelper;
 import com.hy.chatlibrary.R;
 import com.hy.chatlibrary.adapter.ChatGroupMemberAdapter;
@@ -33,6 +33,7 @@ import com.hy.chatlibrary.utils.LoadingHelper;
 import com.hy.chatlibrary.utils.PopupWindowsHelper;
 import com.hy.chatlibrary.utils.SPHelper;
 import com.hy.chatlibrary.utils.StatusBarUtil;
+import com.hy.gdlibrary.GDHelper;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
