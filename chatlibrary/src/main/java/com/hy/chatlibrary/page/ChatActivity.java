@@ -154,6 +154,8 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
         new Thread(() -> {
             ChatMessage mChatMessage = mChatMessageDAO.queryMessageByTopAndSynchronization(mChatGroupId);
             ChatMessage messageByTop = mChatMessageDAO.queryMMessageByTop(mChatGroupId, mMessageHolder.getId());
+            ChatMessage chatMessage = mChatMessageDAO.queryTopByGroupIdNoMe(mChatGroupId, mMessageHolder.getId());
+
             mOnChatInputListener.onInitChatList(mChatMessage, mChatGroupId);
             if (messageByTop != null) {
                 mMessageHolder.setGroupName(messageByTop.getMessageHolderShowName());

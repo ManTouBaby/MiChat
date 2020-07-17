@@ -11,12 +11,12 @@ import java.util.List;
  */
 public class EBInitChatGroupMember {
     private String errorLabel;
-    private String initChatMessageID;
+    private String initChatGroupID;
     private List<MessageHolder> messageHolders;
 
-    public EBInitChatGroupMember(List<MessageHolder> messageHolders, String initChatMessageID, String errorLabel) {
+    public EBInitChatGroupMember(List<MessageHolder> messageHolders, String initChatGroupID, String errorLabel) {
         this.errorLabel = errorLabel;
-        this.initChatMessageID = initChatMessageID;
+        this.initChatGroupID = initChatGroupID;
         this.messageHolders = messageHolders;
     }
 
@@ -28,7 +28,7 @@ public class EBInitChatGroupMember {
         return errorLabel;
     }
 
-    public String getInitChatMessageID() {
-        return initChatMessageID;
+    public String getInitChatGroupID() {
+        return initChatGroupID;
     }
 }

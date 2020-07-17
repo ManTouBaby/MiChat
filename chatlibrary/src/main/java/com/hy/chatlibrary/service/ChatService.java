@@ -162,7 +162,8 @@ public class ChatService extends Service {
     public void initChatGroupMember(EBInitChatGroupMember ebInitChatGroupMember) {//初始化群聊成员
         EBChat groupControl = new EBChat(EBChat.TYPE_GROUP_MEMBER_INIT, null, ebInitChatGroupMember.getMessageHolders(), ebInitChatGroupMember.getErrorLabel());
         EventBus.getDefault().post(groupControl);
-        if (isChatActivityForeground(this, ebInitChatGroupMember.getInitChatMessageID())) {
+        if (isChatActivityForeground(this, ebInitChatGroupMember.getInitChatGroupID())) {
+
         }
     }
 
@@ -293,10 +294,10 @@ public class ChatService extends Service {
      * 判断某个Activity 界面是否在前台 如果在前台则判断最新消息是否属于当前聊天组
      *
      * @param context
-     * @param initChatMessageID
+     * @param initChatGroupID
      * @return
      */
-    public static boolean isChatActivityForeground(Context context, String initChatMessageID) {
+    public static boolean isChatActivityForeground(Context context, String initChatGroupID) {
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         List<ActivityManager.RunningTaskInfo> list = am.getRunningTasks(1);
         boolean isChatActivityForeground = false;
@@ -306,7 +307,7 @@ public class ChatService extends Service {
                 isChatActivityForeground = true;
             }
         }
-        return isChatActivityForeground && initChatMessageID.equals(ChatActivity.mChatGroupId);
+        return isChatActivityForeground && initChatGroupID.equals(ChatActivity.mChatGroupId);
     }
 
     @Nullable
