@@ -170,7 +170,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
         String memberChatGroup = SPHelper.getInstance(this).getString(mMessageHolder.getId() + "-" + mChatGroupId);
         mMessageHolder.setGroupName(TextUtils.isEmpty(memberChatGroup) ? mMessageHolder.getName() : memberChatGroup);
         mOnChatInputListener = miChatHelper.getOnChatInputListener();
-        mChatMessageCreator = new ChatMessageCreator(mChatGroupId, mChatGroupName, miChatHelper, mMessageHolder, mHandler, this);
+        mChatMessageCreator = new ChatMessageCreator(mChatGroupType, mChatGroupId, mChatGroupName, miChatHelper, mMessageHolder, mHandler, this);
 
         mGdHelper.startContinueLocation(aMapLocationListener = aMapLocation -> {
             if (aMapLocation.getErrorCode() == 0) mAMapLocation = aMapLocation;
@@ -550,7 +550,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                 switch (ebChatManager.getType()) {
                     case EBChatManager.TYPE_UPDATE_CHAT_DISPLAY_SUCCESS:
                         mMessageHolder.setGroupName(newChatGroupName);
-                        mChatMessageCreator = new ChatMessageCreator(mChatGroupId, mChatGroupName, miChatHelper, mMessageHolder, mHandler, this);
+                        mChatMessageCreator = new ChatMessageCreator(mChatGroupType, mChatGroupId, mChatGroupName, miChatHelper, mMessageHolder, mHandler, this);
                         updateChatDisplayName(chatManagerChatMessage);
                         addMQMessage(chatManagerChatMessage);
                         break;
@@ -561,7 +561,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
                     case EBChatManager.TYPE_UPDATE_GROUP_NAME_SUCCESS:
                     case EBChatManager.MQ_UPDATE_GROUP_NAME:////群成员更新群聊名称
                         mChatGroupName = newChatGroupName;
-                        mChatMessageCreator = new ChatMessageCreator(mChatGroupId, mChatGroupName, miChatHelper, mMessageHolder, mHandler, this);
+                        mChatMessageCreator = new ChatMessageCreator(mChatGroupType, mChatGroupId, mChatGroupName, miChatHelper, mMessageHolder, mHandler, this);
                         mGroupName.setText(newChatGroupName);
                         updateChatGroupName(chatManagerChatMessage);
                         addMQMessage(chatManagerChatMessage);

@@ -100,7 +100,7 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
         miChatHelper = MiChatHelper.getInstance();
         mHolder = miChatHelper.getMessageHolder();
         mOnChatManagerListener = miChatHelper.getOnChatManagerListener();
-        mChatMessageCreator = new ChatMessageCreator(mGroupId, mOriginalGroupName, miChatHelper, mHolder, mHandler, null);
+        mChatMessageCreator = new ChatMessageCreator(mChatGroupType,mGroupId, mOriginalGroupName, miChatHelper, mHolder, mHandler, null);
         mGdHelper = new GDHelper.Builder().setNaviType(NaviType.GPS).build(getApplicationContext());
 
         mGdHelper.startContinueLocation(aMapLocation -> {
