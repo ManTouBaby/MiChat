@@ -48,11 +48,13 @@ public class ChatMessage extends BaseSmartBO {
     private String messageThumbFilePath;//网络缩率图地址
     private long messageCTMillis;//消息生成时间戳
     private long messageSTMillis;//消息发送成功时间戳
+    private int chatGroupType;//群聊类型
 
     private String messageLocationAddress;//消息发送时的位置名称
     private String messageLocationRoad;//消息发送时的位置所在路段
     private double messageLatitude;//消息发送时的纬度
     private double messageLongitude;//消息发时送的经度
+
 
 
     //语音视频共有
@@ -97,6 +99,13 @@ public class ChatMessage extends BaseSmartBO {
 //    private String messageTo;//消息发送到
 //    private String messageFrom;//消息来自
 
+    public int getChatGroupType() {
+        return chatGroupType;
+    }
+
+    public void setChatGroupType(int chatGroupType) {
+        this.chatGroupType = chatGroupType;
+    }
 
     public String getLabel() {
         return label;

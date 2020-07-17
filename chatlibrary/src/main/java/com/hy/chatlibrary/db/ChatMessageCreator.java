@@ -32,13 +32,14 @@ public class ChatMessageCreator {
     private int mChatGroupType;
     private OnLocalMessageControl localMessageControl;
 
-    public ChatMessageCreator(String mChatGroupId, String mChatGroupName, MiChatHelper mMiChatHelper, MessageHolder mMessageHolder, Handler mHandler, OnLocalMessageControl localMessageControl) {
+    public ChatMessageCreator(int mChatGroupType, String mChatGroupId, String mChatGroupName,MiChatHelper mMiChatHelper, MessageHolder mMessageHolder, Handler mHandler, OnLocalMessageControl localMessageControl) {
         this.mMiChatHelper = mMiChatHelper;
         this.mMessageHolder = mMessageHolder;
         this.mHandler = mHandler;
         this.mChatGroupId = mChatGroupId;
         this.mChatGroupName = mChatGroupName;
         this.localMessageControl = localMessageControl;
+        this.mChatGroupType = mChatGroupType;
     }
 
 
@@ -93,6 +94,7 @@ public class ChatMessageCreator {
                 chatMessage.setLatitude(latitude);
                 chatMessage.setLongitude(longitude);
             }
+            chatMessage.setChatGroupType(mChatGroupType);
             chatMessage.setMessageGroupId(mChatGroupId);
             chatMessage.setMessageGroupName(mChatGroupName);
             chatMessage.setMessageId(UUIDUtil.getUUID());

@@ -55,8 +55,8 @@ public class MiChatHelper {
     public @interface ChatGroupType {
     }
 
-    public final static int CHAT_GROUP = 0x300;//群聊
-    public final static int CHAT_PERSON = 0x400;//私聊
+    public final static int CHAT_GROUP = 0;//群聊
+    public final static int CHAT_PERSON = 1;//私聊
 
 
     private MiChatHelper() {
@@ -151,7 +151,7 @@ public class MiChatHelper {
 
     //进入聊天界面一
     public ChatMessageControl gotoChat(Context context, ChatGroupDetail chatGroupDetail) {
-        return gotoChat(context, chatGroupDetail.getMessageGroupType(), chatGroupDetail.getMessageGroupId(), chatGroupDetail.getMessageGroupName(), chatGroupDetail.getMessageGroupDes());
+        return gotoChat(context, chatGroupDetail.getMessageGroupType(), chatGroupDetail.getMessageGroupId(), chatGroupDetail.getMessageGroupName(), chatGroupDetail.getMessageGroupDes(),null);
     }
 
     //进入聊天界面二
