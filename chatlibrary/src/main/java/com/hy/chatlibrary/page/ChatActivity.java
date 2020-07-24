@@ -132,7 +132,7 @@ public class ChatActivity extends AppCompatActivity implements OnLocalMessageCon
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     private void initData(Intent intent) {
         mChatMessageDAO = DBHelper.getInstance(getApplicationContext()).getChatMessageDAO();
-        mGdHelper = new GDHelper.Builder().setNaviType(NaviType.GPS).build(getApplicationContext());
+        mGdHelper = new GDHelper.Builder().setOpenLocal(true).build(getApplicationContext());
         mChatGroupId = intent.getStringExtra(MiChatHelper.CHAT_GROUP_ID);
         mChatGroupName = intent.getStringExtra(MiChatHelper.CHAT_GROUP_NAME);
         mChatGroupDetail = intent.getStringExtra(MiChatHelper.CHAT_GROUP_DETAIL);

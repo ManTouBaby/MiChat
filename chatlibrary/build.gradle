@@ -22,7 +22,7 @@ uploadArchives {
             }
             pom.groupId = "com.hy.chatlibrary"// 唯一标识（通常为模块包名，也可以任意）
             pom.artifactId = "chatlibrary" // 项目名称（通常为类库模块名称，也可以任意）
-            pom.version = "1.1.1" // 版本号
+            pom.version = "1.1.2" // 版本号
         }
     }
 }
@@ -93,7 +93,7 @@ dependencies {
 
     api 'org.greenrobot:eventbus:3.1.1'
     api 'com.hy.filelibrary:fileLibrary:1.0.1'
-    api 'com.hy.gdlibrary:gdlibrary:1.0.3'
+    api 'com.hy.gdlibrary:gdlibrary:1.0.5'
 //    api 'com.github.ManTouBaby:FileSelectRepository:1.0.3'
     api 'com.davemorrissey.labs:subsampling-scale-image-view:3.5.0'
 //    implementation files('libs/message-center-2.1.1-RELEASE.jar')

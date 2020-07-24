@@ -101,7 +101,7 @@ public class ChatGroupDetailActivity extends AppCompatActivity {
         mHolder = miChatHelper.getMessageHolder();
         mOnChatManagerListener = miChatHelper.getOnChatManagerListener();
         mChatMessageCreator = new ChatMessageCreator(mChatGroupType,mGroupId, mOriginalGroupName, miChatHelper, mHolder, mHandler, null);
-        mGdHelper = new GDHelper.Builder().setNaviType(NaviType.GPS).build(getApplicationContext());
+        mGdHelper = new GDHelper.Builder().build(getApplicationContext());
 
         mGdHelper.startContinueLocation(aMapLocation -> {
             if (aMapLocation.getErrorCode() == 0) mAMapLocation = aMapLocation;
